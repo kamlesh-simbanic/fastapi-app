@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from datetime import timedelta
+from jose import jwt, JWTError
 
 from .. import models, schemas, utils
 from ..database import get_db
@@ -9,6 +11,27 @@ router = APIRouter(
     prefix="/auth",
     tags=["auth"]
 )
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, utils.SECRET_KEY, algorithms=[utils.ALGORITHM])
+        email: str = payload.get("sub")
+        if email is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+    
+    user = db.query(models.User).filter(models.User.email == email).first()
+    if user is None:
+        raise credentials_exception
+    return user
 
 @router.post("/register", response_model=schemas.AuthResponse)
 def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
@@ -43,6 +66,10 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
         "user": new_user,
         "token": {"access_token": access_token, "token_type": "bearer"}
     }
+
+@router.get("/me", response_model=schemas.UserOut)
+def get_me(current_user: models.User = Depends(get_current_user)):
+    return current_user
 
 @router.post("/login", response_model=schemas.AuthResponse)
 def login(user_credentials: schemas.UserLogin, db: Session = Depends(get_db)):
