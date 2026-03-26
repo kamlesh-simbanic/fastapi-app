@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import desc, or_
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime
 
-from .. import models, schemas
+from .. import models, schemas, utils
 from ..database import get_db
 from .auth import get_current_user
+from sqlalchemy import or_
 
 router = APIRouter(
     prefix="/students",
@@ -52,7 +52,9 @@ def get_students(
     db: Session = Depends(get_db), 
     current_user: models.User = Depends(get_current_user)
 ):
-    query = db.query(models.Student).filter(models.Student.status == models.StudentStatus.ACTIVE)
+    # query = db.query(models.Student).filter(models.Student.status == models.StudentStatus.ACTIVE)
+    query = db.query(models.Student)
+    
     
     # Filtering
     if search:
@@ -63,18 +65,8 @@ def get_students(
             )
         )
     
-    # Sorting
-    if not hasattr(models.Student, sort_by):
-        sort_by = "id"
-    
-    sort_field = getattr(models.Student, sort_by)
-    if order.lower() == "desc":
-        query = query.order_by(desc(sort_field))
-    else:
-        query = query.order_by(sort_field)
-    
-    # Pagination
-    return query.offset(skip).limit(limit).all()
+    # Pagination & Sorting using utility
+    return utils.apply_pagination_sort(query, models.Student, skip, limit, sort_by, order).all()
 
 @router.get("/{student_id}", response_model=schemas.StudentOut)
 def get_student(student_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):

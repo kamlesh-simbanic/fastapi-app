@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 
-from .. import models, schemas
+from .. import models, schemas, utils
 from ..database import get_db
 from .auth import get_current_user
 
@@ -24,9 +24,16 @@ def create_task(task: schemas.TaskCreate, db: Session = Depends(get_db), current
     return new_task
 
 @router.get("/", response_model=List[schemas.TaskOut])
-def get_tasks(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
-    tasks = db.query(models.Task).filter(models.Task.created_by == current_user.id).all()
-    return tasks
+def get_tasks(
+    skip: int = 0,
+    limit: int = 100,
+    sort_by: str = "id",
+    order: str = "asc",
+    db: Session = Depends(get_db), 
+    current_user: models.User = Depends(get_current_user)
+):
+    query = db.query(models.Task).filter(models.Task.created_by == current_user.id)
+    return utils.apply_pagination_sort(query, models.Task, skip, limit, sort_by, order).all()
 
 @router.get("/{task_id}", response_model=schemas.TaskOut)
 def get_task(task_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
