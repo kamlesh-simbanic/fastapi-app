@@ -21,6 +21,15 @@ class StudentBase(BaseModel):
 class StudentCreate(StudentBase):
     pass
 
+class StudentMinimal(BaseModel):
+    name: str
+    father_name: str
+    surname: str
+    mobile: str
+
+    class Config:
+        from_attributes = True
+
 class StudentUpdate(BaseModel):
     gr_no: Optional[str] = None
     name: Optional[str] = None

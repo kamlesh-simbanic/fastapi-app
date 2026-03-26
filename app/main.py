@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 from . import models
 from .database import engine, get_db
-from .routers import auth, tasks, students
+from .routers import auth, tasks, students, fees, staff, attendance
 
 load_dotenv()
 
@@ -18,6 +18,9 @@ app = FastAPI(title=os.getenv("PROJECT_NAME", "FastAPI App Starter"))
 app.include_router(auth.router)
 app.include_router(tasks.router)
 app.include_router(students.router)
+app.include_router(fees.router)
+app.include_router(staff.router)
+app.include_router(attendance.router)
 
 @app.get("/")
 async def root():
