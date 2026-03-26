@@ -5,12 +5,13 @@ from datetime import datetime
 
 from .. import models, schemas, utils
 from ..database import get_db
-from .auth import get_current_user
+from .auth import get_current_user, check_access
 from sqlalchemy import or_
 
 router = APIRouter(
     prefix="/students",
-    tags=["students"]
+    tags=["students"],
+    dependencies=[Depends(check_access([models.Department.ADMIN, models.Department.TEACHING, models.Department.MANAGEMENT]))]
 )
 
 @router.post("/", response_model=schemas.StudentOut, status_code=status.HTTP_201_CREATED)
