@@ -33,6 +33,21 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         raise credentials_exception
     return user
 
+def check_access(allowed_departments: list[models.Department]):
+    def dependency(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+        # Check if user is staff and has allowed department
+        staff = db.query(models.Staff).filter(models.Staff.user_id == current_user.id).first()
+        
+        # If user is admin (department 'admin'), they might have access to more areas
+        # But we will follow the allowed_departments list strictly
+        if not staff or staff.department not in allowed_departments:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have permission to access this resource"
+            )
+        return current_user
+    return dependency
+
 @router.post("/register", response_model=schemas.AuthResponse)
 def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     # Check for duplicate email
@@ -60,7 +75,13 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db.refresh(new_user)
     
     # Create access token
-    access_token = utils.create_access_token(data={"sub": new_user.email})
+    # Check if this user is a staff member (unlikely on registration, but for consistency)
+    staff = db.query(models.Staff).filter(models.Staff.user_id == new_user.id).first()
+    token_data = {"sub": new_user.email}
+    if staff:
+        token_data["department"] = staff.department.value
+
+    access_token = utils.create_access_token(data=token_data)
     
     return {
         "user": new_user,
@@ -83,8 +104,15 @@ def login(user_credentials: schemas.UserLogin, db: Session = Depends(get_db)):
         )
     
     access_token_expires = timedelta(minutes=utils.ACCESS_TOKEN_EXPIRE_MINUTES)
+    
+    # Check if user is staff to include department in token
+    staff = db.query(models.Staff).filter(models.Staff.user_id == user.id).first()
+    token_data = {"sub": user.email, "user_id": user.id}
+    if staff:
+        token_data["department"] = staff.department.value
+
     access_token = utils.create_access_token(
-        data={"sub": user.email}, expires_delta=access_token_expires
+        data=token_data, expires_delta=access_token_expires
     )
     
     return {

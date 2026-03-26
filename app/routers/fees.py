@@ -5,11 +5,12 @@ from typing import List, Optional
 
 from .. import models, schemas, utils
 from ..database import get_db
-from .auth import get_current_user
+from .auth import get_current_user, check_access
 
 router = APIRouter(
     prefix="/fees",
-    tags=["fees"]
+    tags=["fees"],
+    dependencies=[Depends(check_access([models.Department.MANAGEMENT, models.Department.ADMIN]))]
 )
 
 @router.post("/", response_model=schemas.FeePaymentOut, status_code=status.HTTP_201_CREATED)

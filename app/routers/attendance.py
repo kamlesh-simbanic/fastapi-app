@@ -8,9 +8,14 @@ from .. import models, schemas, utils
 from ..database import get_db
 from .auth import get_current_user
 
+from .. import models, schemas, utils
+from ..database import get_db
+from .auth import get_current_user, check_access
+
 router = APIRouter(
     prefix="/attendance",
-    tags=["attendance"]
+    tags=["attendance"],
+    dependencies=[Depends(check_access([models.Department.TEACHING]))]
 )
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
