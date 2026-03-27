@@ -246,7 +246,7 @@ export default function StaffPage() {
                                 <div key={member.id} className="group p-6 rounded-[2rem] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-indigo-500/30 transition-all hover:shadow-xl hover:shadow-indigo-500/5 relative overflow-hidden flex flex-col">
                                     <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity"><Briefcase className="w-20 h-20 text-indigo-500" /></div>
                                     <div className="absolute top-4 right-4 flex gap-2">
-                                        <Link href={`/staff/edit/${member.id}`} className="p-2 bg-white/90 dark:bg-zinc-800/90 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-400 hover:text-indigo-500 transition-all shadow-sm"><Pencil className="w-4 h-4" /></Link>
+                                        <Link href={`/staff/edit?id=${member.id}`} className="p-2 bg-white/90 dark:bg-zinc-800/90 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-400 hover:text-indigo-500 transition-all shadow-sm"><Pencil className="w-4 h-4" /></Link>
                                     </div>
 
                                     <div className="flex justify-between items-start mb-6">
@@ -312,7 +312,7 @@ export default function StaffPage() {
                                                 <td className="px-6 py-4 text-xs text-zinc-500">{new Date(member.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</td>
                                                 <td className="px-6 py-4 text-right">
                                                     <div className="flex items-center justify-end gap-1">
-                                                        <Link href={`/staff/edit/${member.id}`} className="p-2 text-zinc-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-xl transition-all"><Pencil className="w-4 h-4" /></Link>
+                                                        <Link href={`/staff/edit?id=${member.id}`} className="p-2 text-zinc-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-xl transition-all"><Pencil className="w-4 h-4" /></Link>
                                                         <button className="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all"><X className="w-4 h-4" /></button>
                                                     </div>
                                                 </td>

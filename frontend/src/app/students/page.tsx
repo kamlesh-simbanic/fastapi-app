@@ -257,7 +257,7 @@ export default function StudentsPage() {
                                     </div>
 
                                     <div className="flex items-center gap-2 mt-6">
-                                        <Link href={`/students/edit/${member.id}`} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 hover:bg-indigo-500 hover:text-white transition-all text-xs font-bold border border-zinc-100 dark:border-zinc-800">
+                                        <Link href={`/students/edit?id=${member.id}`} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 hover:bg-indigo-500 hover:text-white transition-all text-xs font-bold border border-zinc-100 dark:border-zinc-800">
                                             <Pencil className="w-3.5 h-3.5" />
                                             Update Profile
                                         </Link>
@@ -306,7 +306,7 @@ export default function StudentsPage() {
                                                 <td className="px-8 py-5 text-xs font-bold text-zinc-500 uppercase tracking-wider">{member.city}</td>
                                                 <td className="px-8 py-5 text-right">
                                                     <div className="flex items-center justify-end gap-2">
-                                                        <Link href={`/students/edit/${member.id}`} className="p-2.5 text-zinc-400 hover:text-indigo-500 hover:bg-white dark:hover:bg-zinc-800 rounded-xl transition-all shadow-sm"><Pencil className="w-4 h-4" /></Link>
+                                                        <Link href={`/students/edit?id=${member.id}`} className="p-2.5 text-zinc-400 hover:text-indigo-500 hover:bg-white dark:hover:bg-zinc-800 rounded-xl transition-all shadow-sm"><Pencil className="w-4 h-4" /></Link>
                                                         <button className="p-2.5 text-zinc-400 hover:text-red-500 hover:bg-white dark:hover:bg-zinc-800 rounded-xl transition-all opacity-0 group-hover:opacity-100 shadow-sm"><X className="w-4 h-4" /></button>
                                                     </div>
                                                 </td>

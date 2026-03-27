@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useAuth } from '@/components/AuthContext';
 import { DashboardLayout } from '@/components/DashboardLayout';
@@ -35,8 +35,9 @@ interface FormState {
     status: 'active' | 'terminated';
 }
 
-export default function EditStudentPage() {
-    const { id } = useParams();
+function EditStudentForm() {
+    const searchParams = useSearchParams();
+    const id = searchParams.get('id');
     const { user, loading: authLoading } = useAuth();
     const router = useRouter();
 
@@ -432,5 +433,17 @@ export default function EditStudentPage() {
                 </div>
             </div>
         </DashboardLayout>
+    );
+}
+
+export default function EditStudentPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-background flex items-center justify-center">
+                <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+            </div>
+        }>
+            <EditStudentForm />
+        </Suspense>
     );
 }

@@ -54,14 +54,14 @@ export const api = {
         return fetchApi(`/staff/${queryString ? `?${queryString}` : ''}`);
     },
 
-    addStaff: (data: Record<string, unknown>) => fetchApi('/staff/', {
+    addStaff: (data: Record<string, any>) => fetchApi('/staff/', {
         method: 'POST',
         body: JSON.stringify(data),
     }),
 
     getStaffById: (id: string | number) => fetchApi(`/staff/${id}`),
 
-    updateStaff: (id: string | number, data: Record<string, unknown>) => fetchApi(`/staff/${id}`, {
+    updateStaff: (id: string | number, data: Record<string, any>) => fetchApi(`/staff/${id}`, {
         method: 'PUT',
         body: JSON.stringify(data),
     }),
@@ -83,12 +83,12 @@ export const api = {
 
     getStudentById: (id: string | number) => fetchApi(`/students/${id}`),
 
-    addStudent: (data: Record<string, unknown>) => fetchApi('/students/', {
+    addStudent: (data: Record<string, any>) => fetchApi('/students/', {
         method: 'POST',
         body: JSON.stringify(data),
     }),
 
-    updateStudent: (id: string | number, data: Record<string, unknown>) => fetchApi(`/students/${id}`, {
+    updateStudent: (id: string | number, data: Record<string, any>) => fetchApi(`/students/${id}`, {
         method: 'PUT',
         body: JSON.stringify(data),
     })

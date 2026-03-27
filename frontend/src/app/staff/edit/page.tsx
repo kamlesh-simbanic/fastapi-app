@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import React, { useEffect, useState, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useAuth } from '@/components/AuthContext';
 import { DashboardLayout } from '@/components/DashboardLayout';
@@ -29,8 +29,9 @@ interface FormErrors {
     [key: string]: string;
 }
 
-export default function EditStaffPage() {
-    const { id } = useParams();
+function EditStaffForm() {
+    const searchParams = useSearchParams();
+    const id = searchParams.get('id');
     const { user, loading: authLoading } = useAuth();
     const router = useRouter();
 
@@ -357,7 +358,7 @@ export default function EditStaffPage() {
                                     Security Note
                                 </p>
                                 <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed font-medium">
-                                    Updating a staff member's information does not reset their password. To change a password, please use the account security module.
+                                    Updating a staff member&apos;s information does not reset their password. To change a password, please use the account security module.
                                 </p>
                             </div>
                         </div>
@@ -511,5 +512,17 @@ export default function EditStaffPage() {
                 </form>
             </div>
         </DashboardLayout>
+    );
+}
+
+export default function EditStaffPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-background flex items-center justify-center">
+                <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+            </div>
+        }>
+            <EditStaffForm />
+        </Suspense>
     );
 }
