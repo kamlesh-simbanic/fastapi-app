@@ -44,7 +44,7 @@ def register_user(db: Session, user_schema: schemas.UserCreate):
 
 def login_user(db: Session, user_credentials: schemas.UserLogin):
     user = db.query(models.User).filter(models.User.email == user_credentials.email).first()
-    
+    print(user)
     if not user or not utils.verify_password(user_credentials.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

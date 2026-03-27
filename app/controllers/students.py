@@ -37,14 +37,19 @@ def get_students(db: Session, skip: int = 0, limit: int = 100, sort_by: str = "i
     query = db.query(models.Student)
     
     if search:
+        search_filter = f"%{search}%"
         query = query.filter(
             or_(
-                models.Student.name.ilike(f"%{search}%"),
-                models.Student.surname.ilike(f"%{search}%")
+                models.Student.name.ilike(search_filter),
+                models.Student.surname.ilike(search_filter),
+                models.Student.gr_no.ilike(search_filter)
             )
         )
     
-    return utils.apply_pagination_sort(query, models.Student, skip, limit, sort_by, order).all()
+    total = query.count()
+    items = utils.apply_pagination_sort(query, models.Student, skip, limit, sort_by, order).all()
+    
+    return {"items": items, "total": total}
 
 def get_student(db: Session, student_id: int):
     student = db.query(models.Student).filter(models.Student.id == student_id).first()

@@ -23,6 +23,17 @@ class StaffBase(BaseModel):
 class StaffCreate(StaffBase):
     pass
 
+class StaffUpdate(BaseModel):
+    name: Optional[str] = None
+    mobile: Optional[str] = None
+    email: Optional[EmailStr] = None
+    dob: Optional[date] = None
+    department: Optional[Department] = None
+    qualification: Optional[str] = None
+    address: Optional[str] = None
+    city: Optional[str] = None
+    zip_code: Optional[str] = None
+
 class StaffOut(StaffBase):
     id: int
     user_id: int
@@ -31,3 +42,7 @@ class StaffOut(StaffBase):
 
     class Config:
         from_attributes = True
+
+class StaffList(BaseModel):
+    items: list[StaffOut]
+    total: int
