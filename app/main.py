@@ -28,7 +28,7 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy"}
+    return {"status": "healthy Status"}
 
 @app.get("/db-test")
 async def db_test(db: Session = Depends(get_db)):
