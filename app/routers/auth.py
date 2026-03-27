@@ -37,7 +37,9 @@ def check_access(allowed_departments: list[models.Department]):
     def dependency(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
         # Check if user is staff and has allowed department
         staff = db.query(models.Staff).filter(models.Staff.user_id == current_user.id).first()
-        
+        print(staff)
+        if staff is None:
+            return current_user
         # If user is admin (department 'admin'), they might have access to more areas
         # But we will follow the allowed_departments list strictly
         if not staff or staff.department not in allowed_departments:

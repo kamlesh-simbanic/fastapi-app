@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from typing import List, Optional
 from sqlalchemy import or_
+from datetime import datetime
 
 from .. import models, schemas, utils
 
@@ -40,21 +41,70 @@ def add_staff(db: Session, staff_schema: schemas.StaffCreate, current_user_id: i
     db.refresh(new_staff)
     return new_staff
 
-def list_staff(db: Session, skip: int = 0, limit: int = 100, sort_by: str = "id", order: str = "asc", search: Optional[str] = None):
+def list_staff(
+    db: Session, 
+    skip: int = 0, 
+    limit: int = 10, 
+    sort_by: str = "id", 
+    order: str = "asc", 
+    search: Optional[str] = None, 
+    departments: Optional[List[str]] = None
+):
     query = db.query(models.Staff)
-    
+
     if search:
+        search_filter = f"%{search}%"
         query = query.filter(
-            or_(
-                models.Staff.name.ilike(f"%{search}%"),
-                models.Staff.email.ilike(f"%{search}%")
-            )
+            (models.Staff.name.ilike(search_filter)) | 
+            (models.Staff.email.ilike(search_filter))
         )
 
-    return utils.apply_pagination_sort(query, models.Staff, skip, limit, sort_by, order).all()
+    if departments and len(departments) > 0:
+        query = query.filter(models.Staff.department.in_(departments))
+
+    total = query.count()
+    items = utils.apply_pagination_sort(query, models.Staff, skip, limit, sort_by, order).all()
+    
+    return {"items": items, "total": total}
 
 def get_staff(db: Session, staff_id: int):
     staff = db.query(models.Staff).filter(models.Staff.id == staff_id).first()
     if not staff:
         raise HTTPException(status_code=404, detail="Staff member not found")
+    return staff
+
+def update_staff(db: Session, staff_id: int, staff_schema: schemas.StaffUpdate, current_user_id: int):
+    staff = get_staff(db, staff_id)
+    user = db.query(models.User).filter(models.User.id == staff.user_id).first()
+
+    update_data = staff_schema.model_dump(exclude_unset=True)
+
+    # Check unique constraints if changed
+    if "email" in update_data or "mobile" in update_data:
+        email = update_data.get("email", staff.email)
+        mobile = update_data.get("mobile", staff.mobile)
+        
+        existing = db.query(models.Staff).filter(
+            (models.Staff.id != staff_id) & 
+            ((models.Staff.email == email) | (models.Staff.mobile == mobile))
+        ).first()
+        
+        if existing:
+            raise HTTPException(status_code=400, detail="Email or Mobile already exists")
+
+    # Update User if name/email/mobile changed
+    if user:
+        if "name" in update_data: user.name = update_data["name"]
+        if "email" in update_data: user.email = update_data["email"]
+        if "mobile" in update_data: user.mobile = update_data["mobile"]
+
+    # Update Staff
+    for key, value in update_data.items():
+        setattr(staff, key, value)
+    
+    staff.updated_by_id = current_user_id
+    staff.updated_at = datetime.utcnow()
+
+    db.commit()
+    db.refresh(staff)
     return staff

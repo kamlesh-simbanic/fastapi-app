@@ -48,3 +48,7 @@ class StudentOut(StudentBase):
 
     class Config:
         from_attributes = True
+
+class StudentList(BaseModel):
+    items: list[StudentOut]
+    total: int

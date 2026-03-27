@@ -18,7 +18,7 @@ router = APIRouter(
 def create_student(student: schemas.StudentCreate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     return controllers.students.create_student(db, student)
 
-@router.get("/", response_model=List[schemas.StudentOut])
+@router.get("/", response_model=schemas.StudentList)
 def get_students(
     skip: int = 0, 
     limit: int = 100, 
