@@ -41,18 +41,18 @@ export function SideNav({ isOpen, setIsOpen }: SideNavProps) {
 
     return (
         <aside className={cn(
-            "fixed inset-y-0 left-0 z-40 bg-zinc-50 dark:bg-zinc-950 border-r border-zinc-200 dark:border-zinc-800 transition-all duration-300",
+            "fixed inset-y-0 left-0 z-40 bg-zinc-50 dark:bg-zinc-950 border-r border-zinc-200 dark:border-zinc-800 transition-all duration-300 overflow-hidden",
             isOpen ? "w-64" : "w-20 -translate-x-full lg:translate-x-0"
         )}>
-            <div className="flex flex-col h-full">
+            <div className="flex flex-col h-full w-64">
                 {/* Logo */}
-                <div className="h-16 flex items-center px-6 gap-3 border-b border-zinc-200 dark:border-zinc-800/50 mb-6">
+                <div className="h-16 flex items-center px-6 gap-3 border-b border-zinc-200 dark:border-zinc-800/50 mb-6 flex-shrink-0">
                     <div className="w-8 h-8 rounded-lg bg-indigo-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-indigo-500/20">
                         <Layers className="w-5 h-5 text-white" />
                     </div>
                     <span className={cn(
-                        "font-bold text-xl italic tracking-tight transition-opacity duration-300 whitespace-nowrap text-zinc-900 dark:text-white",
-                        !isOpen ? "lg:opacity-0" : "opacity-100"
+                        "font-bold text-xl italic tracking-tight transition-all duration-300 whitespace-nowrap text-zinc-900 dark:text-white",
+                        isOpen ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4 pointer-events-none"
                     )}>
                         FastStack
                     </span>
@@ -61,7 +61,7 @@ export function SideNav({ isOpen, setIsOpen }: SideNavProps) {
                 {/* Nav Items */}
                 <nav className="flex-1 px-3 space-y-1">
                     {navItems.map((item) => {
-                        const isActive = pathname === item.href;
+                        const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
                         return (
                             <Link
                                 key={item.href}
@@ -78,8 +78,8 @@ export function SideNav({ isOpen, setIsOpen }: SideNavProps) {
                                     isActive ? "text-indigo-600 dark:text-indigo-400" : "text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-white"
                                 )} />
                                 <span className={cn(
-                                    "text-sm font-medium transition-opacity duration-300",
-                                    !isOpen ? "lg:opacity-0" : "opacity-100"
+                                    "text-sm font-medium transition-all duration-300 whitespace-nowrap",
+                                    isOpen ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4 pointer-events-none"
                                 )}>
                                     {item.label}
                                 </span>
@@ -103,8 +103,8 @@ export function SideNav({ isOpen, setIsOpen }: SideNavProps) {
                         >
                             <item.icon className="w-5 h-5 flex-shrink-0 group-hover:scale-110 transition-transform" />
                             <span className={cn(
-                                "text-sm font-medium transition-opacity duration-300",
-                                !isOpen ? "lg:opacity-0" : "opacity-100"
+                                "text-sm font-medium transition-all duration-300 whitespace-nowrap",
+                                isOpen ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4 pointer-events-none"
                             )}>
                                 {item.label}
                             </span>
@@ -121,12 +121,12 @@ export function SideNav({ isOpen, setIsOpen }: SideNavProps) {
                         className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all group hidden lg:flex"
                     >
                         <ChevronLeft className={cn(
-                            "w-5 h-5 transition-transform duration-300",
+                            "w-5 h-5 transition-transform duration-300 flex-shrink-0",
                             !isOpen && "rotate-180"
                         )} />
                         <span className={cn(
-                            "text-sm font-medium transition-opacity duration-300",
-                            !isOpen && "opacity-0"
+                            "text-sm font-medium transition-all duration-300 whitespace-nowrap",
+                            isOpen ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4 pointer-events-none"
                         )}>
                             Collapse Menu
                         </span>

@@ -84,9 +84,10 @@ export default function StudentsPage() {
             });
             setStudents(data.items);
             setTotal(data.total);
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Failed to fetch students:', err);
-            setError('Failed to load students. Please try again.');
+            const msg = err instanceof Error ? err.message : 'Failed to load students. Please try again.';
+            setError(msg);
         } finally {
             setLoading(false);
         }
@@ -109,6 +110,13 @@ export default function StudentsPage() {
             return () => clearTimeout(timer);
         }
     }, [fetchStudents, user]);
+
+    useEffect(() => {
+        // Switch to grid view on small screens by default
+        if (window.innerWidth < 1024) {
+            setViewMode('grid');
+        }
+    }, []);
 
     useEffect(() => {
         setPage(1);
@@ -194,6 +202,13 @@ export default function StudentsPage() {
 
                 {/* Main Content */}
                 <div className="min-h-[400px]">
+                    {error && (
+                        <div className="mb-8 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center gap-3 text-red-500 animate-in slide-in-from-top-2">
+                            <X className="w-5 h-5 flex-shrink-0 cursor-pointer" onClick={() => setError(null)} />
+                            <p className="text-sm font-bold uppercase tracking-tight">{error}</p>
+                        </div>
+                    )}
+
                     {loading ? (
                         <div className="flex flex-col items-center justify-center py-32 gap-4 text-zinc-500 animate-in fade-in duration-500">
                             <Loader2 className="w-12 h-12 text-indigo-500 animate-spin" />

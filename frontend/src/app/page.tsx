@@ -53,7 +53,6 @@ export default function Home() {
       setStatus(prev => ({ ...prev, backend: 'loading', db: 'loading' }));
 
       try {
-        const rootData = await api.getRoot();
         const dbData = await api.getDbStatus();
         const statsData = await api.getDashboardStats();
 
@@ -61,7 +60,7 @@ export default function Home() {
         setStatus({
           backend: 'online',
           db: dbData.status === 'connected' ? 'online' : 'offline',
-          message: rootData.message || 'Connection established successfully!',
+          message: 'Connection established successfully!',
         });
       } catch (error) {
         console.error('Data fetch failed:', error);

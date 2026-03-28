@@ -73,7 +73,7 @@ function EditStudentForm() {
                         zip_code: data.zip_code,
                         status: data.status,
                     });
-                } catch (err: any) {
+                } catch (err: unknown) {
                     console.error('Failed to load student:', err);
                     setError('Unable to locate academic record.');
                 } finally {
@@ -142,9 +142,10 @@ function EditStudentForm() {
             setTimeout(() => {
                 router.push('/students');
             }, 1000);
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Update failed:', err);
-            setError(err.message || 'Failed to update academic profile.');
+            const msg = err instanceof Error ? err.message : 'Failed to update academic profile.';
+            setError(msg);
         } finally {
             setSubmitting(false);
         }
@@ -211,7 +212,7 @@ function EditStudentForm() {
                             </div>
                         </div>
                     ) : (
-                        <form onSubmit={handleSubmit} className="p-8 md:p-12 space-y-10">
+                        <form onSubmit={handleSubmit} className="p-6 sm:p-8 md:p-12 space-y-10">
                             {/* Personal Info Section */}
                             <div className="space-y-8">
                                 <div className="flex items-center gap-3 pb-4 border-b border-zinc-100 dark:border-zinc-800/50">

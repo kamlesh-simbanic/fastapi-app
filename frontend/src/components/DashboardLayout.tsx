@@ -6,7 +6,14 @@ import { TopNav } from './TopNav';
 import { cn } from '@/lib/utils';
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+    React.useEffect(() => {
+        // Open sidebar by default on large screens
+        if (window.innerWidth >= 1024) {
+            setIsSidebarOpen(true);
+        }
+    }, []);
 
     return (
         <div className="flex min-h-screen bg-background text-foreground transition-colors duration-300">
@@ -18,7 +25,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             )}>
                 <TopNav onMenuClick={() => setIsSidebarOpen(true)} />
 
-                <main className="flex-1 overflow-y-auto p-6 lg:p-10 relative">
+                <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-10 relative">
                     {/* Subtle Page Background Decoration */}
                     <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-600/5 dark:bg-indigo-600/10 blur-[120px] rounded-full pointer-events-none -z-10" />
 

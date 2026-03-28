@@ -16,7 +16,7 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
         headers.set('Authorization', `Bearer ${token}`);
     }
 
-    const response = await fetch(`${API_URL}/api${endpoint}`, {
+    const response = await fetch(`${API_URL}${endpoint}`, {
         ...options,
         headers,
     });
@@ -30,15 +30,14 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
 }
 
 export const api = {
-    getHealth: () => fetchApi('/health'),
-    getDbStatus: () => fetchApi('/db-test'),
-    getRoot: () => fetchApi('/'),
-    login: (credentials: Record<string, string>) => fetchApi('/auth/login', {
+    getHealth: () => fetchApi('/api/health'),
+    getDbStatus: () => fetchApi('/api/db-test'),
+    login: (credentials: Record<string, string>) => fetchApi('/api/auth/login', {
         method: 'POST',
         body: JSON.stringify(credentials),
     }),
-    getMe: () => fetchApi('/auth/me'),
-    getDashboardStats: () => fetchApi('/dashboard/stats'),
+    getMe: () => fetchApi('/api/auth/me'),
+    getDashboardStats: () => fetchApi('/api/dashboard/stats'),
 
     getStaff: (params: { search?: string; department?: string[]; skip?: number; limit?: number; sort_by?: string; order?: string } = {}) => {
         const query = new URLSearchParams();
@@ -51,17 +50,17 @@ export const api = {
         if (params.sort_by) query.append('sort_by', params.sort_by);
         if (params.order) query.append('order', params.order);
         const queryString = query.toString();
-        return fetchApi(`/staff/${queryString ? `?${queryString}` : ''}`);
+        return fetchApi(`/api/staff/${queryString ? `?${queryString}` : ''}`);
     },
 
-    addStaff: (data: Record<string, any>) => fetchApi('/staff/', {
+    addStaff: (data: Record<string, any>) => fetchApi('/api/staff/', {
         method: 'POST',
         body: JSON.stringify(data),
     }),
 
-    getStaffById: (id: string | number) => fetchApi(`/staff/${id}`),
+    getStaffById: (id: string | number) => fetchApi(`/api/staff/${id}`),
 
-    updateStaff: (id: string | number, data: Record<string, any>) => fetchApi(`/staff/${id}`, {
+    updateStaff: (id: string | number, data: Record<string, any>) => fetchApi(`/api/staff/${id}`, {
         method: 'PUT',
         body: JSON.stringify(data),
     }),
@@ -78,17 +77,17 @@ export const api = {
                 }
             }
         });
-        return fetchApi(`/students/?${query.toString()}`);
+        return fetchApi(`/api/students/?${query.toString()}`);
     },
 
-    getStudentById: (id: string | number) => fetchApi(`/students/${id}`),
+    getStudentById: (id: string | number) => fetchApi(`/api/students/${id}`),
 
-    addStudent: (data: Record<string, any>) => fetchApi('/students/', {
+    addStudent: (data: Record<string, any>) => fetchApi('/api/students/', {
         method: 'POST',
         body: JSON.stringify(data),
     }),
 
-    updateStudent: (id: string | number, data: Record<string, any>) => fetchApi(`/students/${id}`, {
+    updateStudent: (id: string | number, data: Record<string, any>) => fetchApi(`/api/students/${id}`, {
         method: 'PUT',
         body: JSON.stringify(data),
     })

@@ -115,9 +115,10 @@ export default function AddStudentPage() {
             setTimeout(() => {
                 router.push('/students');
             }, 1500);
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Registration failed:', err);
-            setError(err.message || 'Failed to register student. Please check the details.');
+            const msg = err instanceof Error ? err.message : 'Failed to register student. Please check the details.';
+            setError(msg);
         } finally {
             setSubmitting(false);
         }
@@ -172,7 +173,7 @@ export default function AddStudentPage() {
                             </div>
                         </div>
                     ) : (
-                        <form onSubmit={handleSubmit} className="p-8 md:p-12 space-y-10">
+                        <form onSubmit={handleSubmit} className="p-6 sm:p-8 md:p-12 space-y-10">
                             {/* Personal Info Section */}
                             <div className="space-y-8">
                                 <div className="flex items-center gap-3 pb-4 border-b border-zinc-100 dark:border-zinc-800/50">

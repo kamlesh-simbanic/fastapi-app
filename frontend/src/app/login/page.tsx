@@ -69,7 +69,7 @@ export default function LoginPage() {
                     <p className="text-zinc-500">Enter your credentials to access your account</p>
                 </div>
 
-                <div className="bg-zinc-900/50 border border-zinc-800 p-8 rounded-3xl backdrop-blur-xl">
+                <div className="bg-zinc-900/50 border border-zinc-800 p-6 sm:p-8 rounded-3xl backdrop-blur-xl">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {error && (
                             <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center gap-3 text-red-400 text-sm animate-in fade-in slide-in-from-top-1">

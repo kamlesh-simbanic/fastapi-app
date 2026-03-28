@@ -86,9 +86,10 @@ export default function StaffPage() {
             });
             setStaff(data.items);
             setTotal(data.total);
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Failed to fetch staff:', err);
-            setError('Failed to load staff members. Please try again.');
+            const msg = err instanceof Error ? err.message : 'Failed to load staff members. Please try again.';
+            setError(msg);
         } finally {
             setLoading(false);
         }
@@ -111,6 +112,15 @@ export default function StaffPage() {
             return () => clearTimeout(timer);
         }
     }, [fetchStaff, user]);
+
+    useEffect(() => {
+        // Set view mode based on screen size on mount
+        if (window.innerWidth < 1024) {
+            setViewMode('grid');
+        } else {
+            setViewMode('grid'); // Staff defaults to grid anyway
+        }
+    }, []);
 
     useEffect(() => {
         setPage(1);
@@ -229,6 +239,13 @@ export default function StaffPage() {
 
                 {/* Main Content */}
                 <div className="min-h-[400px]">
+                    {error && (
+                        <div className="mb-8 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center gap-3 text-red-500 animate-in slide-in-from-top-2">
+                            <X className="w-5 h-5 flex-shrink-0 cursor-pointer" onClick={() => setError(null)} />
+                            <p className="text-sm font-bold uppercase tracking-tight">{error}</p>
+                        </div>
+                    )}
+
                     {loading ? (
                         <div className="flex flex-col items-center justify-center py-20 gap-4">
                             <Loader2 className="w-10 h-10 text-indigo-500 animate-spin" />
