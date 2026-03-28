@@ -115,4 +115,19 @@ export const api = {
     deleteClass: (id: string | number) => fetchApi(`/api/classes/${id}`, {
         method: 'DELETE',
     }),
+
+    // Class Students
+    getClassStudents: (params: Record<string, unknown> = {}) => fetchApi(`/api/class-students/${buildQuery(params)}`),
+    getClassStudentById: (id: string | number) => fetchApi(`/api/class-students/${id}`),
+    addClassStudent: (data: Record<string, unknown>) => fetchApi('/api/class-students/', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    }),
+    updateClassStudent: (id: string | number, data: Record<string, unknown>) => fetchApi(`/api/class-students/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+    }),
+    deleteClassStudent: (id: string | number) => fetchApi(`/api/class-students/${id}`, {
+        method: 'DELETE',
+    }),
 };
