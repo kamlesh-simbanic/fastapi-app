@@ -101,4 +101,18 @@ export const api = {
         method: 'POST',
         body: JSON.stringify(data),
     }),
+
+    // Classes
+    getClasses: (params: Record<string, unknown> = {}) => fetchApi(`/api/classes/${buildQuery(params)}`),
+    addClass: (data: Record<string, unknown>) => fetchApi('/api/classes/', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    }),
+    updateClass: (id: string | number, data: Record<string, unknown>) => fetchApi(`/api/classes/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+    }),
+    deleteClass: (id: string | number) => fetchApi(`/api/classes/${id}`, {
+        method: 'DELETE',
+    }),
 };
