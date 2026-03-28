@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { api } from '@/lib/api';
+import { api, API_URL } from '@/lib/api';
 import { useAuth } from '@/components/AuthContext';
 import { DashboardLayout } from '@/components/DashboardLayout';
 import {
@@ -152,7 +152,7 @@ export default function Home() {
           <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* API Access Card */}
             <a
-              href="http://localhost:8000/docs"
+              href={`${API_URL}/docs`}
               target="_blank"
               className="group p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-indigo-500/50 transition-all flex flex-col justify-between h-48 relative overflow-hidden"
             >

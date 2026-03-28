@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 const getAuthToken = () => {
     if (typeof window !== 'undefined') {
@@ -16,7 +16,7 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
         headers.set('Authorization', `Bearer ${token}`);
     }
 
-    const response = await fetch(`${API_URL}${endpoint}`, {
+    const response = await fetch(`${API_URL}/api${endpoint}`, {
         ...options,
         headers,
     });
