@@ -69,8 +69,9 @@ export default function ClassesPage() {
                 api.getClasses({ search, limit: 100 }),
                 api.getStaff({ department: 'teaching', limit: 100 })
             ]);
+
             setClasses(classesData);
-            setStaff(staffData);
+            setStaff(staffData.items);
         } catch (err: unknown) {
             console.error('Failed to fetch data:', err);
             setError('Failed to load classes or staff information.');
