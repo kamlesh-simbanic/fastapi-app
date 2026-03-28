@@ -36,7 +36,7 @@ interface SideNavProps {
     setIsOpen: (open: boolean) => void;
 }
 
-export function SideNav({ isOpen, setIsOpen }: SideNavProps) {
+export const SideNav = React.memo(function SideNav({ isOpen, setIsOpen }: SideNavProps) {
     const pathname = usePathname();
 
     return (
@@ -135,4 +135,4 @@ export function SideNav({ isOpen, setIsOpen }: SideNavProps) {
             </div>
         </aside>
     );
-}
+});

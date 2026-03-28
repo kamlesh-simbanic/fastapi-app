@@ -20,8 +20,8 @@ class FeePayment(Base):
     id = Column(Integer, primary_key=True, index=True)
     gr_no = Column(String(50), index=True)
     student_id = Column(Integer, ForeignKey("students.id"))
-    term = Column(Enum(FeeTerm))
-    year = Column(Integer)
+    term = Column(Enum(FeeTerm), index=True)
+    year = Column(Integer, index=True)
     amount = Column(Float)
     
     payment_method = Column(Enum(PaymentMethod), default=PaymentMethod.cash)
