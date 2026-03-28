@@ -90,5 +90,26 @@ export const api = {
     updateStudent: (id: string | number, data: Record<string, any>) => fetchApi(`/api/students/${id}`, {
         method: 'PUT',
         body: JSON.stringify(data),
-    })
+    }),
+
+    // Fees
+    getPayments: (params: Record<string, any> = {}) => {
+        const query = new URLSearchParams();
+        Object.entries(params).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+                if (Array.isArray(value)) {
+                    value.forEach(v => query.append(key, v));
+                } else {
+                    query.append(key, value.toString());
+                }
+            }
+        });
+        const queryString = query.toString();
+        return fetchApi(`/api/fees/?${queryString}`);
+    },
+
+    addPayment: (data: Record<string, any>) => fetchApi('/api/fees/', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    }),
 };

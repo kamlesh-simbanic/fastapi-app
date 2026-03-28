@@ -8,12 +8,19 @@ class FeeTerm(str, Enum):
     SUMMER = "summer"
     WINTER = "winter"
 
+class PaymentMethod(str, Enum):
+    cash = "cash"
+    upi = "upi"
+    cheque = "cheque"
+
 class FeePaymentBase(BaseModel):
     gr_no: str
     student_id: int
     term: FeeTerm
     year: int
     amount: float
+    payment_method: PaymentMethod = PaymentMethod.cash
+    payment_details: Optional[str] = None
 
 class FeePaymentCreate(FeePaymentBase):
     pass

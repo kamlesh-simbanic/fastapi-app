@@ -9,6 +9,11 @@ class FeeTerm(enum.Enum):
     SUMMER = "summer"
     WINTER = "winter"
 
+class PaymentMethod(enum.Enum):
+    cash = "cash"
+    upi = "upi"
+    cheque = "cheque"
+
 class FeePayment(Base):
     __tablename__ = "fee_payments"
 
@@ -18,6 +23,9 @@ class FeePayment(Base):
     term = Column(Enum(FeeTerm))
     year = Column(Integer)
     amount = Column(Float)
+    
+    payment_method = Column(Enum(PaymentMethod), default=PaymentMethod.cash)
+    payment_details = Column(String(255), nullable=True) # upi_transaction id, cheque no
     
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
