@@ -20,6 +20,8 @@ import { cn } from '@/lib/utils';
 const navItems = [
     { icon: LayoutDashboard, label: 'Dashboard', href: '/' },
     { icon: Users, label: 'Students', href: '/students' },
+    { icon: Layers, label: 'Classes', href: '/classes' },
+    { icon: Users, label: 'Class Assignments', href: '/class-students' },
     { icon: BookOpen, label: 'Courses', href: '/courses' },
     { icon: Calendar, label: 'Attendance', href: '/attendance' },
     { icon: CreditCard, label: 'Fees', href: '/fees' },
@@ -36,7 +38,7 @@ interface SideNavProps {
     setIsOpen: (open: boolean) => void;
 }
 
-export function SideNav({ isOpen, setIsOpen }: SideNavProps) {
+export const SideNav = React.memo(function SideNav({ isOpen, setIsOpen }: SideNavProps) {
     const pathname = usePathname();
 
     return (
@@ -135,4 +137,4 @@ export function SideNav({ isOpen, setIsOpen }: SideNavProps) {
             </div>
         </aside>
     );
-}
+});

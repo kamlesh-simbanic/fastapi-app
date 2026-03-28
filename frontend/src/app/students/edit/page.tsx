@@ -6,7 +6,6 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/components/AuthContext';
 import { DashboardLayout } from '@/components/DashboardLayout';
 import {
-    Users,
     ArrowLeft,
     Check,
     AlertCircle,
@@ -33,6 +32,7 @@ interface FormState {
     city: string;
     zip_code: string;
     status: 'active' | 'terminated';
+    [key: string]: unknown;
 }
 
 function EditStudentForm() {

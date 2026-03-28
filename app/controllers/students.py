@@ -33,8 +33,11 @@ def create_student(db: Session, student_schema: schemas.StudentCreate):
     db.refresh(new_student)
     return new_student
 
-def get_students(db: Session, skip: int = 0, limit: int = 100, sort_by: str = "id", order: str = "asc", search: Optional[str] = None):
+def get_students(db: Session, skip: int = 0, limit: int = 100, sort_by: str = "id", order: str = "asc", search: Optional[str] = None, student_ids: Optional[List[int]] = None):
     query = db.query(models.Student)
+    
+    if student_ids:
+        query = query.filter(models.Student.id.in_(student_ids))
     
     if search:
         search_filter = f"%{search}%"

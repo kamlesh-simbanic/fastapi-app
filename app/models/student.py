@@ -19,4 +19,4 @@ class Student(Base):
     address = Column(String(255))
     city = Column(String(100))
     zip_code = Column(String(20))
-    status = Column(SQLAlchemyEnum(StudentStatus), default=StudentStatus.ACTIVE)
+    status = Column(SQLAlchemyEnum(StudentStatus), default=StudentStatus.ACTIVE, index=True)

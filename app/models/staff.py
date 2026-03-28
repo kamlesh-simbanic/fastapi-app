@@ -19,7 +19,7 @@ class Staff(Base):
     mobile = Column(String(15), unique=True, index=True)
     email = Column(String(100), unique=True, index=True)
     dob = Column(Date)
-    department = Column(Enum(Department))
+    department = Column(Enum(Department), index=True)
     qualification = Column(String(255))
     address = Column(String(255))
     city = Column(String(100))

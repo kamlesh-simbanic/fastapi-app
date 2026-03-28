@@ -8,3 +8,5 @@ from .attendance import (
     AttendanceBulkCreate, AttendanceBulkUpdate, AttendanceStatus,
     StudentAttendanceReport
 )
+from .school_class import SchoolClassBase, SchoolClassCreate, SchoolClassUpdate, SchoolClass,StaffSimple
+from .class_student import ClassStudentBase, ClassStudentCreate, ClassStudentUpdate, ClassStudent

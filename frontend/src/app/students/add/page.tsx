@@ -30,6 +30,7 @@ interface FormState {
     city: string;
     zip_code: string;
     status: 'active' | 'terminated';
+    [key: string]: unknown;
 }
 
 const INITIAL_STATE: FormState = {

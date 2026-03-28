@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime
@@ -25,10 +25,11 @@ def get_students(
     sort_by: str = "id", 
     order: str = "asc",
     search: Optional[str] = None,
+    student_ids: Optional[List[int]] = Query(None),
     db: Session = Depends(get_db), 
     current_user: models.User = Depends(get_current_user)
 ):
-    return controllers.students.get_students(db, skip, limit, sort_by, order, search)
+    return controllers.students.get_students(db, skip, limit, sort_by, order, search, student_ids)
 
 @router.get("/{student_id}", response_model=schemas.StudentOut)
 def get_student(student_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):

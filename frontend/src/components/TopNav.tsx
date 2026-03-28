@@ -16,7 +16,7 @@ interface TopNavProps {
     onMenuClick?: () => void;
 }
 
-export function TopNav({ onMenuClick }: TopNavProps) {
+export const TopNav = React.memo(function TopNav({ onMenuClick }: TopNavProps) {
     const { user, logout } = useAuth();
 
     return (
@@ -82,4 +82,4 @@ export function TopNav({ onMenuClick }: TopNavProps) {
             </div>
         </header>
     );
-}
+});
