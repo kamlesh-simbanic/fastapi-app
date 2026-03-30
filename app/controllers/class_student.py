@@ -37,7 +37,10 @@ def list_class_students(db: Session, skip: int = 0, limit: int = 100, sort_by: s
     if academic_year:
         query = query.filter(models.ClassStudent.academic_year == academic_year)
 
-    return utils.apply_pagination_sort(query, models.ClassStudent, skip, limit, sort_by, order).all()
+    total = query.count()
+    items = utils.apply_pagination_sort(query, models.ClassStudent, skip, limit, sort_by, order).all()
+    
+    return {"items": items, "total": total}
 
 def update_class_student(db: Session, mapping_id: int, student_schema: schemas.ClassStudentUpdate, current_user_id: int):
     db_mapping = get_class_student(db, mapping_id)
@@ -57,3 +60,12 @@ def delete_class_student(db: Session, mapping_id: int):
     db.delete(db_mapping)
     db.commit()
     return {"detail": "Class mapping deleted successfully"}
+
+def get_students_by_class(db: Session, class_id: int):
+    mapping = db.query(models.ClassStudent).filter(models.ClassStudent.class_id == class_id).order_by(models.ClassStudent.id.desc()).first()
+    if not mapping or not mapping.students:
+        return []
+    
+    student_ids = mapping.students
+    students = db.query(models.Student).filter(models.Student.id.in_(student_ids)).all()
+    return students

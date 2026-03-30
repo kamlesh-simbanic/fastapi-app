@@ -36,7 +36,7 @@ class StaffUpdate(BaseModel):
 
 class StaffOut(StaffBase):
     id: int
-    user_id: int
+    user_id: Optional[int]
     created_at: datetime
     updated_at: datetime
 

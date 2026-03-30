@@ -19,7 +19,7 @@ def create_class(
 ):
     return controllers.school_class.add_class(db, class_schema, current_user.id)
 
-@router.get("/", response_model=List[schemas.SchoolClass])
+@router.get("/", response_model=schemas.SchoolClassList)
 def list_classes(
     skip: int = Query(0, ge=0),
     limit: int = Query(10, ge=1, le=100),

@@ -2,92 +2,81 @@ from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import extract, and_, or_
 from fastapi import HTTPException, status
 from typing import List, Optional
-from datetime import date
+from datetime import date, datetime
 
 from .. import models, schemas, utils
 
-def add_attendance_bulk(db: Session, bulk_data: schemas.AttendanceBulkCreate, current_user_id: int):
-    attendance_records = []
-    for record in bulk_data.records:
-        existing = db.query(models.Attendance).filter(
-            and_(
-                models.Attendance.student_id == record.student_id,
-                models.Attendance.date == record.date,
-                models.Attendance.period == record.period
-            )
-        ).first()
-        
-        if existing:
-            continue
+def add_attendance_bulk_new(db: Session, data: schemas.AttendanceBulkCreateNew, current_user_id: int):
+    # Check if a record already exists for this class and date
+    existing = db.query(models.Attendance).filter(
+        models.Attendance.class_id == data.class_id,
+        models.Attendance.date == data.date
+    ).first()
 
+    records_json = [r.model_dump() for r in data.records]
+
+    if existing:
+        existing.records = records_json
+        existing.updated_at = datetime.utcnow()
+        existing.updated_by_id = current_user_id
+    else:
         new_attendance = models.Attendance(
-            **record.model_dump(),
+            class_id=data.class_id,
+            date=data.date,
+            records=records_json,
             created_by_id=current_user_id,
             updated_by_id=current_user_id
         )
-        attendance_records.append(new_attendance)
+        db.add(new_attendance)
 
-    if attendance_records:
-        db.bulk_save_objects(attendance_records)
-        db.commit()
-    
-    return {"detail": f"Successfully added {len(attendance_records)} records"}
-
-def update_attendance_bulk(db: Session, bulk_data: schemas.AttendanceBulkUpdate, current_user_id: int):
-    updated_count = 0
-    for record in bulk_data.records:
-        attendance_query = db.query(models.Attendance).filter(models.Attendance.id == record.id)
-        attendance = attendance_query.first()
-        if attendance:
-            attendance_query.update({
-                "status": record.status,
-                "updated_by_id": current_user_id,
-                "updated_at": date.today()
-            }, synchronize_session=False)
-            updated_count += 1
-    
     db.commit()
-    return {"detail": f"Successfully updated {updated_count} records"}
+    return {"detail": "Attendance recorded successfully"}
 
-def view_attendance(db: Session, skip: int = 0, limit: int = 100, sort_by: str = "date", order: str = "desc", day: Optional[date] = None, month: Optional[int] = None, year: Optional[int] = None, search: Optional[str] = None):
-    query = db.query(models.Attendance).options(joinedload(models.Attendance.student))
+def view_attendance(db: Session, skip: int = 0, limit: int = 100, sort_by: str = "date", order: str = "desc", class_id: Optional[int] = None, day: Optional[date] = None, month: Optional[int] = None, year: Optional[int] = None):
+    query = db.query(models.Attendance).options(joinedload(models.Attendance.school_class))
     
+    if class_id:
+        query = query.filter(models.Attendance.class_id == class_id)
     if day:
         query = query.filter(models.Attendance.date == day)
     if month:
         query = query.filter(extract('month', models.Attendance.date) == month)
     if year:
         query = query.filter(extract('year', models.Attendance.date) == year)
-    if search:
-        query = query.join(models.Student).filter(
-            or_(
-                models.Student.name.ilike(f"%{search}%"),
-                models.Student.surname.ilike(f"%{search}%")
-            )
-        )
 
     return utils.apply_pagination_sort(query, models.Attendance, skip, limit, sort_by, order).all()
 
-def view_monthly_attendance_report(db: Session, month: int, year: int, standard: str):
-    records = db.query(models.Attendance).options(joinedload(models.Attendance.student)).filter(
+def view_monthly_attendance_report(db: Session, month: int, year: int, class_id: int):
+    # Get class students to have names
+    class_mapping = db.query(models.ClassStudent).filter(models.ClassStudent.class_id == class_id).first()
+    if not class_mapping:
+        return []
+    
+    students = db.query(models.Student).filter(models.Student.id.in_(class_mapping.students)).all()
+    student_map = {s.id: f"{s.name} {s.surname}" for s in students}
+
+    records = db.query(models.Attendance).filter(
         and_(
             extract('month', models.Attendance.date) == month,
             extract('year', models.Attendance.date) == year,
-            models.Attendance.standard == standard
+            models.Attendance.class_id == class_id
         )
     ).all()
 
     report_dict = {}
+    for s_id, s_name in student_map.items():
+        report_dict[s_id] = {
+            "student_id": s_id,
+            "name": s_name,
+            "data": {}
+        }
+
     for record in records:
-        student_id = record.student_id
-        if student_id not in report_dict:
-            report_dict[student_id] = {
-                "student_id": student_id,
-                "name": record.student.name,
-                "surname": record.student.surname,
-                "data": {}
-            }
-        
-        report_dict[student_id]["data"][str(record.date.day)] = record.status
+        day = str(record.date.day)
+        for r in record.records:
+            s_id = r.get("student_id")
+            if s_id in report_dict:
+                status = r.get("status")
+                report_dict[s_id]["data"][day] = "present" if status == "P" or status == "present" else "absent"
 
     return list(report_dict.values())

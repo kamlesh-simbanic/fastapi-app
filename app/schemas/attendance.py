@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime, date
-from typing import List, Optional
+from typing import List, Optional, Dict
 from enum import Enum
 from .student import StudentMinimal
 
@@ -8,38 +8,33 @@ class AttendanceStatus(str, Enum):
     PRESENT = "present"
     ABSENT = "absent"
 
-class AttendanceBase(BaseModel):
-    gr_no: str
+class AttendanceRecord(BaseModel):
     student_id: int
-    standard: str
-    period: int
+    status: str # "P" or "A"
+
+class AttendanceBase(BaseModel):
+    class_id: int
     date: date
-    status: AttendanceStatus
+    records: List[AttendanceRecord]
 
 class AttendanceCreate(AttendanceBase):
     pass
 
-class AttendanceUpdate(BaseModel):
-    id: int # Required for bulk updates
-    status: AttendanceStatus
+class AttendanceUpdate(AttendanceBase):
+    pass
 
 class AttendanceOut(AttendanceBase):
     id: int
     created_at: datetime
     updated_at: datetime
-    student: Optional[StudentMinimal] = None
 
     class Config:
         from_attributes = True
 
-class AttendanceBulkCreate(BaseModel):
-    records: List[AttendanceCreate]
-
-class AttendanceBulkUpdate(BaseModel):
-    records: List[AttendanceUpdate]
+class AttendanceBulkCreateNew(AttendanceBase):
+    pass
 
 class StudentAttendanceReport(BaseModel):
     student_id: int
     name: str
-    # surname: str
     data: dict # Format { "1": "present", "2": "absent", ... }

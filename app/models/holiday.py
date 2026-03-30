@@ -1,31 +1,21 @@
-from sqlalchemy import Column, Integer, String, Date, ForeignKey, DateTime, Enum, UniqueConstraint, JSON
+from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
-import enum
 
 from ..database import Base
 
-class AttendanceStatus(enum.Enum):
-    PRESENT = "present"
-    ABSENT = "absent"
-
-class Attendance(Base):
-    __tablename__ = "attendance"
+class Holiday(Base):
+    __tablename__ = "holidays"
 
     id = Column(Integer, primary_key=True, index=True)
-    class_id = Column(Integer, ForeignKey("school_classes.id"), index=True)
+    name = Column(String(100), index=True)
     date = Column(Date, index=True)
-    records = Column(JSON) # [{"student_id": 1, "status": "P"}, ...]
+    number_of_days = Column(Integer, default=1)
     
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     created_by_id = Column(Integer, ForeignKey("users.id"))
     updated_by_id = Column(Integer, ForeignKey("users.id"))
 
-    school_class = relationship("SchoolClass")
     created_by = relationship("User", foreign_keys=[created_by_id])
     updated_by = relationship("User", foreign_keys=[updated_by_id])
-
-    __table_args__ = (
-        UniqueConstraint('class_id', 'date', name='uix_class_date'),
-    )

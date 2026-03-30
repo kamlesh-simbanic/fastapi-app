@@ -84,6 +84,9 @@ export const api = {
         method: 'PUT',
         body: JSON.stringify(data),
     }),
+    deleteStaff: (id: string | number) => fetchApi(`/api/staff/${id}`, {
+        method: 'DELETE',
+    }),
 
     getStudents: (params: Record<string, unknown> = {}) => fetchApi(`/api/students/${buildQuery(params)}`),
     getStudentById: (id: string | number) => fetchApi(`/api/students/${id}`),
@@ -128,6 +131,30 @@ export const api = {
         body: JSON.stringify(data),
     }),
     deleteClassStudent: (id: string | number) => fetchApi(`/api/class-students/${id}`, {
+        method: 'DELETE',
+    }),
+    getStudentsByClass: (classId: string | number) => fetchApi(`/api/class-students/class/${classId}`),
+
+    // Attendance
+    getAttendance: (params: Record<string, unknown> = {}) => fetchApi(`/api/attendance/${buildQuery(params)}`),
+    submitAttendance: (data: Record<string, unknown>) => fetchApi('/api/attendance/bulk', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    }),
+    getMonthlyReport: (params: Record<string, unknown>) => fetchApi(`/api/attendance/report/monthly${buildQuery(params)}`),
+
+    // Holidays
+    getHolidays: (params: Record<string, unknown> = {}) => fetchApi(`/api/holidays/${buildQuery(params)}`),
+    getHoliday: (id: number | string) => fetchApi(`/api/holidays/${id}`),
+    addHoliday: (data: Record<string, unknown>) => fetchApi('/api/holidays/', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    }),
+    updateHoliday: (id: number | string, data: Record<string, unknown>) => fetchApi(`/api/holidays/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+    }),
+    deleteHoliday: (id: number | string) => fetchApi(`/api/holidays/${id}`, {
         method: 'DELETE',
     }),
 };

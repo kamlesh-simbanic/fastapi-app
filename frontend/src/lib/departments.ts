@@ -1,4 +1,3 @@
-import { cn } from './utils';
 
 export const DEPARTMENTS = [
     { label: 'All Departments', value: '' },
