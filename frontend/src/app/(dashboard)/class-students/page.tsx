@@ -18,7 +18,6 @@ import {
     LayoutGrid,
     List
 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { ConfirmBox } from '@/components/ConfirmBox';
 import Link from 'next/link';
 
@@ -38,7 +37,6 @@ interface ClassStudent {
 
 export default function ClassStudentsPage() {
     const { user } = useAuth();
-    const router = useRouter();
 
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [mappings, setMappings] = useState<ClassStudent[]>([]);

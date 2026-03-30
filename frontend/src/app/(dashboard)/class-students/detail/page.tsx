@@ -13,9 +13,9 @@ import {
     LayoutGrid,
     List,
     Search,
-    X,
-    Filter
+    X
 } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
@@ -58,7 +58,7 @@ function ClassStudentDetailContent() {
         setLoading(true);
         setError(null);
         try {
-            const data = await api.getClassStudentDetail(parseInt(mappingId));
+            const data = await api.getClassStudentById(parseInt(mappingId));
             setMapping(data);
         } catch (err: unknown) {
             console.error('Failed to fetch detail:', err);

@@ -19,7 +19,6 @@ import {
     List
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useRouter } from 'next/navigation';
 import { ConfirmBox } from '@/components/ConfirmBox';
 
 interface SchoolClass {
@@ -40,7 +39,6 @@ interface Staff {
 
 export default function ClassesPage() {
     const { user } = useAuth();
-    const router = useRouter();
 
     const [classes, setClasses] = useState<SchoolClass[]>([]);
     const [staff, setStaff] = useState<Staff[]>([]);

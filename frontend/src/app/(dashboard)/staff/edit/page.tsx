@@ -1,11 +1,10 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useAuth } from '@/components/AuthContext';
 import {
-    Users,
     ChevronLeft,
     Save,
     User,
@@ -49,13 +48,7 @@ function EditStaffForm() {
 
     const [errors, setErrors] = useState<Record<string, string>>({});
 
-    useEffect(() => {
-        if (staffId && user) {
-            fetchStaffDetails();
-        }
-    }, [staffId, user]);
-
-    const fetchStaffDetails = async () => {
+    const fetchStaffDetails = useCallback(async () => {
         try {
             setFetching(true);
             const data = await api.getStaffById(Number(staffId));
@@ -76,7 +69,13 @@ function EditStaffForm() {
         } finally {
             setFetching(false);
         }
-    };
+    }, [staffId]);
+
+    useEffect(() => {
+        if (staffId && user) {
+            fetchStaffDetails();
+        }
+    }, [staffId, user, fetchStaffDetails]);
 
     const validateForm = () => {
         const newErrors: Record<string, string> = {};

@@ -25,7 +25,6 @@ import {
     ArrowUpDown
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useRouter } from 'next/navigation';
 import { DEPARTMENTS, getDepartmentColor } from '@/lib/departments';
 
 interface StaffMember {
@@ -50,7 +49,6 @@ const SORT_OPTIONS = [
 
 export default function StaffPage() {
     const { user } = useAuth();
-    const router = useRouter();
 
     const [staff, setStaff] = useState<StaffMember[]>([]);
     const [total, setTotal] = useState(0);

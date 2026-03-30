@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation';
 import {
     LayoutDashboard,
     Users,
-    BookOpen,
     CreditCard,
     Briefcase,
     Calendar,

@@ -84,6 +84,9 @@ export const api = {
         method: 'PUT',
         body: JSON.stringify(data),
     }),
+    deleteStaff: (id: string | number) => fetchApi(`/api/staff/${id}`, {
+        method: 'DELETE',
+    }),
 
     getStudents: (params: Record<string, unknown> = {}) => fetchApi(`/api/students/${buildQuery(params)}`),
     getStudentById: (id: string | number) => fetchApi(`/api/students/${id}`),

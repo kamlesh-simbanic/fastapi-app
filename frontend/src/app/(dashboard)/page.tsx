@@ -7,7 +7,6 @@ import {
   Activity,
   Server,
   Terminal,
-  Layers,
   Zap,
   ArrowRight,
   Calendar,
@@ -16,11 +15,9 @@ import {
   CreditCard
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useRouter } from 'next/navigation';
 
 export default function Home() {
-  const { user, loading: authLoading } = useAuth();
-  const router = useRouter();
+  const { user } = useAuth();
   const [status, setStatus] = useState<{
     backend: 'idle' | 'loading' | 'online' | 'offline';
     db: 'idle' | 'loading' | 'online' | 'offline';

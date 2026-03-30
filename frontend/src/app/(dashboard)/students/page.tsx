@@ -25,7 +25,7 @@ import {
     Pencil
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useRouter } from 'next/navigation';
+
 
 interface StudentMember {
     id: number;
@@ -49,8 +49,7 @@ const SORT_OPTIONS = [
 ];
 
 export default function StudentsPage() {
-    const { user, loading: authLoading } = useAuth();
-    const router = useRouter();
+    const { user } = useAuth();
 
     const [students, setStudents] = useState<StudentMember[]>([]);
     const [total, setTotal] = useState(0);

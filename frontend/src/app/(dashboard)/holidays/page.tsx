@@ -14,7 +14,7 @@ import {
     X,
     Trash2
 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+
 import { ConfirmBox } from '@/components/ConfirmBox';
 
 interface Holiday {
@@ -27,7 +27,6 @@ interface Holiday {
 
 export default function HolidaysPage() {
     const { user } = useAuth();
-    const router = useRouter();
 
     const [holidays, setHolidays] = useState<Holiday[]>([]);
     const [loading, setLoading] = useState(true);

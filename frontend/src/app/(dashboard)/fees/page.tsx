@@ -18,7 +18,7 @@ import {
     Plus
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useRouter } from 'next/navigation';
+
 
 interface FeePayment {
     id: number;
@@ -41,7 +41,6 @@ const PAGE_SIZE_OPTIONS = [6, 12, 24, 50];
 
 export default function FeesPage() {
     const { user } = useAuth();
-    const router = useRouter();
 
     const [payments, setPayments] = useState<FeePayment[]>([]);
     const [total, setTotal] = useState(0);

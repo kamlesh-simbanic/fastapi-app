@@ -15,7 +15,6 @@ import {
     ClipboardCheck,
     FileText
 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 interface SchoolClass {
@@ -33,7 +32,6 @@ interface Student {
 
 export default function AttendancePage() {
     const { user } = useAuth();
-    const router = useRouter();
 
     const [classes, setClasses] = useState<SchoolClass[]>([]);
     const [selectedClass, setSelectedClass] = useState<string>('');

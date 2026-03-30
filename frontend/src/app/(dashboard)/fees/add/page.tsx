@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useAuth } from '@/components/AuthContext';
@@ -15,8 +15,8 @@ import {
     Loader2,
     CheckCircle2,
     AlertCircle,
-    Hash,
-    Info
+    Info,
+    ChevronDown
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 

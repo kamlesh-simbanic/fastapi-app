@@ -5,18 +5,17 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/components/AuthContext';
 import {
     Calendar,
-    Users,
     Loader2,
     FileText,
     ChevronDown,
     ChevronLeft,
     Search,
-    Filter,
     Download,
     TrendingUp,
     TrendingDown,
     Activity,
-    Users2
+    Users2,
+    AlertCircle
 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -69,7 +68,7 @@ function AttendanceReportContent() {
         setLoading(true);
         setError(null);
         try {
-            const data = await api.getAttendanceReport({
+            const data = await api.getAttendance({
                 class_id: parseInt(selectedClass),
                 month,
                 year
@@ -135,6 +134,13 @@ function AttendanceReportContent() {
                     </button>
                 </div>
             </section>
+
+            {error && (
+                <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center gap-3 text-red-500 animate-in slide-in-from-top-2">
+                    <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                    <p className="text-sm font-bold">{error}</p>
+                </div>
+            )}
 
             {/* Selection Controls */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-white dark:bg-zinc-900 p-8 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all duration-300">
