@@ -344,19 +344,22 @@ export default function StaffPage() {
 
                 {/* Footer / Pagination */}
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-6 border-t border-zinc-200 dark:border-zinc-800">
-                    <div className="flex items-center gap-6">
-                        <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Per Page:</span>
-                            <select
-                                value={pageSize}
-                                onChange={(e) => setPageSize(Number(e.target.value))}
-                                className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-2 py-1 text-xs font-bold text-zinc-600 focus:outline-none cursor-pointer"
-                            >
-                                {PAGE_SIZE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                            </select>
+                    <div className="flex flex-col sm:flex-row items-center gap-8">
+                        <div className="flex items-center gap-3">
+                            <span className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Viewing:</span>
+                            <div className="relative group">
+                                <select
+                                    value={pageSize}
+                                    onChange={(e) => setPageSize(Number(e.target.value))}
+                                    className="appearance-none bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-2 pr-10 text-xs font-black text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 cursor-pointer shadow-sm"
+                                >
+                                    {PAGE_SIZE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt} Row{opt > 1 ? 's' : ''}</option>)}
+                                </select>
+                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400 pointer-events-none" />
+                            </div>
                         </div>
-                        <p className="text-xs font-medium text-zinc-500">
-                            Showing <span className="text-zinc-900 dark:text-white font-bold">{Math.min((page - 1) * pageSize + 1, total)}</span> to <span className="text-zinc-900 dark:text-white font-bold">{Math.min(page * pageSize, total)}</span> of <span className="text-zinc-900 dark:text-white font-bold">{total}</span> personnel
+                        <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">
+                            Found <span className="text-indigo-500 mx-1">{total}</span> Personnel Records
                         </p>
                     </div>
 
@@ -369,20 +372,36 @@ export default function StaffPage() {
                             <ChevronLeft className="w-5 h-5" />
                         </button>
                         <div className="flex items-center gap-1">
-                            {[...Array(totalPages)].map((_, i) => (
-                                <button
-                                    key={i}
-                                    onClick={() => setPage(i + 1)}
-                                    className={cn(
-                                        "w-9 h-9 rounded-xl text-xs font-bold transition-all",
-                                        page === i + 1
-                                            ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/20"
-                                            : "text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                                    )}
-                                >
-                                    {i + 1}
-                                </button>
-                            ))}
+                            {(() => {
+                                const maxPages = 6;
+                                let startPage = Math.max(1, page - Math.floor(maxPages / 2));
+                                let endPage = startPage + maxPages - 1;
+
+                                if (endPage > totalPages) {
+                                    endPage = totalPages;
+                                    startPage = Math.max(1, endPage - maxPages + 1);
+                                }
+
+                                const pages = [];
+                                for (let i = startPage; i <= endPage; i++) {
+                                    pages.push(i);
+                                }
+
+                                return pages.map((p) => (
+                                    <button
+                                        key={p}
+                                        onClick={() => setPage(p)}
+                                        className={cn(
+                                            "w-9 h-9 rounded-xl text-xs font-bold transition-all",
+                                            page === p
+                                                ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/20"
+                                                : "text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                                        )}
+                                    >
+                                        {p}
+                                    </button>
+                                ));
+                            })()}
                         </div>
                         <button
                             disabled={page === totalPages}

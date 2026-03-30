@@ -364,20 +364,36 @@ export default function StudentsPage() {
                             <ChevronLeft className="w-5 h-5" />
                         </button>
                         <div className="flex items-center gap-1.5 overflow-x-auto max-w-[200px] sm:max-w-none">
-                            {[...Array(totalPages)].map((_, i) => (
-                                <button
-                                    key={i}
-                                    onClick={() => setPage(i + 1)}
-                                    className={cn(
-                                        "w-11 h-11 rounded-2xl text-xs font-black transition-all shadow-sm",
-                                        page === i + 1
-                                            ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/30 active:scale-95"
-                                            : "bg-white dark:bg-zinc-900 text-zinc-500 hover:bg-zinc-50"
-                                    )}
-                                >
-                                    {i + 1}
-                                </button>
-                            ))}
+                            {(() => {
+                                const maxPages = 6;
+                                let startPage = Math.max(1, page - Math.floor(maxPages / 2));
+                                let endPage = startPage + maxPages - 1;
+
+                                if (endPage > totalPages) {
+                                    endPage = totalPages;
+                                    startPage = Math.max(1, endPage - maxPages + 1);
+                                }
+
+                                const pages = [];
+                                for (let i = startPage; i <= endPage; i++) {
+                                    pages.push(i);
+                                }
+
+                                return pages.map((p) => (
+                                    <button
+                                        key={p}
+                                        onClick={() => setPage(p)}
+                                        className={cn(
+                                            "w-11 h-11 rounded-2xl text-xs font-black transition-all shadow-sm",
+                                            page === p
+                                                ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/30 active:scale-95"
+                                                : "bg-white dark:bg-zinc-900 text-zinc-500 hover:bg-zinc-50"
+                                        )}
+                                    >
+                                        {p}
+                                    </button>
+                                ));
+                            })()}
                         </div>
                         <button
                             disabled={page === totalPages}

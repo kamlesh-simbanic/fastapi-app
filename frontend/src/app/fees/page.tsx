@@ -12,14 +12,11 @@ import {
     List,
     ChevronLeft,
     ChevronRight,
-    Calendar,
-    Phone,
     Loader2,
     ChevronDown,
     X,
     Eye,
-    Plus,
-    Filter
+    Plus
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
@@ -335,9 +332,24 @@ export default function FeesPage() {
 
                 {/* Footer / Pagination */}
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-8 pt-10 border-t border-zinc-200 dark:border-zinc-800">
-                    <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">
-                        Found <span className="text-emerald-500 mx-1">{total}</span> Transaction Records
-                    </p>
+                    <div className="flex flex-col sm:flex-row items-center gap-8">
+                        <div className="flex items-center gap-3">
+                            <span className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Viewing:</span>
+                            <div className="relative group">
+                                <select
+                                    value={pageSize}
+                                    onChange={(e) => setPageSize(Number(e.target.value))}
+                                    className="appearance-none bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-2 pr-10 text-xs font-black text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 cursor-pointer shadow-sm"
+                                >
+                                    {PAGE_SIZE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt} Row{opt > 1 ? 's' : ''}</option>)}
+                                </select>
+                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400 pointer-events-none" />
+                            </div>
+                        </div>
+                        <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">
+                            Found <span className="text-emerald-500 mx-1">{total}</span> Transaction Records
+                        </p>
+                    </div>
 
                     <div className="flex items-center gap-2">
                         <button
@@ -347,7 +359,38 @@ export default function FeesPage() {
                         >
                             <ChevronLeft className="w-5 h-5" />
                         </button>
-                        <span className="px-4 text-xs font-black text-zinc-500 uppercase tracking-widest">Page {page} of {totalPages}</span>
+                        <div className="flex items-center gap-1.5 overflow-x-auto max-w-[200px] sm:max-w-none">
+                            {(() => {
+                                const maxPages = 6;
+                                let startPage = Math.max(1, page - Math.floor(maxPages / 2));
+                                let endPage = startPage + maxPages - 1;
+
+                                if (endPage > totalPages) {
+                                    endPage = totalPages;
+                                    startPage = Math.max(1, endPage - maxPages + 1);
+                                }
+
+                                const pages = [];
+                                for (let i = startPage; i <= endPage; i++) {
+                                    pages.push(i);
+                                }
+
+                                return pages.map((p) => (
+                                    <button
+                                        key={p}
+                                        onClick={() => setPage(p)}
+                                        className={cn(
+                                            "w-11 h-11 rounded-2xl text-xs font-black transition-all shadow-sm",
+                                            page === p
+                                                ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 active:scale-95"
+                                                : "bg-white dark:bg-zinc-900 text-zinc-500 hover:bg-zinc-50"
+                                        )}
+                                    >
+                                        {p}
+                                    </button>
+                                ));
+                            })()}
+                        </div>
                         <button
                             disabled={page === totalPages}
                             onClick={() => setPage(prev => prev + 1)}
