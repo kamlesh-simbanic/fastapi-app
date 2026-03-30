@@ -20,6 +20,7 @@ import {
     List
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { ConfirmBox } from '@/components/ConfirmBox';
 import Link from 'next/link';
 
 interface SchoolClass {
@@ -57,6 +58,9 @@ export default function ClassStudentsPage() {
     });
 
     const [submitting, setSubmitting] = useState(false);
+    const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+    const [idToDelete, setIdToDelete] = useState<number | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         if (!authLoading && !user) {
@@ -123,15 +127,25 @@ export default function ClassStudentsPage() {
         }
     };
 
-    const handleDelete = async (id: number) => {
-        if (!confirm('Are you sure you want to delete this assignment?')) return;
+    const handleDelete = async () => {
+        if (!idToDelete) return;
+        setIsDeleting(true);
         try {
-            await api.deleteClassStudent(id);
+            await api.deleteClassStudent(idToDelete);
             fetchData();
+            setDeleteConfirmOpen(false);
         } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : 'Failed to delete assignment.';
             setError(msg);
+        } finally {
+            setIsDeleting(false);
+            setIdToDelete(null);
         }
+    };
+
+    const triggerDelete = (id: number) => {
+        setIdToDelete(id);
+        setDeleteConfirmOpen(true);
     };
 
     const openEdit = (m: ClassStudent) => {
@@ -269,7 +283,7 @@ export default function ClassStudentsPage() {
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <button onClick={() => openEdit(m)} className="p-2 text-zinc-400 hover:text-indigo-500 transition-colors"><Edit2 className="w-4 h-4" /></button>
-                                            <button onClick={() => handleDelete(m.id)} className="p-2 text-zinc-400 hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                                            <button onClick={() => triggerDelete(m.id)} className="p-2 text-zinc-400 hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
                                         </div>
                                     </div>
 
@@ -346,7 +360,7 @@ export default function ClassStudentsPage() {
                                                         View List
                                                     </Link>
                                                     <button onClick={() => openEdit(m)} className="p-2 text-zinc-400 hover:text-indigo-500 transition-colors"><Edit2 className="w-4 h-4" /></button>
-                                                    <button onClick={() => handleDelete(m.id)} className="p-2 text-zinc-400 hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                                                    <button onClick={() => triggerDelete(m.id)} className="p-2 text-zinc-400 hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -437,6 +451,17 @@ export default function ClassStudentsPage() {
                     </div>
                 </div>
             )}
+            {/* Confirm Box */}
+            <ConfirmBox
+                isOpen={deleteConfirmOpen}
+                loading={isDeleting}
+                title="Remove Assignment"
+                description="Are you sure you want to remove this class-student assignment? This will unmap all students from this class for the selected year."
+                onConfirm={handleDelete}
+                onCancel={() => setDeleteConfirmOpen(false)}
+                confirmText="Remove"
+                variant="danger"
+            />
         </DashboardLayout>
     );
 }

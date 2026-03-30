@@ -8,14 +8,15 @@ import {
     Calendar,
     Plus,
     Loader2,
-    Trash2,
     AlertCircle,
     CheckCircle2,
     CalendarDays,
     Clock,
-    X
+    X,
+    Trash2
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { ConfirmBox } from '@/components/ConfirmBox';
 
 interface Holiday {
     id: number;
@@ -41,6 +42,10 @@ export default function HolidaysPage() {
         date: new Date().toISOString().split('T')[0],
         number_of_days: 1
     });
+
+    const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+    const [idToDelete, setIdToDelete] = useState<number | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         if (!authLoading && !user) {
@@ -88,17 +93,28 @@ export default function HolidaysPage() {
         }
     };
 
-    const handleDeleteHoliday = async (id: number) => {
-        if (!confirm('Are you sure you want to delete this holiday?')) return;
+    const handleDeleteHoliday = async () => {
+        if (!idToDelete) return;
 
+        setIsDeleting(true);
+        setError(null);
         try {
-            await api.deleteHoliday(id);
+            await api.deleteHoliday(idToDelete);
             setSuccess('Holiday deleted successfully!');
             fetchHolidays();
             setTimeout(() => setSuccess(null), 3000);
+            setDeleteConfirmOpen(false);
         } catch {
             setError('Failed to delete holiday.');
+        } finally {
+            setIsDeleting(false);
+            setIdToDelete(null);
         }
+    };
+
+    const triggerDelete = (id: number) => {
+        setIdToDelete(id);
+        setDeleteConfirmOpen(true);
     };
 
     if (authLoading || !user) {
@@ -177,7 +193,7 @@ export default function HolidaysPage() {
                                             <CalendarDays className="w-6 h-6" />
                                         </div>
                                         <button
-                                            onClick={() => handleDeleteHoliday(holiday.id)}
+                                            onClick={() => triggerDelete(holiday.id)}
                                             className="p-2 text-zinc-300 hover:text-red-500 transition-colors"
                                         >
                                             <Trash2 className="w-5 h-5" />
@@ -291,6 +307,17 @@ export default function HolidaysPage() {
                     </div>
                 )}
             </div>
+            {/* Confirm Box */}
+            <ConfirmBox
+                isOpen={deleteConfirmOpen}
+                loading={isDeleting}
+                title="Delete Holiday"
+                description="Are you sure you want to remove this holiday from the schedule? This action cannot be undone."
+                onConfirm={handleDeleteHoliday}
+                onCancel={() => setDeleteConfirmOpen(false)}
+                confirmText="Delete"
+                variant="danger"
+            />
         </DashboardLayout>
     );
 }

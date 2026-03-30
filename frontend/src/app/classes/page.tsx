@@ -18,6 +18,7 @@ import {
     AlertCircle
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { ConfirmBox } from '@/components/ConfirmBox';
 
 interface SchoolClass {
     id: number;
@@ -54,6 +55,9 @@ export default function ClassesPage() {
     });
 
     const [submitting, setSubmitting] = useState(false);
+    const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+    const [idToDelete, setIdToDelete] = useState<number | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         if (!authLoading && !user) {
@@ -118,15 +122,25 @@ export default function ClassesPage() {
         }
     };
 
-    const handleDelete = async (id: number) => {
-        if (!confirm('Are you sure you want to delete this class?')) return;
+    const handleDelete = async () => {
+        if (!idToDelete) return;
+        setIsDeleting(true);
         try {
-            await api.deleteClass(id);
+            await api.deleteClass(idToDelete);
             fetchData();
+            setDeleteConfirmOpen(false);
         } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : 'Failed to delete class.';
             setError(msg);
+        } finally {
+            setIsDeleting(false);
+            setIdToDelete(null);
         }
+    };
+
+    const triggerDelete = (id: number) => {
+        setIdToDelete(id);
+        setDeleteConfirmOpen(true);
     };
 
     const openEdit = (cls: SchoolClass) => {
@@ -220,7 +234,7 @@ export default function ClassesPage() {
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <button onClick={() => openEdit(cls)} className="p-2 text-zinc-400 hover:text-indigo-500 transition-colors"><Edit2 className="w-4 h-4" /></button>
-                                            <button onClick={() => handleDelete(cls.id)} className="p-2 text-zinc-400 hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                                            <button onClick={() => triggerDelete(cls.id)} className="p-2 text-zinc-400 hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
                                         </div>
                                     </div>
 
@@ -330,6 +344,17 @@ export default function ClassesPage() {
                     </div>
                 </div>
             )}
+            {/* Confirm Box */}
+            <ConfirmBox
+                isOpen={deleteConfirmOpen}
+                loading={isDeleting}
+                title="Delete Class"
+                description="Are you sure you want to delete this class? This will also affect student assignments."
+                onConfirm={handleDelete}
+                onCancel={() => setDeleteConfirmOpen(false)}
+                confirmText="Delete"
+                variant="danger"
+            />
         </DashboardLayout>
     );
 }
