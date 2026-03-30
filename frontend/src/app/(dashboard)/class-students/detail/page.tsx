@@ -24,7 +24,6 @@ interface Student {
     name: string;
     surname: string;
     gr_no: string;
-    gender: string;
 }
 
 interface SchoolClass {
@@ -179,9 +178,6 @@ function ClassStudentDetailContent() {
                             </div>
                             <h3 className="text-lg font-black text-zinc-900 dark:text-white tracking-tight">{student.name} {student.surname}</h3>
                             <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-4">GR: {student.gr_no}</p>
-                            <div className="px-3 py-1 bg-zinc-50 dark:bg-zinc-950 rounded-xl inline-block text-[10px] font-bold text-zinc-500 uppercase tracking-widest border border-zinc-100 dark:border-zinc-800">
-                                {student.gender}
-                            </div>
                         </div>
                     ))}
                 </div>
@@ -192,7 +188,6 @@ function ClassStudentDetailContent() {
                             <tr className="bg-zinc-50/50 dark:bg-zinc-900/50">
                                 <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest border-b border-zinc-100 dark:border-zinc-800">GR Number</th>
                                 <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest border-b border-zinc-100 dark:border-zinc-800">Student Name</th>
-                                <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest border-b border-zinc-100 dark:border-zinc-800">Gender</th>
                                 <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest border-b border-zinc-100 dark:border-zinc-800 text-right">Profile</th>
                             </tr>
                         </thead>
@@ -209,9 +204,6 @@ function ClassStudentDetailContent() {
                                             </div>
                                             <span className="text-sm font-black text-zinc-900 dark:text-white uppercase tracking-tight">{student.name} {student.surname}</span>
                                         </div>
-                                    </td>
-                                    <td className="px-8 py-5">
-                                        <span className="text-xs font-bold text-zinc-500 uppercase">{student.gender}</span>
                                     </td>
                                     <td className="px-8 py-5 text-right">
                                         <Link

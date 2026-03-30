@@ -29,6 +29,12 @@ def get_class_student(db: Session, mapping_id: int):
     mapping = db.query(models.ClassStudent).options(joinedload(models.ClassStudent.school_class)).filter(models.ClassStudent.id == mapping_id).first()
     if not mapping:
         raise HTTPException(status_code=404, detail="Class mapping not found")
+    
+    if mapping.students:
+        mapping.student_details = db.query(models.Student).filter(models.Student.id.in_(mapping.students)).all()
+    else:
+        mapping.student_details = []
+        
     return mapping
 
 def list_class_students(db: Session, skip: int = 0, limit: int = 100, sort_by: str = "id", order: str = "asc", academic_year: Optional[str] = None):
