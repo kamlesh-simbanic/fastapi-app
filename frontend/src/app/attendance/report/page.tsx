@@ -61,7 +61,7 @@ export default function AttendanceReportPage() {
         setClassesLoading(true);
         try {
             const data = await api.getClasses({ limit: 100 });
-            setClasses(data);
+            setClasses(data.items);
         } catch {
             setError('Failed to load classes.');
         } finally {
