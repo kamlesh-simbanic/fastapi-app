@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, ForeignKey, DateTime, Enum, UniqueConstraint
+from sqlalchemy import Column, Integer, String, Date, ForeignKey, DateTime, Enum, UniqueConstraint, JSON
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import enum
@@ -13,22 +13,19 @@ class Attendance(Base):
     __tablename__ = "attendance"
 
     id = Column(Integer, primary_key=True, index=True)
-    gr_no = Column(String(50), index=True)
-    student_id = Column(Integer, ForeignKey("students.id"))
-    standard = Column(String(20))
-    period = Column(Integer)
+    class_id = Column(Integer, ForeignKey("school_classes.id"), index=True)
     date = Column(Date, index=True)
-    status = Column(Enum(AttendanceStatus))
+    records = Column(JSON) # [{"student_id": 1, "status": "P"}, ...]
     
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     created_by_id = Column(Integer, ForeignKey("users.id"))
     updated_by_id = Column(Integer, ForeignKey("users.id"))
 
-    student = relationship("Student")
+    school_class = relationship("SchoolClass")
     created_by = relationship("User", foreign_keys=[created_by_id])
     updated_by = relationship("User", foreign_keys=[updated_by_id])
 
     __table_args__ = (
-        UniqueConstraint('student_id', 'date', 'period', name='uix_student_date_period'),
+        UniqueConstraint('class_id', 'date', name='uix_class_date'),
     )

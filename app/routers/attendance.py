@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import date
@@ -13,43 +13,35 @@ router = APIRouter(
     dependencies=[Depends(check_access([models.Department.TEACHING]))]
 )
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
-def add_attendance_bulk(
-    bulk_data: schemas.AttendanceBulkCreate, 
+@router.post("/bulk", status_code=status.HTTP_201_CREATED)
+def add_attendance_bulk_new(
+    data: schemas.AttendanceBulkCreateNew, 
     db: Session = Depends(get_db), 
     current_user: models.User = Depends(get_current_user)
 ):
-    return controllers.attendance.add_attendance_bulk(db, bulk_data, current_user.id)
-
-@router.put("/", status_code=status.HTTP_200_OK)
-def update_attendance_bulk(
-    bulk_data: schemas.AttendanceBulkUpdate, 
-    db: Session = Depends(get_db), 
-    current_user: models.User = Depends(get_current_user)
-):
-    return controllers.attendance.update_attendance_bulk(db, bulk_data, current_user.id)
+    return controllers.attendance.add_attendance_bulk_new(db, data, current_user.id)
 
 @router.get("/", response_model=List[schemas.AttendanceOut])
 def view_attendance(
-    skip: int = 0,
-    limit: int = 100,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1),
     sort_by: str = "date",
     order: str = "desc",
+    class_id: Optional[int] = None,
     day: Optional[date] = None,
     month: Optional[int] = None,
     year: Optional[int] = None,
-    search: Optional[str] = None,
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
-    return controllers.attendance.view_attendance(db, skip, limit, sort_by, order, day, month, year, search)
+    return controllers.attendance.view_attendance(db, skip, limit, sort_by, order, class_id, day, month, year)
 
 @router.get("/report/monthly", response_model=List[schemas.StudentAttendanceReport])
 def view_monthly_attendance_report(
     month: int,
     year: int,
-    standard: str,
+    class_id: int,
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
-    return controllers.attendance.view_monthly_attendance_report(db, month, year, standard)
+    return controllers.attendance.view_monthly_attendance_report(db, month, year, class_id)

@@ -57,3 +57,12 @@ def delete_class_student(db: Session, mapping_id: int):
     db.delete(db_mapping)
     db.commit()
     return {"detail": "Class mapping deleted successfully"}
+
+def get_students_by_class(db: Session, class_id: int):
+    mapping = db.query(models.ClassStudent).filter(models.ClassStudent.class_id == class_id).order_by(models.ClassStudent.id.desc()).first()
+    if not mapping or not mapping.students:
+        return []
+    
+    student_ids = mapping.students
+    students = db.query(models.Student).filter(models.Student.id.in_(student_ids)).all()
+    return students

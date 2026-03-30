@@ -56,3 +56,10 @@ def delete_class_student(
     current_user: models.User = Depends(get_current_user)
 ):
     return controllers.class_student.delete_class_student(db, id)
+@router.get("/class/{class_id}", response_model=List[schemas.StudentOut])
+def get_students_by_class(
+    class_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    return controllers.class_student.get_students_by_class(db, class_id)

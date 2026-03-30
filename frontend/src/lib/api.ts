@@ -130,4 +130,12 @@ export const api = {
     deleteClassStudent: (id: string | number) => fetchApi(`/api/class-students/${id}`, {
         method: 'DELETE',
     }),
+    getStudentsByClass: (classId: string | number) => fetchApi(`/api/class-students/class/${classId}`),
+
+    // Attendance
+    getAttendance: (params: Record<string, unknown> = {}) => fetchApi(`/api/attendance/${buildQuery(params)}`),
+    submitAttendance: (data: Record<string, unknown>) => fetchApi('/api/attendance/bulk', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    }),
 };

@@ -5,8 +5,7 @@ from .fee_payment import FeePaymentCreate, FeePaymentOut, FeeTerm
 from .staff import StaffCreate, StaffOut, Department, StaffList, StaffUpdate
 from .attendance import (
     AttendanceCreate, AttendanceUpdate, AttendanceOut, 
-    AttendanceBulkCreate, AttendanceBulkUpdate, AttendanceStatus,
-    StudentAttendanceReport
+    AttendanceStatus, StudentAttendanceReport, AttendanceBulkCreateNew
 )
 from .school_class import SchoolClassBase, SchoolClassCreate, SchoolClassUpdate, SchoolClass,StaffSimple
 from .class_student import ClassStudentBase, ClassStudentCreate, ClassStudentUpdate, ClassStudent
