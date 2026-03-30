@@ -8,5 +8,5 @@ from .attendance import (
     AttendanceStatus, StudentAttendanceReport, AttendanceBulkCreateNew
 )
 from .holiday import HolidayBase, HolidayCreate, HolidayUpdate, HolidayOut
-from .school_class import SchoolClassBase, SchoolClassCreate, SchoolClassUpdate, SchoolClass,StaffSimple
-from .class_student import ClassStudentBase, ClassStudentCreate, ClassStudentUpdate, ClassStudent
+from .school_class import SchoolClassBase, SchoolClassCreate, SchoolClassUpdate, SchoolClass, StaffSimple, SchoolClassList
+from .class_student import ClassStudentBase, ClassStudentCreate, ClassStudentUpdate, ClassStudent, ClassStudentList

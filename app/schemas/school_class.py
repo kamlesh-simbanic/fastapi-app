@@ -29,3 +29,7 @@ class SchoolClass(SchoolClassBase):
     class_teacher: Optional[StaffSimple] = None
 
     model_config = ConfigDict(from_attributes=True)
+
+class SchoolClassList(BaseModel):
+    items: list[SchoolClass]
+    total: int

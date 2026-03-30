@@ -15,8 +15,11 @@ import {
     X,
     BadgeCheck,
     ChevronDown,
-    AlertCircle
+    AlertCircle,
+    LayoutGrid,
+    List
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { ConfirmBox } from '@/components/ConfirmBox';
 
@@ -43,7 +46,11 @@ export default function ClassesPage() {
     const [classes, setClasses] = useState<SchoolClass[]>([]);
     const [staff, setStaff] = useState<Staff[]>([]);
     const [loading, setLoading] = useState(true);
+    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [search, setSearch] = useState('');
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [total, setTotal] = useState(0);
     const [isAddOpen, setIsAddOpen] = useState(false);
     const [editingClass, setEditingClass] = useState<SchoolClass | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -70,11 +77,12 @@ export default function ClassesPage() {
         setError(null);
         try {
             const [classesData, staffData] = await Promise.all([
-                api.getClasses({ search, limit: 100 }),
-                api.getStaff({ department: 'teaching', limit: 100 })
+                api.getClasses({ search, skip: (page - 1) * pageSize, limit: pageSize }),
+                api.getStaff({ limit: 200 })
             ]);
 
-            setClasses(classesData);
+            setClasses(classesData.items);
+            setTotal(classesData.total);
             setStaff(staffData.items);
         } catch (err: unknown) {
             console.error('Failed to fetch data:', err);
@@ -82,7 +90,7 @@ export default function ClassesPage() {
         } finally {
             setLoading(false);
         }
-    }, [search]);
+    }, [search, page, pageSize]);
 
     useEffect(() => {
         if (user) {
@@ -189,7 +197,7 @@ export default function ClassesPage() {
                     </button>
                 </section>
 
-                {/* Filters */}
+                {/* Filters & Toggle */}
                 <section className="flex flex-col sm:flex-row items-center gap-4">
                     <div className="relative group flex-1 w-full">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" />
@@ -201,6 +209,27 @@ export default function ClassesPage() {
                             className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-3.5 pl-12 pr-12 text-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-sm"
                         />
                         {search && <button onClick={() => setSearch('')} className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 hover:bg-zinc-100 rounded-xl text-zinc-400"><X className="w-4 h-4" /></button>}
+                    </div>
+
+                    <div className="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl self-end sm:self-center">
+                        <button
+                            onClick={() => setViewMode('grid')}
+                            className={cn(
+                                "p-2 rounded-lg transition-all",
+                                viewMode === 'grid' ? "bg-white dark:bg-zinc-700 shadow-sm text-indigo-500" : "text-zinc-400 hover:text-zinc-500"
+                            )}
+                        >
+                            <LayoutGrid className="w-4 h-4" />
+                        </button>
+                        <button
+                            onClick={() => setViewMode('list')}
+                            className={cn(
+                                "p-2 rounded-lg transition-all",
+                                viewMode === 'list' ? "bg-white dark:bg-zinc-700 shadow-sm text-indigo-500" : "text-zinc-400 hover:text-zinc-500"
+                            )}
+                        >
+                            <List className="w-4 h-4" />
+                        </button>
                     </div>
                 </section>
 
@@ -224,7 +253,7 @@ export default function ClassesPage() {
                             <h3 className="text-lg font-bold text-zinc-900 dark:text-white">No classes found</h3>
                             <p className="text-zinc-500 text-sm max-w-xs">Create your first class to start managing student groups.</p>
                         </div>
-                    ) : (
+                    ) : viewMode === 'grid' ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-in slide-in-from-bottom-4 duration-500">
                             {classes.map((cls) => (
                                 <div key={cls.id} className="group p-6 rounded-[2.5rem] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-indigo-500/30 transition-all hover:shadow-2xl hover:shadow-indigo-500/5 relative overflow-hidden flex flex-col">
@@ -261,6 +290,63 @@ export default function ClassesPage() {
                                     </div>
                                 </div>
                             ))}
+                        </div>
+                    ) : (
+                        <div className="bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-sm animate-in fade-in duration-500">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="bg-zinc-50/50 dark:bg-zinc-900/50">
+                                        <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest border-b border-zinc-100 dark:border-zinc-800">Standard / Level</th>
+                                        <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest border-b border-zinc-100 dark:border-zinc-800">Division</th>
+                                        <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest border-b border-zinc-100 dark:border-zinc-800">Class Teacher</th>
+                                        <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest border-b border-zinc-100 dark:border-zinc-800 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/50">
+                                    {classes.map((cls) => (
+                                        <tr key={cls.id} className="group hover:bg-zinc-50/[0.5] dark:hover:bg-zinc-800/30 transition-colors">
+                                            <td className="px-8 py-5">
+                                                <span className="text-sm font-black text-zinc-900 dark:text-white tracking-tight italic uppercase">
+                                                    Standard {cls.standard}
+                                                </span>
+                                            </td>
+                                            <td className="px-8 py-5">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-500 font-black text-[10px]">
+                                                        {cls.division}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-8 py-5">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+                                                        <User className="w-4 h-4 text-zinc-400" />
+                                                    </div>
+                                                    <span className="text-sm font-bold text-zinc-700 dark:text-zinc-300">
+                                                        {cls.class_teacher?.name || 'Not assigned'}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td className="px-8 py-5 text-right">
+                                                <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <button
+                                                        onClick={() => openEdit(cls)}
+                                                        className="p-2 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-xl hover:bg-indigo-100 transition-all active:scale-95"
+                                                    >
+                                                        <Edit2 className="w-4 h-4" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => triggerDelete(cls.id)}
+                                                        className="p-2 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-100 transition-all active:scale-95"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
                     )}
                 </div>
@@ -341,6 +427,84 @@ export default function ClassesPage() {
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Pagination Footer */}
+            {!loading && total > 0 && (
+                <div className="mt-8 bg-white dark:bg-zinc-900 p-6 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div className="flex items-center gap-4 order-2 md:order-1">
+                        <div className="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl">
+                            {[5, 10, 20, 50].map((size) => (
+                                <button
+                                    key={size}
+                                    onClick={() => {
+                                        setPageSize(size);
+                                        setPage(1);
+                                    }}
+                                    className={cn(
+                                        "px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                                        pageSize === size
+                                            ? "bg-white dark:bg-zinc-700 shadow-sm text-indigo-500"
+                                            : "text-zinc-400 hover:text-zinc-500"
+                                    )}
+                                >
+                                    {size}
+                                </button>
+                            ))}
+                        </div>
+                        <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Rows per page</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 order-1 md:order-2">
+                        {(() => {
+                            const totalPages = Math.ceil(total / pageSize);
+                            let startPage = Math.max(1, page - 2);
+                            const endPage = Math.min(totalPages, startPage + 5);
+                            if (endPage - startPage < 5) {
+                                startPage = Math.max(1, endPage - 5);
+                            }
+
+                            return (
+                                <>
+                                    <button
+                                        disabled={page === 1}
+                                        onClick={() => setPage(p => p - 1)}
+                                        className="p-2 rounded-xl border border-zinc-200 dark:border-zinc-800 disabled:opacity-30 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all"
+                                    >
+                                        <ChevronDown className="w-4 h-4 rotate-90" />
+                                    </button>
+                                    <div className="flex items-center gap-1">
+                                        {Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map((p) => (
+                                            <button
+                                                key={p}
+                                                onClick={() => setPage(p)}
+                                                className={cn(
+                                                    "w-10 h-10 rounded-xl text-sm font-bold transition-all",
+                                                    page === p
+                                                        ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/20"
+                                                        : "hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500"
+                                                )}
+                                            >
+                                                {p}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <button
+                                        disabled={page === totalPages}
+                                        onClick={() => setPage(p => p + 1)}
+                                        className="p-2 rounded-xl border border-zinc-200 dark:border-zinc-800 disabled:opacity-30 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all"
+                                    >
+                                        <ChevronDown className="w-4 h-4 -rotate-90" />
+                                    </button>
+                                </>
+                            );
+                        })()}
+                    </div>
+
+                    <div className="text-[10px] font-black text-zinc-400 uppercase tracking-widest order-3">
+                        Showing {(page - 1) * pageSize + 1} to {Math.min(page * pageSize, total)} of {total} Results
                     </div>
                 </div>
             )}

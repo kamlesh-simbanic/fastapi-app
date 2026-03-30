@@ -58,6 +58,9 @@ export default function ClassStudentsPage() {
     });
 
     const [submitting, setSubmitting] = useState(false);
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [total, setTotal] = useState(0);
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
     const [idToDelete, setIdToDelete] = useState<number | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -73,19 +76,20 @@ export default function ClassStudentsPage() {
         setError(null);
         try {
             const [mappingsData, classesData] = await Promise.all([
-                api.getClassStudents({ academic_year: academicYear }),
+                api.getClassStudents({ academic_year: academicYear, skip: (page - 1) * pageSize, limit: pageSize }),
                 api.getClasses({ limit: 100 })
             ]);
 
-            setMappings(mappingsData);
-            setClasses(classesData);
+            setMappings(mappingsData.items);
+            setTotal(mappingsData.total);
+            setClasses(classesData.items);
         } catch (err: unknown) {
             console.error('Failed to fetch data:', err);
             setError('Failed to load class assignments.');
         } finally {
             setLoading(false);
         }
-    }, [academicYear]);
+    }, [academicYear, page, pageSize]);
 
     useEffect(() => {
         if (user) {
@@ -352,15 +356,26 @@ export default function ClassStudentsPage() {
                                                 </span>
                                             </td>
                                             <td className="px-8 py-5 text-right">
-                                                <div className="flex items-center justify-end gap-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
                                                     <Link
                                                         href={`/class-students/detail?id=${m.id}`}
-                                                        className="text-[10px] font-black text-indigo-500 hover:text-indigo-600 uppercase tracking-widest"
+                                                        className="p-2 bg-zinc-50 dark:bg-zinc-800 text-indigo-500 hover:text-indigo-600 rounded-xl transition-all"
+                                                        title="View Details"
                                                     >
-                                                        View List
+                                                        <UserCircle className="w-4 h-4" />
                                                     </Link>
-                                                    <button onClick={() => openEdit(m)} className="p-2 text-zinc-400 hover:text-indigo-500 transition-colors"><Edit2 className="w-4 h-4" /></button>
-                                                    <button onClick={() => triggerDelete(m.id)} className="p-2 text-zinc-400 hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                                                    <button
+                                                        onClick={() => openEdit(m)}
+                                                        className="p-2 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-xl hover:bg-indigo-100 transition-all active:scale-95"
+                                                    >
+                                                        <Edit2 className="w-4 h-4" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => triggerDelete(m.id)}
+                                                        className="p-2 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-100 transition-all active:scale-95"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -448,6 +463,80 @@ export default function ClassStudentsPage() {
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Pagination Footer */}
+            {!loading && total > 0 && (
+                <div className="mt-8 bg-white dark:bg-zinc-900 p-6 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div className="flex items-center gap-4 order-2 md:order-1">
+                        <div className="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl">
+                            {[5, 10, 20, 50].map((size) => (
+                                <button
+                                    key={size}
+                                    onClick={() => {
+                                        setPageSize(size);
+                                        setPage(1);
+                                    }}
+                                    className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${pageSize === size
+                                        ? "bg-white dark:bg-zinc-700 shadow-sm text-indigo-500"
+                                        : "text-zinc-400 hover:text-zinc-500"
+                                        }`}
+                                >
+                                    {size}
+                                </button>
+                            ))}
+                        </div>
+                        <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Rows per page</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 order-1 md:order-2">
+                        {(() => {
+                            const totalPages = Math.ceil(total / pageSize);
+                            let startPage = Math.max(1, page - 2);
+                            const endPage = Math.min(totalPages, startPage + 5);
+                            if (endPage - startPage < 5) {
+                                startPage = Math.max(1, endPage - 5);
+                            }
+
+                            return (
+                                <>
+                                    <button
+                                        disabled={page === 1}
+                                        onClick={() => setPage(p => p - 1)}
+                                        className="p-2 rounded-xl border border-zinc-200 dark:border-zinc-800 disabled:opacity-30 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all"
+                                    >
+                                        <ChevronDown className="w-4 h-4 rotate-90" />
+                                    </button>
+                                    <div className="flex items-center gap-1">
+                                        {Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map((p) => (
+                                            <button
+                                                key={p}
+                                                onClick={() => setPage(p)}
+                                                className={`w-10 h-10 rounded-xl text-sm font-bold transition-all ${page === p
+                                                    ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/20"
+                                                    : "hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500"
+                                                    }`}
+                                            >
+                                                {p}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <button
+                                        disabled={page === totalPages}
+                                        onClick={() => setPage(p => p + 1)}
+                                        className="p-2 rounded-xl border border-zinc-200 dark:border-zinc-800 disabled:opacity-30 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all"
+                                    >
+                                        <ChevronDown className="w-4 h-4 -rotate-90" />
+                                    </button>
+                                </>
+                            );
+                        })()}
+                    </div>
+
+                    <div className="text-[10px] font-black text-zinc-400 uppercase tracking-widest order-3">
+                        Showing {(page - 1) * pageSize + 1} to {Math.min(page * pageSize, total)} of {total} Results
                     </div>
                 </div>
             )}

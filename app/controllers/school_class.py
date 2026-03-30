@@ -41,7 +41,10 @@ def list_classes(db: Session, skip: int = 0, limit: int = 100, sort_by: str = "i
             )
         )
 
-    return utils.apply_pagination_sort(query, models.SchoolClass, skip, limit, sort_by, order).all()
+    total = query.count()
+    items = utils.apply_pagination_sort(query, models.SchoolClass, skip, limit, sort_by, order).all()
+    
+    return {"items": items, "total": total}
 
 def update_class(db: Session, class_id: int, class_schema: schemas.SchoolClassUpdate, current_user_id: int):
     db_class = get_class(db, class_id)

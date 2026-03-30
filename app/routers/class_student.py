@@ -20,7 +20,7 @@ def create_class_student(
 ):
     return controllers.class_student.add_class_student(db, student_schema, current_user.id)
 
-@router.get("/", response_model=List[schemas.ClassStudent])
+@router.get("/", response_model=schemas.ClassStudentList)
 def read_class_students(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1),
