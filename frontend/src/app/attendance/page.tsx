@@ -13,9 +13,11 @@ import {
     Save,
     ChevronDown,
     AlertCircle,
-    ClipboardCheck
+    ClipboardCheck,
+    FileText
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 interface SchoolClass {
     id: number;
@@ -191,6 +193,14 @@ export default function AttendancePage() {
                         </h1>
                         <p className="text-zinc-500 dark:text-zinc-400 text-sm font-medium">Record daily student attendance by class.</p>
                     </div>
+
+                    <Link
+                        href="/attendance/report"
+                        className="px-6 py-3 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-zinc-200 transition-all flex items-center gap-2 group"
+                    >
+                        <FileText className="w-4 h-4 text-indigo-500 group-hover:scale-110 transition-transform" />
+                        Monthly Report
+                    </Link>
                 </section>
 
                 {error && (

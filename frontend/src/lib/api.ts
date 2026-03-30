@@ -138,4 +138,20 @@ export const api = {
         method: 'POST',
         body: JSON.stringify(data),
     }),
+    getMonthlyReport: (params: Record<string, unknown>) => fetchApi(`/api/attendance/report/monthly${buildQuery(params)}`),
+
+    // Holidays
+    getHolidays: (params: Record<string, unknown> = {}) => fetchApi(`/api/holidays/${buildQuery(params)}`),
+    getHoliday: (id: number | string) => fetchApi(`/api/holidays/${id}`),
+    addHoliday: (data: Record<string, unknown>) => fetchApi('/api/holidays/', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    }),
+    updateHoliday: (id: number | string, data: Record<string, unknown>) => fetchApi(`/api/holidays/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+    }),
+    deleteHoliday: (id: number | string) => fetchApi(`/api/holidays/${id}`, {
+        method: 'DELETE',
+    }),
 };

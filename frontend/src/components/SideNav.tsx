@@ -10,6 +10,7 @@ import {
     CreditCard,
     Briefcase,
     Calendar,
+    CalendarDays,
     Settings,
     HelpCircle,
     Layers,
@@ -24,6 +25,7 @@ const navItems = [
     { icon: Users, label: 'Class Assignments', href: '/class-students' },
     { icon: BookOpen, label: 'Courses', href: '/courses' },
     { icon: Calendar, label: 'Attendance', href: '/attendance' },
+    { icon: CalendarDays, label: 'Holidays', href: '/holidays' },
     { icon: CreditCard, label: 'Fees', href: '/fees' },
     { icon: Briefcase, label: 'Staff', href: '/staff' },
 ];

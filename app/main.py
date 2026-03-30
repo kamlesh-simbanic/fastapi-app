@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 from . import models
 from .database import engine, get_db
-from .routers import auth, tasks, students, fees, staff, attendance, dashboard, school_class, class_student
+from .routers import auth, tasks, students, fees, staff, attendance, dashboard, school_class, class_student, holiday
 
 load_dotenv()
 
@@ -39,7 +39,8 @@ app.include_router(students.router, prefix="/api")
 app.include_router(fees.router, prefix="/api")
 app.include_router(staff.router, prefix="/api")
 app.include_router(attendance.router, prefix="/api")
-app.include_router(dashboard.router, prefix="/api")
+app.include_router(dashboard.router, prefix="/api", tags=["Dashboard"])
+app.include_router(holiday.router, prefix="/api")
 app.include_router(school_class.router, prefix="/api")
 app.include_router(class_student.router, prefix="/api")
 
