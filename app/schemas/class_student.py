@@ -1,6 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 from typing import List, Optional
+from .student import StudentOut
 
 class ClassStudentBase(BaseModel):
     academic_year: str
@@ -29,6 +30,7 @@ class ClassStudent(ClassStudentBase):
     updated_by_id: int
     
     school_class: Optional[SchoolClassSimple] = None
+    student_details: Optional[List[StudentOut]] = None
 
     model_config = ConfigDict(from_attributes=True)
 
