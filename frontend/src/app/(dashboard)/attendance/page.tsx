@@ -4,7 +4,6 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/components/AuthContext';
 import {
-    Calendar,
     Users,
     CheckCircle2,
     XCircle,
@@ -16,6 +15,7 @@ import {
     FileText
 } from 'lucide-react';
 import Link from 'next/link';
+import CalendarPicker from '@/components/CalendarPicker';
 
 interface SchoolClass {
     id: number;
@@ -44,6 +44,7 @@ export default function AttendancePage() {
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
+    const [selectedDateIsHoliday, setSelectedDateIsHoliday] = useState(false);
 
     const fetchClasses = useCallback(async () => {
         setClassesLoading(true);
@@ -105,15 +106,36 @@ export default function AttendancePage() {
         }
     }, []);
 
+    const checkIsInvalidDate = useCallback((dateString: string) => {
+        const d = new Date(dateString);
+        if (!isNaN(d.getTime())) {
+            // Sunday check
+            if (d.getUTCDay() === 0) return { invalid: true, reason: 'Sundays are holidays' };
+
+            // Holiday check (using state from Calendar)
+            if (selectedDateIsHoliday) {
+                return { invalid: true, reason: 'This date is a holiday' };
+            }
+        }
+        return { invalid: false };
+    }, [selectedDateIsHoliday]);
+
     useEffect(() => {
         const loadPageData = async () => {
+            const dateStatus = checkIsInvalidDate(date);
+            if (dateStatus.invalid) {
+                setStudents([]);
+                setError(`Attendance cannot be marked: ${dateStatus.reason}`);
+                return;
+            }
+
             if (selectedClass) {
                 await fetchStudents(selectedClass);
                 await fetchAttendance(selectedClass, date);
             }
         };
         loadPageData();
-    }, [selectedClass, date, fetchStudents, fetchAttendance]);
+    }, [selectedClass, date, fetchStudents, fetchAttendance, checkIsInvalidDate]);
 
     const handleStatusChange = (studentId: number, status: string) => {
         setAttendance(prev => ({
@@ -204,15 +226,17 @@ export default function AttendancePage() {
             {/* Selection Controls */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white dark:bg-zinc-900 p-8 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all duration-300">
                 <div className="space-y-2">
-                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2">
-                        <Calendar className="w-3 h-3" /> Date
-                    </label>
-                    <input
-                        type="date"
+                    <CalendarPicker
+                        label="Date"
                         value={date}
-                        onChange={(e) => setDate(e.target.value)}
-                        max={new Date().toISOString().split('T')[0]}
-                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-3 px-4 text-sm focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-bold"
+                        onChange={(d, isHoliday) => {
+                            setDate(d);
+                            setSelectedDateIsHoliday(!!isHoliday);
+                        }}
+                        maxDate={new Date().toISOString().split('T')[0]}
+                        disableHolidays={true}
+                        shouldDisableDate={(d) => d.getDay() === 0}
+                        error={checkIsInvalidDate(date).invalid ? `Attendance cannot be marked: ${checkIsInvalidDate(date).reason}` : undefined}
                     />
                 </div>
 
@@ -340,8 +364,8 @@ export default function AttendancePage() {
                         <div className="flex justify-end pt-6">
                             <button
                                 onClick={handleSubmit}
-                                disabled={submitting}
-                                className="px-8 py-4 bg-emerald-500 text-white rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-emerald-600 shadow-xl shadow-emerald-500/20 active:scale-95 transition-all flex items-center gap-3"
+                                disabled={submitting || checkIsInvalidDate(date).invalid}
+                                className="px-8 py-4 bg-emerald-500 text-white rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-emerald-600 shadow-xl shadow-emerald-500/20 active:scale-95 transition-all flex items-center gap-3 disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed"
                             >
                                 {submitting ? (
                                     <Loader2 className="w-5 h-5 animate-spin" />
