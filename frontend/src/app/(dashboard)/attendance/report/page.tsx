@@ -120,7 +120,7 @@ function AttendanceReportContent() {
     const daysInMonth = new Date(year, month, 0).getDate();
     const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
-    const exportToPDF = () => {
+    const exportToPDF_Frontend = () => {
         const doc = new jsPDF('landscape', 'mm', 'a4');
         const className = classes.find(c => c.id.toString() === selectedClass);
         const monthName = new Date(year, month - 1).toLocaleString('default', { month: 'long' });
@@ -128,7 +128,7 @@ function AttendanceReportContent() {
         // Header
         doc.setFontSize(22);
         doc.setTextColor(50, 50, 50);
-        doc.text('Monthly Attendance Report', 14, 15);
+        doc.text('Monthly Attendance Report (FE)', 14, 15);
 
         doc.setFontSize(14);
         doc.setTextColor(100, 100, 100);
@@ -158,8 +158,8 @@ function AttendanceReportContent() {
             startY: 35,
             theme: 'grid',
             headStyles: {
-                fillColor: "gray",
-                textColor: "black",
+                fillColor: [80, 80, 80],
+                textColor: [255, 255, 255],
                 fontSize: 7,
                 halign: 'center',
                 fontStyle: 'bold'
@@ -183,7 +183,35 @@ function AttendanceReportContent() {
             }
         });
 
-        doc.save(`Attendance_Report_${className?.standard}_${className?.division}_${monthName}_${year}.pdf`);
+        doc.save(`Attendance_Report_FE_${className?.standard}_${className?.division}_${monthName}_${year}.pdf`);
+    };
+
+    const exportToPDF_Backend = async () => {
+        if (!selectedClass) return;
+        setLoading(true);
+        try {
+            const blob = await api.getMonthlyReportPDF({
+                classId: parseInt(selectedClass),
+                month,
+                year,
+                class_id: parseInt(selectedClass) // backend expects class_id
+            });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const className = classes.find(c => c.id.toString() === selectedClass);
+            const monthName = new Date(year, month - 1).toLocaleString('default', { month: 'long' });
+            a.download = `Attendance_Report_Server_${className?.standard}_${className?.division}_${monthName}_${year}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        } catch (err) {
+            setError('Failed to download PDF report.');
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -209,14 +237,23 @@ function AttendanceReportContent() {
                     </div>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3">
                     <button
-                        onClick={exportToPDF}
+                        onClick={exportToPDF_Frontend}
+                        disabled={loading || report.length === 0}
+                        className="flex items-center gap-2 px-5 py-3 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all active:scale-95 disabled:opacity-50"
+                    >
+                        <Download className="w-4 h-4" />
+                        Export PDF (Client)
+                    </button>
+                    <button
+                        onClick={exportToPDF_Backend}
                         disabled={loading || report.length === 0}
                         className="flex items-center gap-2 px-5 py-3 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 text-[10px] font-black uppercase tracking-widest rounded-2xl hover:scale-105 transition-all shadow-xl shadow-zinc-900/10 active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
                     >
-                        <Download className="w-4 h-4" />
-                        Export PDF
+                        <Loader2 className={`w-4 h-4 ${loading ? 'animate-spin' : 'hidden'}`} />
+                        <Download className={`w-4 h-4 ${loading ? 'hidden' : ''}`} />
+                        Export PDF (Server)
                     </button>
                 </div>
             </section>

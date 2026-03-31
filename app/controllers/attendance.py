@@ -3,6 +3,13 @@ from sqlalchemy import extract, and_, or_
 from fastapi import HTTPException, status
 from typing import List, Optional
 from datetime import date, datetime
+from io import BytesIO
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib import colors
+from reportlab.lib.units import inch
+import calendar
 
 from .. import models, schemas, utils
 
@@ -97,3 +104,87 @@ def view_monthly_attendance_report(db: Session, month: int, year: int, class_id:
             report_dict[s_id]["attendance_percentage"] = round((present / total) * 100, 1)
 
     return list(report_dict.values())
+
+def generate_monthly_attendance_pdf(db: Session, month: int, year: int, class_id: int):
+    # Get class and school details
+    school_class = db.query(models.SchoolClass).filter(models.SchoolClass.id == class_id).first()
+    class_name = f"{school_class.standard} - {school_class.division}" if school_class else "Unknown"
+    
+    month_name = datetime(year, month, 1).strftime('%B')
+    
+    # Get and sort report data by full name DESC
+    report_data = view_monthly_attendance_report(db, month, year, class_id)
+    sorted_data = sorted(report_data, key=lambda x: f"{x['name']} {x['surname']}".lower(), reverse=True)
+    
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=landscape(A4), rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=30)
+    elements = []
+    
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        'TitleStyle',
+        parent=styles['Heading1'],
+        alignment=1,
+        spaceAfter=12,
+        textColor=colors.HexColor('#10b981')
+    )
+    
+    # Header
+    elements.append(Paragraph(f"Monthly Attendance Report - {month_name} {year}", title_style))
+    elements.append(Paragraph(f"Class: {class_name}", styles['Normal']))
+    elements.append(Spacer(1, 0.2 * inch))
+    
+    # Table Header
+    _, last_day = calendar.monthrange(year, month)
+    
+    headers = ['S.No', 'Student Name', 'GR No.']
+    for d in range(1, last_day + 1):
+        headers.append(str(d))
+    headers.append('%')
+    
+    table_data = [headers]
+    
+    for idx, student in enumerate(sorted_data, 1):
+        row = [idx, f"{student['name']} {student['surname']}", student['gr_no']]
+        for d in range(1, last_day + 1):
+            status = student['data'].get(str(d), "")
+            if status == "present":
+                row.append("P")
+            elif status == "absent":
+                row.append("A")
+            else:
+                row.append("-")
+        row.append(f"{student['attendance_percentage']}%")
+        table_data.append(row)
+    
+    # Table Styles
+    col_widths = [0.4 * inch, 1.8 * inch, 0.8 * inch] + [0.22 * inch] * last_day + [0.5 * inch]
+    table = Table(table_data, colWidths=col_widths, repeatRows=1)
+    
+    style = TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#f4f4f5')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor('#18181b')),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 8),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ('FONTSIZE', (0, 1), (-1, -1), 7),
+        ('ALIGN', (1, 1), (1, -1), 'LEFT'),
+    ])
+    
+    # Conditional Coloring
+    for row_idx, row in enumerate(table_data[1:], 1):
+        for col_idx, cell in enumerate(row[3:-1], 3):
+            if cell == "P":
+                style.add('TEXTCOLOR', (col_idx, row_idx), (col_idx, row_idx), colors.HexColor('#10b981'))
+            elif cell == "A":
+                style.add('TEXTCOLOR', (col_idx, row_idx), (col_idx, row_idx), colors.red)
+    
+    table.setStyle(style)
+    elements.append(table)
+    
+    doc.build(elements)
+    buffer.seek(0)
+    return buffer

@@ -45,3 +45,20 @@ def view_monthly_attendance_report(
     current_user: models.User = Depends(get_current_user)
 ):
     return controllers.attendance.view_monthly_attendance_report(db, month, year, class_id)
+
+@router.get("/report/monthly/pdf")
+def view_monthly_attendance_report_pdf(
+    month: int,
+    year: int,
+    class_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    from fastapi.responses import StreamingResponse
+    pdf_buffer = controllers.attendance.generate_monthly_attendance_pdf(db, month, year, class_id)
+    filename = f"Attendance_Report_{month}_{year}_{class_id}.pdf"
+    return StreamingResponse(
+        pdf_buffer, 
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )

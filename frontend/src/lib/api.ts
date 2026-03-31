@@ -142,6 +142,15 @@ export const api = {
         body: JSON.stringify(data),
     }),
     getMonthlyReport: (params: Record<string, unknown>) => fetchApi(`/api/attendance/report/monthly${buildQuery(params)}`),
+    getMonthlyReportPDF: async (params: Record<string, unknown>) => {
+        const response = await fetch(`${API_URL}/api/attendance/report/monthly/pdf${buildQuery(params)}`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+        if (!response.ok) throw new Error('Failed to download PDF');
+        return response.blob();
+    },
 
     // Holidays
     getHolidays: (params: Record<string, unknown> = {}) => fetchApi(`/api/holidays/${buildQuery(params)}`),
