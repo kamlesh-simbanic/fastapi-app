@@ -47,13 +47,13 @@ def view_attendance(db: Session, skip: int = 0, limit: int = 100, sort_by: str =
     return utils.apply_pagination_sort(query, models.Attendance, skip, limit, sort_by, order).all()
 
 def view_monthly_attendance_report(db: Session, month: int, year: int, class_id: int):
-    # Get class students to have names
+    # Get class students
     class_mapping = db.query(models.ClassStudent).filter(models.ClassStudent.class_id == class_id).first()
     if not class_mapping:
         return []
     
     students = db.query(models.Student).filter(models.Student.id.in_(class_mapping.students)).all()
-    student_map = {s.id: f"{s.name} {s.surname}" for s in students}
+    student_meta = {s.id: {"name": s.name, "surname": s.surname, "gr_no": s.gr_no} for s in students}
 
     records = db.query(models.Attendance).filter(
         and_(
@@ -64,10 +64,16 @@ def view_monthly_attendance_report(db: Session, month: int, year: int, class_id:
     ).all()
 
     report_dict = {}
-    for s_id, s_name in student_map.items():
+    for s_id, meta in student_meta.items():
         report_dict[s_id] = {
             "student_id": s_id,
-            "name": s_name,
+            "name": meta["name"],
+            "surname": meta["surname"],
+            "gr_no": meta["gr_no"],
+            "total_days": len(records),
+            "present_days": 0,
+            "absent_days": 0,
+            "attendance_percentage": 0.0,
             "data": {}
         }
 
@@ -77,6 +83,17 @@ def view_monthly_attendance_report(db: Session, month: int, year: int, class_id:
             s_id = r.get("student_id")
             if s_id in report_dict:
                 status = r.get("status")
-                report_dict[s_id]["data"][day] = "present" if status == "P" or status == "present" else "absent"
+                is_present = status == "P" or status == "present"
+                report_dict[s_id]["data"][day] = "present" if is_present else "absent"
+                if is_present:
+                    report_dict[s_id]["present_days"] += 1
+                else:
+                    report_dict[s_id]["absent_days"] += 1
+
+    for s_id in report_dict:
+        total = report_dict[s_id]["total_days"]
+        if total > 0:
+            present = report_dict[s_id]["present_days"]
+            report_dict[s_id]["attendance_percentage"] = round((present / total) * 100, 1)
 
     return list(report_dict.values())

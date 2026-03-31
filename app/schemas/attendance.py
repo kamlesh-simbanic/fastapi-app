@@ -37,4 +37,10 @@ class AttendanceBulkCreateNew(AttendanceBase):
 class StudentAttendanceReport(BaseModel):
     student_id: int
     name: str
-    data: dict # Format { "1": "present", "2": "absent", ... }
+    surname: str
+    gr_no: str
+    total_days: int
+    present_days: int
+    absent_days: int
+    attendance_percentage: float
+    data: Dict[str, str] # Format { "1": "present", "2": "absent", ... }

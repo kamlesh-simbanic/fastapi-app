@@ -18,6 +18,8 @@ import {
     AlertCircle
 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 interface SchoolClass {
     id: number;
@@ -27,13 +29,14 @@ interface SchoolClass {
 
 interface AttendanceSummary {
     student_id: number;
-    student_name: string;
-    student_surname: string;
+    name: string;
+    surname: string;
     gr_no: string;
     total_days: number;
     present_days: number;
     absent_days: number;
     attendance_percentage: number;
+    data: Record<string, string>;
 }
 
 function AttendanceReportContent() {
@@ -68,11 +71,13 @@ function AttendanceReportContent() {
         setLoading(true);
         setError(null);
         try {
-            const data = await api.getAttendance({
+            const data = await api.getMonthlyReport({
                 class_id: parseInt(selectedClass),
                 month,
                 year
             });
+            console.log("data", data);
+
             setReport(data);
         } catch {
             setError('Failed to load attendance report.');
@@ -95,14 +100,91 @@ function AttendanceReportContent() {
 
     if (!user) return null;
 
-    const filteredReport = report.filter(s =>
-        `${s.student_name} ${s.student_surname}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        s.gr_no.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredReport = report
+        .filter(s =>
+            `${s.name} ${s.surname}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            s.gr_no.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        .sort((a, b) => {
+            const nameA = `${a.name} ${a.surname}`.toLowerCase();
+            const nameB = `${b.name} ${b.surname}`.toLowerCase();
+            if (nameB < nameA) return 1;
+            if (nameB > nameA) return -1;
+            return 0;
+        });
 
     const averageAttendance = report.length > 0
         ? report.reduce((acc, curr) => acc + curr.attendance_percentage, 0) / report.length
         : 0;
+
+    const daysInMonth = new Date(year, month, 0).getDate();
+    const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+
+    const exportToPDF = () => {
+        const doc = new jsPDF('landscape', 'mm', 'a4');
+        const className = classes.find(c => c.id.toString() === selectedClass);
+        const monthName = new Date(year, month - 1).toLocaleString('default', { month: 'long' });
+
+        // Header
+        doc.setFontSize(22);
+        doc.setTextColor(50, 50, 50);
+        doc.text('Monthly Attendance Report', 14, 15);
+
+        doc.setFontSize(14);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Class: Standard ${className?.standard} - ${className?.division} | Period: ${monthName} ${year}`, 14, 25);
+
+        // Prepare table data
+        const head = [
+            ['GR No', 'Student', ...daysArray.map(String), 'P/T', '%']
+        ];
+
+        const body = filteredReport.map(student => [
+            student.gr_no,
+            `${student.name} ${student.surname}`,
+            ...daysArray.map(day => {
+                const status = student.data[day.toString()];
+                if (status === 'present') return 'P';
+                if (status === 'absent') return 'A';
+                return '-';
+            }),
+            `${student.present_days}/${student.total_days}`,
+            `${student.attendance_percentage.toFixed(1)}%`
+        ]);
+
+        autoTable(doc, {
+            head,
+            body,
+            startY: 35,
+            theme: 'grid',
+            headStyles: {
+                fillColor: "gray",
+                textColor: "black",
+                fontSize: 7,
+                halign: 'center',
+                fontStyle: 'bold'
+            },
+            bodyStyles: {
+                fontSize: 6,
+                halign: 'center'
+            },
+            columnStyles: {
+                1: { halign: 'left', cellWidth: 35 }, // Student name column
+                0: { fontStyle: 'bold', cellWidth: 15 } // GR No
+            },
+            didDrawCell: (data) => {
+                if (data.section === 'body' && data.column.index >= 2 && data.column.index < daysArray.length + 2) {
+                    if (data.cell.text[0] === 'P') {
+                        doc.setTextColor(16, 185, 129); // emerald-500
+                    } else if (data.cell.text[0] === 'A') {
+                        doc.setTextColor(239, 68, 68); // red-500
+                    }
+                }
+            }
+        });
+
+        doc.save(`Attendance_Report_${className?.standard}_${className?.division}_${monthName}_${year}.pdf`);
+    };
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500 pb-20">
@@ -128,7 +210,11 @@ function AttendanceReportContent() {
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <button className="flex items-center gap-2 px-5 py-3 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 text-[10px] font-black uppercase tracking-widest rounded-2xl hover:scale-105 transition-all shadow-xl shadow-zinc-900/10 active:scale-95">
+                    <button
+                        onClick={exportToPDF}
+                        disabled={loading || report.length === 0}
+                        className="flex items-center gap-2 px-5 py-3 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 text-[10px] font-black uppercase tracking-widest rounded-2xl hover:scale-105 transition-all shadow-xl shadow-zinc-900/10 active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
+                    >
                         <Download className="w-4 h-4" />
                         Export PDF
                     </button>
@@ -271,40 +357,53 @@ function AttendanceReportContent() {
                             />
                         </div>
 
-                        <div className="bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-xl shadow-zinc-200/50 dark:shadow-none">
-                            <table className="w-full text-left border-collapse">
+                        <div className="bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 overflow-x-auto shadow-xl shadow-zinc-200/50 dark:shadow-none">
+                            <table className="w-full text-left border-collapse min-w-[1200px]">
                                 <thead>
                                     <tr className="bg-zinc-50 dark:bg-zinc-900/50 border-b border-zinc-200 dark:border-zinc-800">
-                                        <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest">GR No</th>
-                                        <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest">Student</th>
-                                        <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest text-center">Days (P/T)</th>
-                                        <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest text-right">Attendance %</th>
+                                        <th className="px-6 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest sticky left-0 bg-zinc-50 dark:bg-zinc-900/50 z-10 border-r border-zinc-200/50 dark:border-zinc-800/50">GR No</th>
+                                        <th className="px-6 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest sticky left-[100px] bg-zinc-50 dark:bg-zinc-900/50 z-10 border-r border-zinc-200/50 dark:border-zinc-800/50">Student</th>
+                                        {daysArray.map(day => (
+                                            <th key={day} className="px-2 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest text-center min-w-[35px] border-r border-zinc-200/10 dark:border-zinc-800/10 last:border-r-0">
+                                                {day}
+                                            </th>
+                                        ))}
+                                        <th className="px-6 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest text-center border-l border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50">Days (P/T)</th>
+                                        <th className="px-6 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest text-right bg-zinc-50 dark:bg-zinc-900/50">Attendance %</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
                                     {filteredReport.map((student) => (
                                         <tr key={student.student_id} className="group hover:bg-zinc-50 dark:hover:bg-zinc-900/40 transition-colors">
-                                            <td className="px-8 py-5">
+                                            <td className="px-6 py-5 sticky left-0 bg-white dark:bg-zinc-900 z-10 group-hover:bg-zinc-50 dark:group-hover:bg-zinc-900/40 border-r border-zinc-200/50 dark:border-zinc-800/50">
                                                 <span className="font-mono text-xs font-black text-indigo-500">{student.gr_no}</span>
                                             </td>
-                                            <td className="px-8 py-5">
-                                                <p className="text-sm font-black text-zinc-900 dark:text-white italic uppercase tracking-tight">
-                                                    {student.student_name} {student.student_surname}
+                                            <td className="px-6 py-5 sticky left-[100px] bg-white dark:bg-zinc-900 z-10 group-hover:bg-zinc-50 dark:group-hover:bg-zinc-900/40 border-r border-zinc-200/50 dark:border-zinc-800/50">
+                                                <p className="text-sm font-black text-zinc-900 dark:text-white italic uppercase tracking-tight truncate max-w-[150px]">
+                                                    {student.name} {student.surname}
                                                 </p>
                                             </td>
-                                            <td className="px-8 py-5 text-center">
+                                            {daysArray.map(day => {
+                                                const status = student.data[day.toString()];
+                                                return (
+                                                    <td key={day} className="px-2 py-5 text-center border-r border-zinc-100 dark:border-zinc-800/30 last:border-r-0">
+                                                        {status === 'present' ? (
+                                                            <span className="text-[10px] font-black text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded">P</span>
+                                                        ) : status === 'absent' ? (
+                                                            <span className="text-[10px] font-black text-red-500 bg-red-500/10 px-1.5 py-0.5 rounded">A</span>
+                                                        ) : (
+                                                            <span className="text-zinc-300 dark:text-zinc-700">-</span>
+                                                        )}
+                                                    </td>
+                                                );
+                                            })}
+                                            <td className="px-6 py-5 text-center border-l border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 group-hover:bg-zinc-50 dark:group-hover:bg-zinc-900/40">
                                                 <span className="text-xs font-bold text-zinc-500">
                                                     {student.present_days} / {student.total_days}
                                                 </span>
                                             </td>
-                                            <td className="px-8 py-5 text-right">
+                                            <td className="px-6 py-5 text-right bg-white dark:bg-zinc-900 group-hover:bg-zinc-50 dark:group-hover:bg-zinc-900/40">
                                                 <div className="flex items-center justify-end gap-3">
-                                                    <div className="w-24 h-2 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden hidden sm:block">
-                                                        <div
-                                                            className={`h-full rounded-full transition-all duration-1000 ${student.attendance_percentage >= 75 ? 'bg-emerald-500' : 'bg-amber-500'}`}
-                                                            style={{ width: `${student.attendance_percentage}%` }}
-                                                        />
-                                                    </div>
                                                     <span className={`text-sm font-black ${student.attendance_percentage >= 75 ? 'text-emerald-500' : 'text-amber-500'}`}>
                                                         {student.attendance_percentage.toFixed(1)}%
                                                     </span>
