@@ -1,0 +1,77 @@
+[project]
+name = "fastapi-app"
+version = "0.1.0"
+description = "A modular FastAPI application"
+authors = [
+    { name = "Kamlesh" }
+]
+dependencies = [
+    "fastapi[standard]",
+    "uvicorn",
+    "pydantic",
+    "python-dotenv",
+    "sqlalchemy",
+    "pymysql",
+    "cryptography",
+    "passlib[bcrypt]",
+    "bcrypt==4.0.1",
+    "python-jose[cryptography]",
+    "email-validator",
+]
+requires-python = ">=3.10"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.20",
+    "ruff>=0.3.0",
+    "mypy>=1.0",
+    "httpx>=0.24",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+# Target Python version
+target-version = "py310"
+
+# Rules for Ruff
+# E: pycodestyle errors
+# F: Pyflakes
+# I: isort
+# B: flake8-bugbear
+# UP: pyupgrade
+# ANN: flake8-annotations (can be noisy, but good for FastAPI)
+# S: flake8-bandit (security)
+select = ["E", "F", "I", "B", "UP", "S"]
+ignore = ["E501"] # Line length is handled by formatter
+
+[tool.ruff.lint]
+# Add more robust checks for FastAPI
+extend-select = ["TID", "PT", "ARG"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+ignore_missing_imports = true
+plugins = ["pydantic.mypy"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
+asyncio_mode = "auto"
+
+[tool.fastapi]
+entrypoint = "app.main:app"

@@ -1,0 +1,14 @@
+venv/
+__pycache__/
+*.pyc
+.env
+.git/
+.gitignore
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+node_modules/
+out/
+Dockerfile
+.dockerignore
+pyproject.toml
