@@ -166,4 +166,7 @@ export const api = {
     deleteHoliday: (id: number | string) => fetchApi(`/api/holidays/${id}`, {
         method: 'DELETE',
     }),
+
+    // Public
+    getPublicStudent: (grNo: string) => fetchApi(`/api/public/student/${grNo}`),
 };

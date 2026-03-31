@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 from . import models
 from .database import engine, get_db
-from .routers import auth, tasks, students, fees, staff, attendance, dashboard, school_class, class_student, holiday
+from .routers import auth, tasks, students, fees, staff, attendance, dashboard, school_class, class_student, holiday, public
 
 load_dotenv()
 
@@ -33,6 +33,7 @@ app.add_middleware(
 )
 
 # Include Routers
+app.include_router(public.router, prefix="/api")
 app.include_router(auth.router, prefix="/api")
 app.include_router(tasks.router, prefix="/api")
 app.include_router(students.router, prefix="/api")
