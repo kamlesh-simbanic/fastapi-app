@@ -57,6 +57,27 @@ export default function PublicFeePaymentPage() {
         }
     };
 
+    const handlePayUsingPG = async () => {
+        if (!student) return;
+        setLoading(true);
+        setError(null);
+        try {
+            const res = await api.initiatePublicPayment({
+                gr_no: student.gr_no,
+                amount: FEE_AMOUNT
+            });
+            if (res.success && res.redirectUrl) {
+                window.location.href = res.redirectUrl;
+            } else {
+                throw new Error("Failed to get redirect URL");
+            }
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : "Payment initiation failed.";
+            setError(message);
+            setLoading(false);
+        }
+    };
+
     const upiLink = student ? `upi://pay?pa=${SCHOOL_UPI_ID}&pn=${encodeURIComponent(SCHOOL_NAME)}&am=${FEE_AMOUNT}&cu=INR&tn=${encodeURIComponent(`Fee Payment - GR: ${student.gr_no}`)}` : '';
 
     return (
@@ -172,18 +193,32 @@ export default function PublicFeePaymentPage() {
                                             </div>
                                         </div>
 
-                                        <div className="flex flex-col items-center justify-center space-y-6">
+                                        <div className="flex flex-col items-center justify-center space-y-4">
+                                            <button
+                                                onClick={handlePayUsingPG}
+                                                disabled={loading || !student}
+                                                className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black uppercase tracking-widest text-xs transition-all shadow-xl shadow-indigo-500/20 active:scale-95 disabled:opacity-50"
+                                            >
+                                                {loading ? "Redirecting..." : "Pay via PhonePe Gateway"}
+                                            </button>
+
+                                            <div className="flex items-center gap-4 w-full">
+                                                <div className="h-px bg-zinc-200 dark:bg-zinc-800 flex-1" />
+                                                <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">OR</span>
+                                                <div className="h-px bg-zinc-200 dark:bg-zinc-800 flex-1" />
+                                            </div>
+
                                             {!showQR ? (
                                                 <button
                                                     onClick={() => setShowQR(true)}
-                                                    className="w-full h-full min-h-[220px] rounded-[2.5rem] bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex flex-col items-center justify-center gap-4 group transition-all hover:scale-[1.02] shadow-2xl shadow-zinc-900/20"
+                                                    className="w-full h-full min-h-[160px] rounded-[2.5rem] bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex flex-col items-center justify-center gap-4 group transition-all hover:scale-[1.02] shadow-2xl shadow-zinc-900/20"
                                                 >
-                                                    <div className="w-16 h-16 rounded-3xl bg-white/10 dark:bg-zinc-900/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                                        <QrCode className="w-8 h-8" />
+                                                    <div className="w-12 h-12 rounded-2xl bg-white/10 dark:bg-zinc-900/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                                        <QrCode className="w-6 h-6" />
                                                     </div>
                                                     <div className="text-center">
-                                                        <p className="text-xs font-black uppercase tracking-widest">Generate QR Code</p>
-                                                        <p className="text-[10px] opacity-60 font-bold">Fast & secure payment</p>
+                                                        <p className="text-[10px] font-black uppercase tracking-widest">Generate UPI QR</p>
+                                                        <p className="text-[9px] opacity-60 font-bold italic">Static QR Code</p>
                                                     </div>
                                                 </button>
                                             ) : (
@@ -191,15 +226,15 @@ export default function PublicFeePaymentPage() {
                                                     <div className="p-4 bg-zinc-50 rounded-2xl">
                                                         <QRCodeSVG
                                                             value={upiLink}
-                                                            size={200}
+                                                            size={160}
                                                             level="H"
                                                             includeMargin={true}
                                                             imageSettings={{
                                                                 src: "/images/phonepe.png",
                                                                 x: undefined,
                                                                 y: undefined,
-                                                                height: 40,
-                                                                width: 40,
+                                                                height: 32,
+                                                                width: 32,
                                                                 excavate: true,
                                                             }}
                                                         />

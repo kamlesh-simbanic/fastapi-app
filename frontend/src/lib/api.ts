@@ -169,4 +169,8 @@ export const api = {
 
     // Public
     getPublicStudent: (grNo: string) => fetchApi(`/api/public/student/${grNo}`),
+    initiatePublicPayment: (data: { gr_no: string, amount: number }) => fetchApi('/api/public/pay/initiate', {
+        method: 'POST',
+        body: JSON.stringify(data)
+    }),
 };
