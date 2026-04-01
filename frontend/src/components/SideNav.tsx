@@ -26,6 +26,7 @@ const navItems = [
     { icon: Calendar, label: 'Attendance', href: '/attendance' },
     { icon: CalendarDays, label: 'Holidays', href: '/holidays' },
     { icon: CreditCard, label: 'Fees', href: '/fees' },
+    { icon: CreditCard, label: 'Fee Structure', href: '/fee-structure' },
     { icon: Briefcase, label: 'Staff', href: '/staff' },
 ];
 

@@ -8,3 +8,4 @@ from .attendance import Attendance, AttendanceStatus
 from .holiday import Holiday
 from .school_class import SchoolClass
 from .class_student import ClassStudent
+from .fee_structure import FeeStructure

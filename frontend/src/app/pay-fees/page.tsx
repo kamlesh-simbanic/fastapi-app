@@ -28,10 +28,10 @@ export default function PublicFeePaymentPage() {
     const [grNo, setGrNo] = useState('');
     const [loading, setLoading] = useState(false);
     const [student, setStudent] = useState<StudentInfo | null>(null);
+    const [feeAmount, setFeeAmount] = useState<number>(25000); // Default amount
     const [error, setError] = useState<string | null>(null);
     const [showQR, setShowQR] = useState(false);
 
-    const FEE_AMOUNT = 25000;
     const SCHOOL_UPI_ID = "kamleshthavani12345@okhdfcbank"; // Placeholder UPI ID
     const SCHOOL_NAME = "Simbanic School Management";
 
@@ -47,8 +47,8 @@ export default function PublicFeePaymentPage() {
         setShowQR(false);
 
         try {
-            const data = await api.getPublicStudent(grNo.trim());
-            setStudent(data);
+            const studentData = await api.getPublicStudent(grNo.trim());
+            setStudent(studentData);
         } catch (err: unknown) {
             const message = err instanceof Error ? err.message : "Failed to fetch student details. Please check the GR Number.";
             setError(message);
@@ -64,7 +64,7 @@ export default function PublicFeePaymentPage() {
         try {
             const res = await api.initiatePublicPayment({
                 gr_no: student.gr_no,
-                amount: FEE_AMOUNT
+                amount: feeAmount
             });
             if (res.success && res.redirectUrl) {
                 window.location.href = res.redirectUrl;
@@ -78,7 +78,7 @@ export default function PublicFeePaymentPage() {
         }
     };
 
-    const upiLink = student ? `upi://pay?pa=${SCHOOL_UPI_ID}&pn=${encodeURIComponent(SCHOOL_NAME)}&am=${FEE_AMOUNT}&cu=INR&tn=${encodeURIComponent(`Fee Payment - GR: ${student.gr_no}`)}` : '';
+    const upiLink = student ? `upi://pay?pa=${SCHOOL_UPI_ID}&pn=${encodeURIComponent(SCHOOL_NAME)}&am=${feeAmount}&cu=INR&tn=${encodeURIComponent(`Fee Payment - GR: ${student.gr_no}`)}` : '';
 
     return (
         <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 font-space selection:bg-emerald-500/30">
@@ -178,17 +178,19 @@ export default function PublicFeePaymentPage() {
 
                                             <div className="p-6 rounded-[2rem] bg-zinc-50 dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-800">
                                                 <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-                                                    <CreditCard className="w-3 h-3" /> Annual Fees
+                                                    <CreditCard className="w-3 h-3" /> Amount to Pay (₹)
                                                 </p>
-                                                <div className="flex items-end gap-1">
-                                                    <span className="text-sm font-black text-zinc-400 mb-1">₹</span>
-                                                    <span className="text-4xl font-black text-zinc-900 dark:text-white tabular-nums tracking-tighter italic font-space">
-                                                        {FEE_AMOUNT.toLocaleString('en-IN')}
-                                                    </span>
+                                                <div className="relative">
+                                                    <input
+                                                        type="number"
+                                                        value={feeAmount}
+                                                        onChange={(e) => setFeeAmount(parseInt(e.target.value) || 0)}
+                                                        className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-4 px-6 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 font-black text-3xl text-zinc-900 dark:text-white tabular-nums tracking-tighter italic transition-all"
+                                                    />
                                                 </div>
                                                 <div className="mt-4 flex items-center gap-2 text-xs font-bold text-zinc-500">
                                                     <Info className="w-3 h-3" />
-                                                    Fixed annual tuition fee for academic year 2025-26.
+                                                    Enter the fee amount you wish to pay.
                                                 </div>
                                             </div>
                                         </div>
