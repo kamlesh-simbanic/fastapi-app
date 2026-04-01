@@ -104,6 +104,21 @@ export const api = {
         method: 'POST',
         body: JSON.stringify(data),
     }),
+    getSuggestedFee: (grNo: string | number, year: string | number) => fetchApi(`/api/fees/suggested-amount/${grNo}/${year}`),
+
+    // Fee Structure
+    getFeeStructures: (params: Record<string, unknown> = {}) => fetchApi(`/api/fee-structure/${buildQuery(params)}`),
+    addFeeStructure: (data: Record<string, unknown>) => fetchApi('/api/fee-structure/', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    }),
+    updateFeeStructure: (id: string | number, data: Record<string, unknown>) => fetchApi(`/api/fee-structure/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+    }),
+    deleteFeeStructure: (id: string | number) => fetchApi(`/api/fee-structure/${id}`, {
+        method: 'DELETE',
+    }),
 
     // Classes
     getClasses: (params: Record<string, unknown> = {}) => fetchApi(`/api/classes/${buildQuery(params)}`),
@@ -169,6 +184,7 @@ export const api = {
 
     // Public
     getPublicStudent: (grNo: string) => fetchApi(`/api/public/student/${grNo}`),
+    getPublicStudentFee: (grNo: string, year: number) => fetchApi(`/api/public/student/${grNo}/fee?year=${year}`),
     initiatePublicPayment: (data: { gr_no: string, amount: number }) => fetchApi('/api/public/pay/initiate', {
         method: 'POST',
         body: JSON.stringify(data)

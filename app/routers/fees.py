@@ -34,3 +34,12 @@ def list_payments(
     current_user: models.User = Depends(get_current_user)
 ):
     return controllers.fees.list_payments(db, skip, limit, sort_by, order, term, year, search)
+
+@router.get("/suggested-amount/{gr_no}/{year}")
+def get_suggested_amount(
+    gr_no: str, 
+    year: int,  
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    return controllers.fees.get_suggested_fee(db, gr_no, year)

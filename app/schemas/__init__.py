@@ -10,3 +10,4 @@ from .attendance import (
 from .holiday import HolidayBase, HolidayCreate, HolidayUpdate, HolidayOut
 from .school_class import SchoolClassBase, SchoolClassCreate, SchoolClassUpdate, SchoolClass, StaffSimple, SchoolClassList
 from .class_student import ClassStudentBase, ClassStudentCreate, ClassStudentUpdate, ClassStudent, ClassStudentList
+from .fee_structure import FeeStructureBase, FeeStructureCreate, FeeStructureUpdate, FeeStructure, FeeStructureDetailed

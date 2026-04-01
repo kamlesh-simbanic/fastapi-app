@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query, Request
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
+from datetime import datetime
 
 import base64
 import json
@@ -35,6 +36,62 @@ def get_student_by_gr_no(gr_no: str, db: Session = Depends(get_db)):
         )
     
     return student
+
+@router.get("/student/{gr_no}/fee")
+def get_public_student_fee(gr_no: str, year: int = Query(...), db: Session = Depends(get_db)):
+    student = db.query(models.Student).filter(
+        models.Student.gr_no == gr_no,
+        models.Student.status == models.StudentStatus.ACTIVE
+    ).first()
+    
+    if not student:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No active student found with GR No. {gr_no}"
+        )
+        
+    year_str = str(year)
+    
+    # Refined search: prefer academic years starting with the year (e.g. 2025-26)
+    mappings = db.query(models.ClassStudent).options(
+        joinedload(models.ClassStudent.school_class)
+    ).filter(
+        models.ClassStudent.academic_year.startswith(year_str)
+    ).all()
+    
+    # Fallback if no exact start found (maybe it was 2024-2025)
+    if not mappings:
+        mappings = db.query(models.ClassStudent).options(
+            joinedload(models.ClassStudent.school_class)
+        ).filter(
+            models.ClassStudent.academic_year.contains(year_str)
+        ).all()
+    
+    relevant_class = None
+    for m in mappings:
+        if m.students and student.id in m.students:
+            relevant_class = m.school_class
+            break
+            
+    if not relevant_class:
+        raise HTTPException(
+            status_code=404, 
+            detail=f"Student record found, but student is not assigned to any class for academic year {year}."
+        )
+        
+    fee = db.query(models.FeeStructure).filter(
+        models.FeeStructure.class_id == relevant_class.id,
+        models.FeeStructure.year == year
+    ).first()
+    
+    if not fee:
+        class_info = f"{relevant_class.standard} - {relevant_class.division}"
+        raise HTTPException(
+            status_code=404, 
+            detail=f"Fee structure not defined for class '{class_info}' in year {year}. Please contact admin."
+        )
+        
+    return {"fee_amount": fee.fee_amount}
 
 @router.post("/pay/initiate")
 async def initiate_payment(data: dict):

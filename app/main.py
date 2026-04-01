@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 from . import models
 from .database import engine, get_db
-from .routers import auth, tasks, students, fees, staff, attendance, dashboard, school_class, class_student, holiday, public
+from .routers import auth, tasks, students, fees, staff, attendance, dashboard, school_class, class_student, holiday, public, fee_structure
 
 load_dotenv()
 
@@ -44,6 +44,7 @@ app.include_router(dashboard.router, prefix="/api", tags=["Dashboard"])
 app.include_router(holiday.router, prefix="/api")
 app.include_router(school_class.router, prefix="/api")
 app.include_router(class_student.router, prefix="/api")
+app.include_router(fee_structure.router, prefix="/api")
 
 # Root redirect to frontend
 # API health and test endpoints

@@ -74,6 +74,23 @@ export default function RecordPaymentPage() {
         return () => clearTimeout(timer);
     }, [studentSearch]);
 
+    // Fetch suggested fee
+    useEffect(() => {
+        const fetchSuggestedFee = async () => {
+            if (selectedStudent && formData.year) {
+                try {
+                    const data = await api.getSuggestedFee(selectedStudent.gr_no, formData.year);
+                    if (data && data.fee_amount) {
+                        setFormData(prev => ({ ...prev, amount: data.fee_amount.toString() }));
+                    }
+                } catch {
+                    console.log('No fee structure found for this student/year');
+                }
+            }
+        };
+        fetchSuggestedFee();
+    }, [selectedStudent, formData.year]);
+
     const validateForm = () => {
         const newErrors: Record<string, string> = {};
 
