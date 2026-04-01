@@ -11,7 +11,8 @@ import {
     CheckCircle2,
     QrCode,
     School,
-    ArrowRight
+    ArrowRight,
+    ChevronDown
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import Image from 'next/image';
@@ -26,9 +27,11 @@ interface StudentInfo {
 
 export default function PublicFeePaymentPage() {
     const [grNo, setGrNo] = useState('');
+    const [academicYear, setAcademicYear] = useState('2025-26');
     const [loading, setLoading] = useState(false);
+    const [fetchingFee, setFetchingFee] = useState(false);
     const [student, setStudent] = useState<StudentInfo | null>(null);
-    const [feeAmount, setFeeAmount] = useState<number>(25000); // Default amount
+    const [feeAmount, setFeeAmount] = useState<number>(0);
     const [error, setError] = useState<string | null>(null);
     const [showQR, setShowQR] = useState(false);
 
@@ -45,10 +48,13 @@ export default function PublicFeePaymentPage() {
         setError(null);
         setStudent(null);
         setShowQR(false);
+        setFeeAmount(0);
 
         try {
             const studentData = await api.getPublicStudent(grNo.trim());
             setStudent(studentData);
+            // Fetch fee amount immediately after fetching student
+            await fetchFeeAmount(studentData.gr_no, academicYear);
         } catch (err: unknown) {
             const message = err instanceof Error ? err.message : "Failed to fetch student details. Please check the GR Number.";
             setError(message);
@@ -56,6 +62,29 @@ export default function PublicFeePaymentPage() {
             setLoading(false);
         }
     };
+
+    const fetchFeeAmount = async (gr: string, yearStr: string) => {
+        setFetchingFee(true);
+        try {
+            const year = parseInt(yearStr.split('-')[0]);
+            const res = await api.getPublicStudentFee(gr, year);
+            setFeeAmount(res.fee_amount);
+        } catch (err: unknown) {
+            console.error("Failed to fetch fee:", err);
+            const message = err instanceof Error ? err.message : "Could not determine fee amount.";
+            setError(message);
+            setFeeAmount(0);
+        } finally {
+            setFetchingFee(false);
+        }
+    };
+
+    // Re-fetch fee if academic year changes while student is loaded
+    React.useEffect(() => {
+        if (student) {
+            fetchFeeAmount(student.gr_no, academicYear);
+        }
+    }, [academicYear]);
 
     const handlePayUsingPG = async () => {
         if (!student) return;
@@ -116,7 +145,7 @@ export default function PublicFeePaymentPage() {
                                 <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2">
                                     <User className="w-3 h-3" /> Student GR Number
                                 </label>
-                                <div className="flex gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="relative flex-1">
                                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400" />
                                         <input
@@ -128,14 +157,28 @@ export default function PublicFeePaymentPage() {
                                             className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-4 pl-12 pr-6 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 font-bold text-zinc-900 dark:text-zinc-100 transition-all"
                                         />
                                     </div>
-                                    <button
-                                        onClick={fetchStudent}
-                                        disabled={loading}
-                                        className="px-8 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-black uppercase tracking-widest text-[10px] rounded-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 shadow-xl shadow-zinc-900/10 disabled:opacity-50"
-                                    >
-                                        {loading ? "Fetching..." : "Verify"}
-                                        {!loading && <ArrowRight className="w-4 h-4" />}
-                                    </button>
+                                    <div className="flex gap-4">
+                                        <div className="relative flex-1">
+                                            <select
+                                                value={academicYear}
+                                                onChange={(e) => setAcademicYear(e.target.value)}
+                                                className="w-full appearance-none bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-4 pl-4 pr-10 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 font-bold text-zinc-900 dark:text-zinc-100 transition-all cursor-pointer"
+                                            >
+                                                <option value="2024-25">2024-25</option>
+                                                <option value="2025-26">2025-26</option>
+                                                <option value="2026-27">2026-27</option>
+                                            </select>
+                                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
+                                        </div>
+                                        <button
+                                            onClick={fetchStudent}
+                                            disabled={loading}
+                                            className="px-8 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-black uppercase tracking-widest text-[10px] rounded-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 shadow-xl shadow-zinc-900/10 disabled:opacity-50"
+                                        >
+                                            {loading ? "Fetching..." : "Verify"}
+                                            {!loading && <ArrowRight className="w-4 h-4" />}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
@@ -185,7 +228,8 @@ export default function PublicFeePaymentPage() {
                                                         type="number"
                                                         value={feeAmount}
                                                         onChange={(e) => setFeeAmount(parseInt(e.target.value) || 0)}
-                                                        className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-4 px-6 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 font-black text-3xl text-zinc-900 dark:text-white tabular-nums tracking-tighter italic transition-all"
+                                                        className={`w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-4 px-6 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 font-black text-3xl text-zinc-900 dark:text-white tabular-nums tracking-tighter italic transition-all ${fetchingFee ? 'opacity-50 animate-pulse' : ''}`}
+                                                        readOnly
                                                     />
                                                 </div>
                                                 <div className="mt-4 flex items-center gap-2 text-xs font-bold text-zinc-500">
@@ -195,69 +239,71 @@ export default function PublicFeePaymentPage() {
                                             </div>
                                         </div>
 
-                                        <div className="flex flex-col items-center justify-center space-y-4">
-                                            <button
-                                                onClick={handlePayUsingPG}
-                                                disabled={loading || !student}
-                                                className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black uppercase tracking-widest text-xs transition-all shadow-xl shadow-indigo-500/20 active:scale-95 disabled:opacity-50"
-                                            >
-                                                {loading ? "Redirecting..." : "Pay via PhonePe Gateway"}
-                                            </button>
-
-                                            <div className="flex items-center gap-4 w-full">
-                                                <div className="h-px bg-zinc-200 dark:bg-zinc-800 flex-1" />
-                                                <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">OR</span>
-                                                <div className="h-px bg-zinc-200 dark:bg-zinc-800 flex-1" />
-                                            </div>
-
-                                            {!showQR ? (
+                                        {feeAmount > 0 && (
+                                            <div className="flex flex-col items-center justify-center space-y-4">
                                                 <button
-                                                    onClick={() => setShowQR(true)}
-                                                    className="w-full h-full min-h-[160px] rounded-[2.5rem] bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex flex-col items-center justify-center gap-4 group transition-all hover:scale-[1.02] shadow-2xl shadow-zinc-900/20"
+                                                    onClick={handlePayUsingPG}
+                                                    disabled={loading || !student}
+                                                    className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black uppercase tracking-widest text-xs transition-all shadow-xl shadow-indigo-500/20 active:scale-95 disabled:opacity-50"
                                                 >
-                                                    <div className="w-12 h-12 rounded-2xl bg-white/10 dark:bg-zinc-900/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                                        <QrCode className="w-6 h-6" />
-                                                    </div>
-                                                    <div className="text-center">
-                                                        <p className="text-[10px] font-black uppercase tracking-widest">Generate UPI QR</p>
-                                                        <p className="text-[9px] opacity-60 font-bold italic">Static QR Code</p>
-                                                    </div>
+                                                    {loading ? "Redirecting..." : "Pay via PhonePe Gateway"}
                                                 </button>
-                                            ) : (
-                                                <div className="animate-in zoom-in-90 duration-500 p-6 bg-white rounded-[2.5rem] shadow-2xl shadow-emerald-500/10 border border-emerald-500/20 flex flex-col items-center space-y-6">
-                                                    <div className="p-4 bg-zinc-50 rounded-2xl">
-                                                        <QRCodeSVG
-                                                            value={upiLink}
-                                                            size={160}
-                                                            level="H"
-                                                            includeMargin={true}
-                                                            imageSettings={{
-                                                                src: "/images/phonepe.png",
-                                                                x: undefined,
-                                                                y: undefined,
-                                                                height: 32,
-                                                                width: 32,
-                                                                excavate: true,
-                                                            }}
-                                                        />
-                                                    </div>
-                                                    <div className="text-center space-y-1">
-                                                        <p className="text-xs font-black text-zinc-900 uppercase tracking-widest">Scan to Pay</p>
-                                                        <div className="flex items-center gap-2">
-                                                            <div className="relative w-6 h-6 rounded-md overflow-hidden shadow-sm">
-                                                                <Image src="/images/phonepe.png" alt="PhonePe" fill className="object-cover" />
+
+                                                <div className="flex items-center gap-4 w-full">
+                                                    <div className="h-px bg-zinc-200 dark:bg-zinc-800 flex-1" />
+                                                    <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">OR</span>
+                                                    <div className="h-px bg-zinc-200 dark:bg-zinc-800 flex-1" />
+                                                </div>
+
+                                                {!showQR ? (
+                                                    <button
+                                                        onClick={() => setShowQR(true)}
+                                                        className="w-full h-full min-h-[160px] rounded-[2.5rem] bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex flex-col items-center justify-center gap-4 group transition-all hover:scale-[1.02] shadow-2xl shadow-zinc-900/20"
+                                                    >
+                                                        <div className="w-12 h-12 rounded-2xl bg-white/10 dark:bg-zinc-900/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                                            <QrCode className="w-6 h-6" />
+                                                        </div>
+                                                        <div className="text-center">
+                                                            <p className="text-[10px] font-black uppercase tracking-widest">Generate UPI QR</p>
+                                                            <p className="text-[9px] opacity-60 font-bold italic">Static QR Code</p>
+                                                        </div>
+                                                    </button>
+                                                ) : (
+                                                    <div className="animate-in zoom-in-90 duration-500 p-6 bg-white rounded-[2.5rem] shadow-2xl shadow-emerald-500/10 border border-emerald-500/20 flex flex-col items-center space-y-6">
+                                                        <div className="p-4 bg-zinc-50 rounded-2xl">
+                                                            <QRCodeSVG
+                                                                value={upiLink}
+                                                                size={160}
+                                                                level="H"
+                                                                includeMargin={true}
+                                                                imageSettings={{
+                                                                    src: "/images/phonepe.png",
+                                                                    x: undefined,
+                                                                    y: undefined,
+                                                                    height: 32,
+                                                                    width: 32,
+                                                                    excavate: true,
+                                                                }}
+                                                            />
+                                                        </div>
+                                                        <div className="text-center space-y-1">
+                                                            <p className="text-xs font-black text-zinc-900 uppercase tracking-widest">Scan to Pay</p>
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="relative w-6 h-6 rounded-md overflow-hidden shadow-sm">
+                                                                    <Image src="/images/phonepe.png" alt="PhonePe" fill className="object-cover" />
+                                                                </div>
+                                                                <div className="w-px h-3 bg-zinc-200" />
+                                                                <div className="relative w-6 h-6 rounded-md overflow-hidden shadow-sm">
+                                                                    <Image src="/images/gpay.png" alt="GPay" fill className="object-cover" />
+                                                                </div>
+                                                                <div className="w-px h-3 bg-zinc-200" />
+                                                                <span className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">UPI Enabled</span>
                                                             </div>
-                                                            <div className="w-px h-3 bg-zinc-200" />
-                                                            <div className="relative w-6 h-6 rounded-md overflow-hidden shadow-sm">
-                                                                <Image src="/images/gpay.png" alt="GPay" fill className="object-cover" />
-                                                            </div>
-                                                            <div className="w-px h-3 bg-zinc-200" />
-                                                            <span className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">UPI Enabled</span>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            )}
-                                        </div>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             )}
