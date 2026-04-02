@@ -10,7 +10,7 @@ import {
     User,
     Mail,
     Phone,
-    Calendar,
+    Calendar as CalendarIcon,
     Briefcase,
     MapPin,
     GraduationCap,
@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DEPARTMENTS, QUALIFICATIONS, getDepartmentColor } from '@/lib/departments';
+import CalendarPicker from '@/components/CalendarPicker';
 
 function EditStaffForm() {
     const { user } = useAuth();
@@ -305,24 +306,24 @@ function EditStaffForm() {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 ml-1">Date of Birth</label>
-                                <div className="relative group">
-                                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" />
-                                    <input
-                                        type="date"
-                                        name="dob"
-                                        value={formData.dob}
-                                        onChange={handleChange}
-                                        className={cn(
-                                            "w-full bg-zinc-50 dark:bg-zinc-950 border rounded-2xl py-3 pl-11 pr-4 text-sm focus:outline-none focus:ring-4 transition-all text-zinc-900 dark:text-white",
-                                            errors.dob
-                                                ? "border-red-500 focus:ring-red-500/10 focus:border-red-500"
-                                                : "border-zinc-200 dark:border-zinc-800 focus:ring-indigo-500/10 focus:border-indigo-500"
-                                        )}
-                                    />
-                                </div>
-                                {errors.dob && <p className="text-[10px] font-bold text-red-500 ml-1 mt-1 uppercase tracking-wider">{errors.dob}</p>}
+                                <CalendarPicker
+                                    label="Date of Birth"
+                                    value={formData.dob}
+                                    onChange={(date) => {
+                                        setFormData(prev => ({ ...prev, dob: date }));
+                                        if (errors.dob) {
+                                            setErrors(prev => {
+                                                const updated = { ...prev };
+                                                delete updated.dob;
+                                                return updated;
+                                            });
+                                        }
+                                    }}
+                                    maxDate={new Date().toISOString().split('T')[0]}
+                                    error={errors.dob}
+                                />
                             </div>
+
                         </div>
                     </div>
 
@@ -375,7 +376,7 @@ function EditStaffForm() {
                             <div className="space-y-2">
                                 <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 ml-1">Leave Balance (Days)</label>
                                 <div className="relative group">
-                                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-indigo-500 transition-colors pointer-events-none" />
+                                    <CalendarIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-indigo-500 transition-colors pointer-events-none" />
                                     <input
                                         type="number"
                                         name="leave_balance"

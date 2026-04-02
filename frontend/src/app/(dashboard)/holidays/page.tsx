@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 
 import { ConfirmBox } from '@/components/ConfirmBox';
+import CalendarPicker from '@/components/CalendarPicker';
 
 interface Holiday {
     id: number;
@@ -242,16 +243,12 @@ export default function HolidaysPage() {
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-6">
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 flex items-center gap-2">
-                                            Start Date
-                                        </label>
-                                        <input
-                                            type="date"
-                                            required
+                                    <div className="space-y-2 col-span-2 md:col-span-1">
+                                        <CalendarPicker
+                                            label="Start Date"
                                             value={formData.date}
-                                            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-3xl py-4 px-6 focus:outline-none focus:border-amber-500 transition-all font-bold"
+                                            onChange={(date) => setFormData({ ...formData, date: date })}
+                                            minDate={new Date().toISOString().split('T')[0]}
                                         />
                                     </div>
 
