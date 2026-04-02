@@ -19,6 +19,7 @@ dependencies = [
     "email-validator",
     "reportlab",
     "requests",
+    "apscheduler",
 ]
 requires-python = ">=3.10"
 
