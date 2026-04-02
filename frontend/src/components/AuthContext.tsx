@@ -4,11 +4,12 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 
-interface User {
+export interface User {
     id: number;
     name: string;
     email: string;
     mobile: string;
+    department?: string;
 }
 
 interface AuthContextType {

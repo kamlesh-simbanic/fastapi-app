@@ -19,6 +19,7 @@ class StaffBase(BaseModel):
     address: str
     city: str
     zip_code: str
+    leave_balance: int = 1
 
 class StaffCreate(StaffBase):
     pass

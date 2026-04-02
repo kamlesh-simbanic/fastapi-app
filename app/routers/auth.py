@@ -55,7 +55,10 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return controllers.auth.register_user(db, user)
 
 @router.get("/me", response_model=schemas.UserOut)
-def get_me(current_user: models.User = Depends(get_current_user)):
+def get_me(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    staff = db.query(models.Staff).filter(models.Staff.user_id == current_user.id).first()
+    if staff:
+        current_user.department = staff.department.value
     return current_user
 
 @router.post("/login", response_model=schemas.AuthResponse)

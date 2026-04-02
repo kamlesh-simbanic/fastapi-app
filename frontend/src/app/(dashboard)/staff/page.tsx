@@ -35,6 +35,7 @@ interface StaffMember {
     department: string;
     qualification: string;
     city: string;
+    leave_balance: number;
     created_at: string;
 }
 

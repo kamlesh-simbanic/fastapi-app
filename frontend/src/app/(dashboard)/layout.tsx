@@ -2,9 +2,10 @@
 
 import React, { useEffect } from 'react';
 import { useAuth } from '@/components/AuthContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { Layers } from 'lucide-react';
+import { hasPermission } from '@/lib/permissions';
 
 export default function AuthenticatedLayout({
     children,
@@ -13,12 +14,19 @@ export default function AuthenticatedLayout({
 }) {
     const { user, loading: authLoading } = useAuth();
     const router = useRouter();
+    const pathname = usePathname();
 
     useEffect(() => {
-        if (!authLoading && !user) {
-            router.push('/login');
+        if (!authLoading) {
+            console.log("user", user);
+
+            if (!user) {
+                router.push('/login');
+            } else if (!hasPermission(pathname, user.department)) {
+                router.push('/');
+            }
         }
-    }, [user, authLoading, router]);
+    }, [user, authLoading, router, pathname]);
 
     if (authLoading || !user) {
         return (

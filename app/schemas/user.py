@@ -16,6 +16,7 @@ class UserLogin(BaseModel):
 class UserOut(UserBase):
     id: int
     is_active: bool
+    department: Optional[str] = None
 
     class Config:
         from_attributes = True

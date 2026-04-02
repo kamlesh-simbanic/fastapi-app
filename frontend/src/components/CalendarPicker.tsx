@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, } from 'lucide-react';
+import { Calendar as CalendarIcon, ChevronRight } from 'lucide-react';
 import { api } from '@/lib/api';
 
 interface Holiday {
@@ -129,6 +129,16 @@ const CalendarPicker = ({
 
     const weekDays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
+    const years = Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - 80 + i);
+
+    const handleYearChange = (year: number) => {
+        setCurrentMonth(new Date(year, currentMonth.getMonth(), 1));
+    };
+
+    const handleMonthChange = (month: number) => {
+        setCurrentMonth(new Date(currentMonth.getFullYear(), month, 1));
+    };
+
     const renderCalendar = () => {
         const year = currentMonth.getFullYear();
         const month = currentMonth.getMonth();
@@ -212,16 +222,25 @@ const CalendarPicker = ({
             {isOpen && (
                 <div className="absolute top-full left-0 mt-3 z-50 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[2rem] shadow-2xl p-6 min-w-[280px] animate-in slide-in-from-top-4 fade-in duration-300">
                     <div className="flex items-center justify-between mb-6">
-                        <button
-                            type="button"
-                            onClick={() => changeMonth(-1)}
-                            className="p-2 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500 dark:text-zinc-400 transition-colors"
-                        >
-                            <ChevronLeft className="w-4 h-4" />
-                        </button>
-                        <div className="text-center">
-                            <p className="text-xs font-black uppercase tracking-widest text-zinc-400">{currentMonth.getFullYear()}</p>
-                            <h3 className="text-sm font-black text-zinc-900 dark:text-white italic">{months[currentMonth.getMonth()]}</h3>
+                        <div className="flex items-center gap-2">
+                            <select
+                                value={currentMonth.getMonth()}
+                                onChange={(e) => handleMonthChange(parseInt(e.target.value))}
+                                className="bg-transparent text-sm font-black text-zinc-900 dark:text-white italic outline-none cursor-pointer hover:text-emerald-500 transition-colors appearance-none"
+                            >
+                                {months.map((m, i) => (
+                                    <option key={m} value={i} className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white font-sans not-italic">{m}</option>
+                                ))}
+                            </select>
+                            <select
+                                value={currentMonth.getFullYear()}
+                                onChange={(e) => handleYearChange(parseInt(e.target.value))}
+                                className="bg-transparent text-sm font-black text-zinc-400 outline-none cursor-pointer hover:text-emerald-500 transition-colors appearance-none"
+                            >
+                                {years.map(y => (
+                                    <option key={y} value={y} className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white font-sans not-italic">{y}</option>
+                                ))}
+                            </select>
                         </div>
                         <button
                             type="button"

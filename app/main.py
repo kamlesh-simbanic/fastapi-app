@@ -9,7 +9,8 @@ from dotenv import load_dotenv
 
 from . import models
 from .database import engine, get_db
-from .routers import auth, tasks, students, fees, staff, attendance, dashboard, school_class, class_student, holiday, public, fee_structure, subjects
+from .routers import auth, tasks, students, fees, staff, attendance, dashboard, school_class, class_student, holiday, public, fee_structure, subjects, leave_request
+from .scheduler import start_scheduler, shutdown_scheduler
 
 load_dotenv()
 
@@ -17,6 +18,14 @@ load_dotenv()
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title=os.getenv("PROJECT_NAME", "FastAPI App Starter"))
+
+@app.on_event("startup")
+async def startup_event():
+    start_scheduler()
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    shutdown_scheduler()
 
 # Configure CORS
 origins = [
@@ -46,6 +55,7 @@ app.include_router(school_class.router, prefix="/api")
 app.include_router(class_student.router, prefix="/api")
 app.include_router(fee_structure.router, prefix="/api")
 app.include_router(subjects.router, prefix="/api")
+app.include_router(leave_request.router, prefix="/api")
 
 
 # Root redirect to frontend
