@@ -16,7 +16,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     }, []);
 
     return (
-        <div className="flex min-h-screen bg-background text-foreground transition-colors duration-300 print:bg-white print:text-black">
+        <div className="flex h-screen overflow-hidden bg-background text-foreground transition-colors duration-300 print:bg-white print:text-black">
             <div className="print:hidden">
                 <SideNav isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
             </div>

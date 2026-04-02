@@ -214,4 +214,15 @@ export const api = {
     unassignTeacher: (assignmentId: string | number) => fetchApi(`/api/subjects/assign/${assignmentId}`, {
         method: 'DELETE',
     }),
+
+    // Leave Requests
+    getLeaveRequests: (params: Record<string, unknown> = {}) => fetchApi(`/api/leave-requests/${buildQuery(params)}`),
+    addLeaveRequest: (data: Record<string, unknown>) => fetchApi('/api/leave-requests/', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    }),
+    updateLeaveRequestStatus: (leaveId: string | number, data: { status: string }) => fetchApi(`/api/leave-requests/${leaveId}/status`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+    }),
 };

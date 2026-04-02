@@ -24,6 +24,7 @@ class Staff(Base):
     address = Column(String(255))
     city = Column(String(100))
     zip_code = Column(String(15))
+    leave_balance = Column(Integer, default=20)
     
     user_id = Column(Integer, ForeignKey("users.id"))
     

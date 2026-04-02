@@ -17,21 +17,21 @@ import {
     BookOpen
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from './AuthContext';
+import { PERMISSIONS } from '@/lib/permissions';
 
 const navItems = [
     { icon: LayoutDashboard, label: 'Dashboard', href: '/' },
     { icon: Users, label: 'Students', href: '/students' },
     { icon: Layers, label: 'Classes', href: '/classes' },
     { icon: Users, label: 'Class Assignments', href: '/class-students' },
-    // { icon: BookOpen, label: 'Courses', href: '/courses' },
     { icon: Calendar, label: 'Attendance', href: '/attendance' },
     { icon: CalendarDays, label: 'Holidays', href: '/holidays' },
     { icon: CreditCard, label: 'Fees', href: '/fees' },
     { icon: CreditCard, label: 'Fee Structure', href: '/fee-structure' },
     { icon: Briefcase, label: 'Staff', href: '/staff' },
     { icon: BookOpen, label: 'Subjects', href: '/subjects' },
-
-
+    { icon: Calendar, label: 'Leave Management', href: '/leave' },
 ];
 
 const secondaryItems = [
@@ -46,6 +46,18 @@ interface SideNavProps {
 
 export const SideNav = React.memo(function SideNav({ isOpen, setIsOpen }: SideNavProps) {
     const pathname = usePathname();
+    const { user } = useAuth();
+
+    const filteredNavItems = navItems.filter(item => {
+        if (!user) return false;
+        // Dashboard is accessible to everyone
+        if (item.href === '/') return true;
+
+        const allowed = PERMISSIONS[item.href];
+        if (!allowed) return true;
+
+        return !user.department || user.department === 'admin' || allowed.includes(user.department || 'other');
+    });
 
     return (
         <aside className={cn(
@@ -68,7 +80,7 @@ export const SideNav = React.memo(function SideNav({ isOpen, setIsOpen }: SideNa
 
                 {/* Nav Items */}
                 <nav className="flex-1 px-3 space-y-1">
-                    {navItems.map((item) => {
+                    {filteredNavItems.map((item) => {
                         const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
                         return (
                             <Link

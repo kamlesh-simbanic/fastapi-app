@@ -44,6 +44,7 @@ function EditStaffForm() {
         address: '',
         city: '',
         zip_code: '',
+        leave_balance: 20,
     });
 
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -62,6 +63,7 @@ function EditStaffForm() {
                 address: data.address || '',
                 city: data.city || '',
                 zip_code: data.zip_code || '',
+                leave_balance: data.leave_balance ?? 20,
             });
         } catch (err) {
             console.error('Failed to fetch staff:', err);
@@ -353,7 +355,6 @@ function EditStaffForm() {
                                     </select>
                                 </div>
                             </div>
-
                             <div className="space-y-2">
                                 <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 ml-1">Qualification</label>
                                 <div className="relative group">
@@ -369,6 +370,21 @@ function EditStaffForm() {
                                         ))}
                                     </select>
                                 </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 ml-1">Leave Balance (Days)</label>
+                                <div className="relative group">
+                                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-indigo-500 transition-colors pointer-events-none" />
+                                    <input
+                                        type="number"
+                                        name="leave_balance"
+                                        value={formData.leave_balance}
+                                        readOnly
+                                        className="w-full bg-zinc-100 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-3 pl-11 pr-4 text-sm text-zinc-500 dark:text-zinc-400 cursor-not-allowed opacity-80"
+                                    />
+                                </div>
+                                <p className="text-[10px] font-bold text-zinc-400 ml-1 mt-1 uppercase tracking-wider italic">This field is managed by Administration.</p>
                             </div>
                         </div>
                     </div>
@@ -467,7 +483,8 @@ function EditStaffForm() {
                         </button>
                     </div>
                 </form>
-            )}
+            )
+            }
         </div>
     );
 }

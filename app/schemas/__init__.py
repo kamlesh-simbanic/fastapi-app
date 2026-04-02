@@ -16,3 +16,7 @@ from .subject import (
     TeacherSubjectBase, TeacherSubjectCreate, TeacherSubject,
     SubjectWithTeachers
 )
+from .leave_request import (
+    LeaveRequestBase, LeaveRequestCreate, LeaveRequestUpdate, 
+    LeaveRequestResponse, LeaveType, LeaveStatus
+)
