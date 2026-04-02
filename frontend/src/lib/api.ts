@@ -189,4 +189,29 @@ export const api = {
         method: 'POST',
         body: JSON.stringify(data)
     }),
+
+    // / Subjects
+    getSubjects: (params: Record<string, unknown> = {}) => fetchApi(`/api/subjects/${buildQuery(params)}`),
+    addSubject: (data: Record<string, unknown>) => fetchApi('/api/subjects/', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    }),
+    updateSubject: (id: string | number, data: Record<string, unknown>) => fetchApi(`/api/subjects/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+    }),
+    deleteSubject: (id: string | number) => fetchApi(`/api/subjects/${id}`, {
+        method: 'DELETE',
+    }),
+
+    // Teacher Subject Assignment
+    assignTeacher: (data: Record<string, unknown>) => fetchApi('/api/subjects/assign', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    }),
+    getTeacherAssignments: (teacherId: string | number) => fetchApi(`/api/subjects/teacher/${teacherId}`),
+    getSubjectAssignments: (subjectId: string | number) => fetchApi(`/api/subjects/${subjectId}/teachers`),
+    unassignTeacher: (assignmentId: string | number) => fetchApi(`/api/subjects/assign/${assignmentId}`, {
+        method: 'DELETE',
+    }),
 };

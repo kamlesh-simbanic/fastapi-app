@@ -13,7 +13,8 @@ import {
     Settings,
     HelpCircle,
     Layers,
-    ChevronLeft
+    ChevronLeft,
+    BookOpen
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -28,6 +29,9 @@ const navItems = [
     { icon: CreditCard, label: 'Fees', href: '/fees' },
     { icon: CreditCard, label: 'Fee Structure', href: '/fee-structure' },
     { icon: Briefcase, label: 'Staff', href: '/staff' },
+    { icon: BookOpen, label: 'Subjects', href: '/subjects' },
+
+
 ];
 
 const secondaryItems = [
