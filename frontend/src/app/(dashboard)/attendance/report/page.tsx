@@ -20,6 +20,8 @@ import {
 import { useRouter, useSearchParams } from 'next/navigation';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import Table from '@/components/Table';
+import { getAttendanceReportColumns, AttendanceSummary, AttendanceSummaryWithId } from '../utils';
 
 interface SchoolClass {
     id: number;
@@ -27,17 +29,7 @@ interface SchoolClass {
     division: string;
 }
 
-interface AttendanceSummary {
-    student_id: number;
-    name: string;
-    surname: string;
-    gr_no: string;
-    total_days: number;
-    present_days: number;
-    absent_days: number;
-    attendance_percentage: number;
-    data: Record<string, string>;
-}
+// Use AttendanceSummary from ../utils
 
 function AttendanceReportContent() {
     const { user } = useAuth();
@@ -100,7 +92,7 @@ function AttendanceReportContent() {
 
     if (!user) return null;
 
-    const filteredReport = report
+    const filteredReport: AttendanceSummaryWithId[] = report
         .filter(s =>
             `${s.name} ${s.surname}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
             s.gr_no.toLowerCase().includes(searchTerm.toLowerCase())
@@ -111,7 +103,8 @@ function AttendanceReportContent() {
             if (nameB < nameA) return 1;
             if (nameB > nameA) return -1;
             return 0;
-        });
+        })
+        .map(s => ({ ...s, id: s.student_id }));
 
     const averageAttendance = report.length > 0
         ? report.reduce((acc, curr) => acc + curr.attendance_percentage, 0) / report.length
@@ -394,63 +387,13 @@ function AttendanceReportContent() {
                             />
                         </div>
 
-                        <div className="bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 overflow-x-auto shadow-xl shadow-zinc-200/50 dark:shadow-none">
-                            <table className="w-full text-left border-collapse min-w-[1200px]">
-                                <thead>
-                                    <tr className="bg-zinc-50 dark:bg-zinc-900/50 border-b border-zinc-200 dark:border-zinc-800">
-                                        <th className="px-6 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest sticky left-0 bg-zinc-50 dark:bg-zinc-900/50 z-10 border-r border-zinc-200/50 dark:border-zinc-800/50">GR No</th>
-                                        <th className="px-6 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest sticky left-[100px] bg-zinc-50 dark:bg-zinc-900/50 z-10 border-r border-zinc-200/50 dark:border-zinc-800/50">Student</th>
-                                        {daysArray.map(day => (
-                                            <th key={day} className="px-2 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest text-center min-w-[35px] border-r border-zinc-200/10 dark:border-zinc-800/10 last:border-r-0">
-                                                {day}
-                                            </th>
-                                        ))}
-                                        <th className="px-6 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest text-center border-l border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50">Days (P/T)</th>
-                                        <th className="px-6 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest text-right bg-zinc-50 dark:bg-zinc-900/50">Attendance %</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                                    {filteredReport.map((student) => (
-                                        <tr key={student.student_id} className="group hover:bg-zinc-50 dark:hover:bg-zinc-900/40 transition-colors">
-                                            <td className="px-6 py-5 sticky left-0 bg-white dark:bg-zinc-900 z-10 group-hover:bg-zinc-50 dark:group-hover:bg-zinc-900/40 border-r border-zinc-200/50 dark:border-zinc-800/50">
-                                                <span className="font-mono text-xs font-black text-indigo-500">{student.gr_no}</span>
-                                            </td>
-                                            <td className="px-6 py-5 sticky left-[100px] bg-white dark:bg-zinc-900 z-10 group-hover:bg-zinc-50 dark:group-hover:bg-zinc-900/40 border-r border-zinc-200/50 dark:border-zinc-800/50">
-                                                <p className="text-sm font-black text-zinc-900 dark:text-white italic uppercase tracking-tight truncate max-w-[150px]">
-                                                    {student.name} {student.surname}
-                                                </p>
-                                            </td>
-                                            {daysArray.map(day => {
-                                                const status = student.data[day.toString()];
-                                                return (
-                                                    <td key={day} className="px-2 py-5 text-center border-r border-zinc-100 dark:border-zinc-800/30 last:border-r-0">
-                                                        {status === 'present' ? (
-                                                            <span className="text-[10px] font-black text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded">P</span>
-                                                        ) : status === 'absent' ? (
-                                                            <span className="text-[10px] font-black text-red-500 bg-red-500/10 px-1.5 py-0.5 rounded">A</span>
-                                                        ) : (
-                                                            <span className="text-zinc-300 dark:text-zinc-700">-</span>
-                                                        )}
-                                                    </td>
-                                                );
-                                            })}
-                                            <td className="px-6 py-5 text-center border-l border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 group-hover:bg-zinc-50 dark:group-hover:bg-zinc-900/40">
-                                                <span className="text-xs font-bold text-zinc-500">
-                                                    {student.present_days} / {student.total_days}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-5 text-right bg-white dark:bg-zinc-900 group-hover:bg-zinc-50 dark:group-hover:bg-zinc-900/40">
-                                                <div className="flex items-center justify-end gap-3">
-                                                    <span className={`text-sm font-black ${student.attendance_percentage >= 75 ? 'text-emerald-500' : 'text-amber-500'}`}>
-                                                        {student.attendance_percentage.toFixed(1)}%
-                                                    </span>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                        <Table
+                            columns={getAttendanceReportColumns({ daysArray })}
+                            data={filteredReport}
+                            loading={loading}
+                            emptyMessage="No attendance data found for the selected period."
+                            className="bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-xl shadow-zinc-200/50 dark:shadow-none"
+                        />
                     </div>
                 )}
             </div>
