@@ -16,16 +16,16 @@ import {
     X,
     LayoutGrid,
     List,
-    ChevronLeft,
     Pencil,
     ChevronDown,
     ArrowUp,
     ArrowDown,
-    ArrowUpDown,
-    ChevronRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DEPARTMENTS, getDepartmentColor } from '@/lib/departments';
+
+import Table, { Column } from '@/components/Table';
+
 
 interface StaffMember {
     id: number;
@@ -62,6 +62,65 @@ export default function StaffPage() {
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [error, setError] = useState<string | null>(null);
+
+    const columns: Column<StaffMember>[] = [
+        {
+            key: 'name',
+            label: 'Full Name',
+            sortable: true,
+            render: (member) => (
+                <span className="font-bold text-zinc-900 dark:text-white text-sm group-hover:text-primary-main group-hover:italic transition-all">{member.name}</span>
+            )
+        },
+        {
+            key: 'department',
+            label: 'Department',
+            render: (member) => (
+                <span className={cn("px-2 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest border italic", getDepartmentColor(member.department))}>{member.department}</span>
+            )
+        },
+        {
+            key: 'qualification',
+            label: 'Degree',
+            sortable: true,
+            render: (member) => <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest italic">{member.qualification}</span>
+        },
+        {
+            key: 'contact',
+            label: 'Contact Details',
+            render: (member) => (
+                <div>
+                    <div className="text-[11px] text-zinc-600 dark:text-zinc-300 font-bold uppercase tracking-widest truncate max-w-[150px]">{member.email}</div>
+                    <div className="text-[10px] text-zinc-400 font-bold tracking-widest">{member.mobile}</div>
+                </div>
+            )
+        },
+        {
+            key: 'city',
+            label: 'Location',
+            sortable: true,
+            render: (member) => <span className="text-xs font-bold text-zinc-500 italic">{member.city}</span>
+        },
+        {
+            key: 'created_at',
+            label: 'Joined',
+            sortable: true,
+            render: (member) => (
+                <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">{new Date(member.created_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+            )
+        },
+        {
+            key: 'actions',
+            label: '',
+            render: (member) => (
+                <div className="flex items-center justify-end gap-2">
+                    <Link href={`/staff/edit?id=${member.id}`} className="p-3 text-zinc-300 hover:text-primary-main hover:bg-primary-main/5 rounded-radius-medium transition-all shadow-sm"><Pencil className="w-4.5 h-4.5" /></Link>
+                    <button className="p-3 text-zinc-200 hover:text-error hover:bg-red-50 dark:hover:bg-red-500/10 rounded-radius-medium transition-all opacity-0 group-hover:opacity-100 shadow-sm"><X className="w-4.5 h-4.5" /></button>
+                </div>
+            ),
+            className: "text-right"
+        }
+    ];
 
     const fetchStaff = useCallback(async () => {
         setLoading(true);
@@ -129,8 +188,6 @@ export default function StaffPage() {
 
     if (!user) return null;
 
-    const totalPages = Math.ceil(total / pageSize);
-
     return (
         <div className="space-y-8 animate-in fade-in duration-500 pb-10">
             {/* Toolbar */}
@@ -146,29 +203,31 @@ export default function StaffPage() {
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest hidden sm:inline">Sort by:</span>
-                        <div className="relative group">
-                            <select
-                                value={sortBy}
-                                onChange={(e) => setSortBy(e.target.value)}
-                                className="appearance-none bg-surface-paper dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-radius-medium px-4 py-2 pr-10 text-[10px] font-bold text-zinc-600 dark:text-zinc-300 uppercase tracking-widest focus:outline-none focus:ring-4 focus:ring-primary-main/5 transition-all cursor-pointer min-w-[140px] shadow-sm italic"
+                    {viewMode === 'grid' && (
+                        <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest hidden sm:inline">Sort by:</span>
+                            <div className="relative group">
+                                <select
+                                    value={sortBy}
+                                    onChange={(e) => setSortBy(e.target.value)}
+                                    className="appearance-none bg-surface-paper dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-radius-medium px-4 py-2 pr-10 text-[10px] font-bold text-zinc-600 dark:text-zinc-300 uppercase tracking-widest focus:outline-none focus:ring-4 focus:ring-primary-main/5 transition-all cursor-pointer min-w-[140px] shadow-sm italic"
+                                >
+                                    {SORT_OPTIONS.map(opt => (
+                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                    ))}
+                                </select>
+                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400 pointer-events-none" />
+                            </div>
+                            <button
+                                onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
+                                className="p-2.5 bg-surface-paper dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-radius-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors shadow-sm active:scale-95 text-primary-main"
                             >
-                                {SORT_OPTIONS.map(opt => (
-                                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                                ))}
-                            </select>
-                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400 pointer-events-none" />
+                                {sortOrder === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />}
+                            </button>
                         </div>
-                        <button
-                            onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
-                            className="p-2.5 bg-surface-paper dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-radius-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors shadow-sm active:scale-95 text-primary-main"
-                        >
-                            {sortOrder === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />}
-                        </button>
-                    </div>
+                    )}
 
-                    <div className="w-px h-8 bg-zinc-200 dark:bg-zinc-800 mx-1" />
+                    {viewMode === 'grid' && <div className="w-px h-8 bg-zinc-200 dark:bg-zinc-800 mx-1" />}
 
                     <div className="flex bg-zinc-100 dark:bg-zinc-900 p-1 rounded-radius-medium border border-zinc-200 dark:border-zinc-800">
                         <button onClick={() => setViewMode('grid')} className={cn("p-2 rounded-md transition-all", viewMode === 'grid' ? "bg-white dark:bg-zinc-800 text-primary-main shadow-sm" : "text-zinc-400 hover:text-zinc-600 hover:bg-white/50 dark:hover:bg-zinc-800/50")}>
@@ -232,171 +291,69 @@ export default function StaffPage() {
                     </div>
                 )}
 
-                {loading ? (
-                    <div className="flex flex-col items-center justify-center py-20 gap-4">
-                        <Loader2 className="w-10 h-10 text-primary-main animate-spin" />
-                        <p className="text-zinc-500 text-sm font-medium animate-pulse italic">Syncing directory records...</p>
-                    </div>
-                ) : staff.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-20 gap-4 bg-surface-ground rounded-radius-large border border-dashed border-zinc-200 dark:border-zinc-800 text-center">
-                        <Users className="w-12 h-12 text-zinc-300" />
-                        <h3 className="text-lg font-bold text-zinc-900 dark:text-white italic">No personnel found</h3>
-                        <button onClick={() => { setSearch(''); setSelectedDepartments([]); }} className="text-primary-main text-sm font-bold hover:underline italic">Clear all filters</button>
-                    </div>
-                ) : viewMode === 'grid' ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in slide-in-from-bottom-4 duration-500">
-                        {staff.map((member) => (
-                            <div key={member.id} className="group p-6 rounded-radius-large bg-surface-paper dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-primary-main/30 transition-all hover:shadow-xl hover:shadow-primary-main/5 relative overflow-hidden flex flex-col">
-                                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity"><Briefcase className="w-20 h-20 text-primary-main" /></div>
-                                <div className="absolute top-4 right-4 flex gap-2">
-                                    <Link href={`/staff/edit?id=${member.id}`} className="p-2.5 bg-surface-paper/90 dark:bg-zinc-800/90 border border-zinc-200 dark:border-zinc-700 rounded-radius-medium text-zinc-400 hover:text-primary-main transition-all shadow-sm"><Pencil className="w-4 h-4" /></Link>
-                                </div>
-
-                                <div className="flex justify-between items-start mb-6">
-                                    <div className="w-12 h-12 rounded-radius-medium bg-primary-main/10 flex items-center justify-center"><Users className="w-6 h-6 text-primary-main" /></div>
-                                    <span className={cn("px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest border italic", getDepartmentColor(member.department))}>{member.department}</span>
-                                </div>
-
-                                <div className="space-y-1 mb-6">
-                                    <h3 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight group-hover:text-primary-main group-hover:italic transition-all">{member.name}</h3>
-                                    <p className="text-primary-main dark:text-primary-light text-xs font-bold uppercase tracking-widest opacity-80 italic">{member.qualification}</p>
-                                </div>
-
-                                <div className="space-y-3 pt-6 border-t border-zinc-100 dark:border-zinc-800/50 flex-1">
-                                    <div className="flex items-center gap-3 text-sm text-zinc-500 dark:text-zinc-400 italic"><Mail className="w-4 h-4 text-zinc-300" /><span className="truncate">{member.email}</span></div>
-                                    <div className="flex items-center gap-3 text-sm text-zinc-500 dark:text-zinc-400 italic"><Phone className="w-4 h-4 text-zinc-300" /><span>{member.mobile}</span></div>
-                                    <div className="flex items-center gap-3 text-sm text-zinc-500 dark:text-zinc-400 italic"><MapPin className="w-4 h-4 text-zinc-300" /><span>{member.city}</span></div>
-                                    <div className="flex items-center gap-2 text-zinc-300 dark:text-zinc-500 mt-2">
-                                        <span className="text-[9px] font-bold uppercase tracking-widest opacity-60">Joined Primary Force:</span>
-                                        <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest italic">{new Date(member.created_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                {viewMode === 'grid' ? (
+                    loading ? (
+                        <div className="flex flex-col items-center justify-center py-20 gap-4">
+                            <Loader2 className="w-10 h-10 text-primary-main animate-spin" />
+                            <p className="text-zinc-500 text-sm font-medium animate-pulse italic">Syncing directory records...</p>
+                        </div>
+                    ) : staff.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-20 gap-4 bg-surface-ground rounded-radius-large border border-dashed border-zinc-200 dark:border-zinc-800 text-center">
+                            <Users className="w-12 h-12 text-zinc-300" />
+                            <h3 className="text-lg font-bold text-zinc-900 dark:text-white italic">No personnel found</h3>
+                            <button onClick={() => { setSearch(''); setSelectedDepartments([]); }} className="text-primary-main text-sm font-bold hover:underline italic">Clear all filters</button>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in slide-in-from-bottom-4 duration-500">
+                            {staff.map((member) => (
+                                <div key={member.id} className="group p-6 rounded-radius-large bg-surface-paper dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-primary-main/30 transition-all hover:shadow-xl hover:shadow-primary-main/5 relative overflow-hidden flex flex-col">
+                                    <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity"><Briefcase className="w-20 h-20 text-primary-main" /></div>
+                                    <div className="absolute top-4 right-4 flex gap-2">
+                                        <Link href={`/staff/edit?id=${member.id}`} className="p-2.5 bg-surface-paper/90 dark:bg-zinc-800/90 border border-zinc-200 dark:border-zinc-700 rounded-radius-medium text-zinc-400 hover:text-primary-main transition-all shadow-sm"><Pencil className="w-4 h-4" /></Link>
                                     </div>
+
+                                    <div className="flex justify-between items-start mb-6">
+                                        <div className="w-12 h-12 rounded-radius-medium bg-primary-main/10 flex items-center justify-center"><Users className="w-6 h-6 text-primary-main" /></div>
+                                        <span className={cn("px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest border italic", getDepartmentColor(member.department))}>{member.department}</span>
+                                    </div>
+
+                                    <div className="space-y-1 mb-6">
+                                        <h3 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight group-hover:text-primary-main group-hover:italic transition-all">{member.name}</h3>
+                                        <p className="text-primary-main dark:text-primary-light text-xs font-bold uppercase tracking-widest opacity-80 italic">{member.qualification}</p>
+                                    </div>
+
+                                    <div className="space-y-3 pt-6 border-t border-zinc-100 dark:border-zinc-800/50 flex-1">
+                                        <div className="flex items-center gap-3 text-sm text-zinc-500 dark:text-zinc-400 italic"><Mail className="w-4 h-4 text-zinc-300" /><span className="truncate">{member.email}</span></div>
+                                        <div className="flex items-center gap-3 text-sm text-zinc-500 dark:text-zinc-400 italic"><Phone className="w-4 h-4 text-zinc-300" /><span>{member.mobile}</span></div>
+                                        <div className="flex items-center gap-3 text-sm text-zinc-500 dark:text-zinc-400 italic"><MapPin className="w-4 h-4 text-zinc-300" /><span>{member.city}</span></div>
+                                        <div className="flex items-center gap-2 text-zinc-300 dark:text-zinc-500 mt-2">
+                                            <span className="text-[9px] font-bold uppercase tracking-widest opacity-60">Joined Primary Force:</span>
+                                            <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest italic">{new Date(member.created_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                                        </div>
+                                    </div>
+
+                                    <button className="mt-6 w-full py-3 rounded-radius-medium bg-surface-ground dark:bg-zinc-950 text-zinc-900 dark:text-white text-[10px] font-bold uppercase tracking-[0.2em] border border-zinc-200 dark:border-zinc-800 hover:bg-primary-main hover:text-white dark:hover:bg-primary-main group-hover:shadow-lg group-hover:shadow-primary-main/10 transition-all italic">Review Details</button>
                                 </div>
-
-                                <button className="mt-6 w-full py-3 rounded-radius-medium bg-surface-ground dark:bg-zinc-950 text-zinc-900 dark:text-white text-[10px] font-bold uppercase tracking-[0.2em] border border-zinc-200 dark:border-zinc-800 hover:bg-primary-main hover:text-white dark:hover:bg-primary-main group-hover:shadow-lg group-hover:shadow-primary-main/10 transition-all italic">Review Details</button>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    )
                 ) : (
-                    <div className="bg-surface-paper dark:bg-zinc-900 rounded-radius-large border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-sm animate-in slide-in-from-bottom-4 duration-500">
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-separate border-spacing-0">
-                                <thead className="bg-surface-ground">
-                                    <tr>
-                                        <th onClick={() => handleSort('name')} className="px-8 py-6 text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] cursor-pointer hover:text-primary-main transition-colors border-b border-zinc-100 dark:border-zinc-800">
-                                            <div className="flex items-center gap-2">Full Name {sortBy === 'name' ? (sortOrder === 'asc' ? <ArrowUp className="w-3 h-3 text-primary-main" /> : <ArrowDown className="w-3 h-3 text-primary-main" />) : <ArrowUpDown className="w-3 h-3 text-zinc-300" />}</div>
-                                        </th>
-                                        <th className="px-8 py-6 text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] border-b border-zinc-100 dark:border-zinc-800">Department</th>
-                                        <th onClick={() => handleSort('qualification')} className="px-8 py-6 text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] cursor-pointer hover:text-primary-main transition-colors border-b border-zinc-100 dark:border-zinc-800">
-                                            <div className="flex items-center gap-2">Degree {sortBy === 'qualification' ? (sortOrder === 'asc' ? <ArrowUp className="w-3 h-3 text-primary-main" /> : <ArrowDown className="w-3 h-3 text-primary-main" />) : <ArrowUpDown className="w-3 h-3 text-zinc-300" />}</div>
-                                        </th>
-                                        <th className="px-8 py-6 text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] border-b border-zinc-100 dark:border-zinc-800">Contact Details</th>
-                                        <th onClick={() => handleSort('city')} className="px-8 py-6 text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] cursor-pointer hover:text-primary-main transition-colors border-b border-zinc-100 dark:border-zinc-800">
-                                            <div className="flex items-center gap-2">Location {sortBy === 'city' ? (sortOrder === 'asc' ? <ArrowUp className="w-3 h-3 text-primary-main" /> : <ArrowDown className="w-3 h-3 text-primary-main" />) : <ArrowUpDown className="w-3 h-3 text-zinc-300" />}</div>
-                                        </th>
-                                        <th onClick={() => handleSort('created_at')} className="px-8 py-6 text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] cursor-pointer hover:text-primary-main transition-colors border-b border-zinc-100 dark:border-zinc-800">
-                                            <div className="flex items-center gap-2">Joined {sortBy === 'created_at' ? (sortOrder === 'asc' ? <ArrowUp className="w-3 h-3 text-primary-main" /> : <ArrowDown className="w-3 h-3 text-primary-main" />) : <ArrowUpDown className="w-3 h-3 text-zinc-300" />}</div>
-                                        </th>
-                                        <th className="px-8 py-6 border-b border-zinc-100 dark:border-zinc-800 text-right"></th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-zinc-50 dark:divide-zinc-800">
-                                    {staff.map((member) => (
-                                        <tr key={member.id} className="group hover:bg-zinc-50/50 dark:hover:bg-zinc-950/50 transition-colors">
-                                            <td className="px-8 py-6 font-bold text-zinc-900 dark:text-white text-sm group-hover:text-primary-main group-hover:italic transition-all">{member.name}</td>
-                                            <td className="px-8 py-6">
-                                                <span className={cn("px-2 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest border italic", getDepartmentColor(member.department))}>{member.department}</span>
-                                            </td>
-                                            <td className="px-8 py-6 text-xs font-bold text-zinc-400 uppercase tracking-widest italic">{member.qualification}</td>
-                                            <td className="px-8 py-6">
-                                                <div className="text-[11px] text-zinc-600 dark:text-zinc-300 font-bold uppercase tracking-widest truncate max-w-[150px]">{member.email}</div>
-                                                <div className="text-[10px] text-zinc-400 font-bold tracking-widest">{member.mobile}</div>
-                                            </td>
-                                            <td className="px-8 py-6 text-xs font-bold text-zinc-500 italic">{member.city}</td>
-                                            <td className="px-8 py-6 text-xs font-bold text-zinc-400 uppercase tracking-widest">{new Date(member.created_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}</td>
-                                            <td className="px-8 py-6 text-right">
-                                                <div className="flex items-center justify-end gap-2">
-                                                    <Link href={`/staff/edit?id=${member.id}`} className="p-3 text-zinc-300 hover:text-primary-main hover:bg-primary-main/5 rounded-radius-medium transition-all shadow-sm"><Pencil className="w-4.5 h-4.5" /></Link>
-                                                    <button className="p-3 text-zinc-200 hover:text-error hover:bg-red-50 dark:hover:bg-red-500/10 rounded-radius-medium transition-all opacity-0 group-hover:opacity-100 shadow-sm"><X className="w-4.5 h-4.5" /></button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                    <Table
+                        columns={columns}
+                        data={staff}
+                        loading={loading}
+                        totalCount={total}
+                        page={page}
+                        pageSize={pageSize}
+                        onPageChange={setPage}
+                        onPageSizeChange={setPageSize}
+                        pageSizeOptions={PAGE_SIZE_OPTIONS}
+                        sortBy={sortBy}
+                        sortOrder={sortOrder}
+                        onSort={handleSort}
+                        emptyMessage="No staff members found matching your criteria."
+                    />
                 )}
-            </div>
-
-            {/* Footer / Pagination */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-8 pt-10 border-t border-zinc-200 dark:border-zinc-800">
-                <div className="flex flex-col sm:flex-row items-center gap-10">
-                    <div className="flex items-center gap-4">
-                        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Display:</span>
-                        <div className="relative group">
-                            <select
-                                value={pageSize}
-                                onChange={(e) => setPageSize(Number(e.target.value))}
-                                className="appearance-none bg-surface-paper dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-radius-medium px-4 py-2 pr-10 text-[10px] font-bold text-zinc-600 dark:text-zinc-300 uppercase tracking-widest focus:outline-none focus:ring-4 focus:ring-primary-main/5 cursor-pointer shadow-sm italic"
-                            >
-                                {PAGE_SIZE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt} Personnel</option>)}
-                            </select>
-                            <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400 pointer-events-none" />
-                        </div>
-                    </div>
-                    <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
-                        Academic Force Strength: <span className="text-primary-main ml-1">{total}</span>
-                    </p>
-                </div>
-
-                <div className="flex items-center gap-3">
-                    <button
-                        disabled={page === 1}
-                        onClick={() => setPage(prev => prev - 1)}
-                        className="p-3 rounded-radius-medium border border-zinc-200 dark:border-zinc-800 bg-surface-paper dark:bg-zinc-900 text-zinc-500 hover:text-primary-main disabled:opacity-30 transition-all active:scale-95 shadow-sm"
-                    >
-                        <ChevronLeft className="w-5 h-5" />
-                    </button>
-                    <div className="flex items-center gap-2">
-                        {(() => {
-                            const maxPages = 4;
-                            let startPage = Math.max(1, page - Math.floor(maxPages / 2));
-                            let endPage = startPage + maxPages - 1;
-
-                            if (endPage > totalPages) {
-                                endPage = totalPages;
-                                startPage = Math.max(1, endPage - maxPages + 1);
-                            }
-
-                            const pages = [];
-                            for (let i = startPage; i <= endPage; i++) {
-                                pages.push(i);
-                            }
-
-                            return pages.map((p) => (
-                                <button
-                                    key={p}
-                                    onClick={() => setPage(p)}
-                                    className={cn(
-                                        "w-10 h-10 rounded-radius-medium text-[10px] font-bold uppercase transition-all shadow-sm italic",
-                                        page === p
-                                            ? "bg-primary-main text-white shadow-xl shadow-primary-main/20 ring-4 ring-primary-main/5 active:scale-95"
-                                            : "bg-surface-paper dark:bg-zinc-900 text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 border border-zinc-100 dark:border-zinc-800"
-                                    )}
-                                >
-                                    {p.toString().padStart(2, '0')}
-                                </button>
-                            ));
-                        })()}
-                    </div>
-                    <button
-                        disabled={page === totalPages}
-                        onClick={() => setPage(prev => prev + 1)}
-                        className="p-3 rounded-radius-medium border border-zinc-200 dark:border-zinc-800 bg-surface-paper dark:bg-zinc-900 text-zinc-500 hover:text-primary-main disabled:opacity-30 transition-all active:scale-95 shadow-sm"
-                    >
-                        <ChevronRight className="w-5 h-5" />
-                    </button>
-                </div>
             </div>
         </div>
     );

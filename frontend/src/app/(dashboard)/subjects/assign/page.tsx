@@ -11,10 +11,10 @@ import {
     Trash2,
     User,
     AlertCircle,
-    CheckCircle2
+    CheckCircle2,
+    ChevronDown
 } from 'lucide-react';
 import { ConfirmBox } from '@/components/ConfirmBox';
-import { cn } from '@/lib/utils';
 
 interface Subject {
     id: number;

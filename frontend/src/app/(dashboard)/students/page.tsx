@@ -9,9 +9,6 @@ import {
     Search,
     LayoutGrid,
     List,
-    ChevronLeft,
-    ChevronRight,
-    ArrowUpDown,
     Calendar,
     MapPin,
     Phone,
@@ -25,6 +22,9 @@ import {
     Pencil
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+
+import Table, { Column } from '@/components/Table';
 
 
 interface StudentMember {
@@ -62,6 +62,63 @@ export default function StudentsPage() {
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
     const [error, setError] = useState<string | null>(null);
 
+    const columns: Column<StudentMember>[] = [
+        {
+            key: 'gr_no',
+            label: 'GR NO',
+            sortable: true,
+            render: (member) => (
+                <span className="text-xs font-bold font-mono text-zinc-500">#{member.gr_no}</span>
+            )
+        },
+        {
+            key: 'name',
+            label: 'Student Name',
+            sortable: true,
+            render: (member) => (
+                <div className="flex flex-col">
+                    <span className="text-sm font-bold text-zinc-900 dark:text-zinc-100 leading-tight group-hover:text-primary-main group-hover:italic transition-all">{member.name} {member.surname}</span>
+                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest opacity-60">Son of {member.father_name}</span>
+                </div>
+            )
+        },
+        {
+            key: 'dob',
+            label: 'DOB',
+            sortable: true,
+            render: (member) => (
+                <span className="text-sm font-bold text-zinc-600 dark:text-zinc-400 italic">
+                    {new Date(member.dob).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                </span>
+            )
+        },
+        {
+            key: 'mobile',
+            label: 'Contact',
+            render: (member) => (
+                <span className="text-sm font-bold text-zinc-600 dark:text-zinc-400 italic">{member.mobile}</span>
+            )
+        },
+        {
+            key: 'city',
+            label: 'City',
+            sortable: true,
+            render: (member) => (
+                <span className="text-sm font-bold text-zinc-600 dark:text-zinc-400 italic">{member.city}</span>
+            )
+        },
+        {
+            key: 'actions',
+            label: '',
+            render: (member) => (
+                <div className="flex items-center justify-end gap-2">
+                    <Link href={`/students/edit?id=${member.id}`} className="p-3 text-zinc-300 hover:text-primary-main hover:bg-primary-main/5 rounded-xl transition-all"><Pencil className="w-4.5 h-4.5" /></Link>
+                    <button className="p-3 text-zinc-200 hover:text-error hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all opacity-0 group-hover:opacity-100"><X className="w-4.5 h-4.5" /></button>
+                </div>
+            ),
+            className: "text-right"
+        }
+    ];
 
     const fetchStudents = useCallback(async () => {
         setLoading(true);
@@ -115,8 +172,6 @@ export default function StudentsPage() {
         setPage(1);
     }, [search, pageSize]);
 
-
-    const totalPages = Math.ceil(total / pageSize);
 
     if (!user) return null;
 
@@ -197,204 +252,103 @@ export default function StudentsPage() {
                     </div>
                 )}
 
-                {loading ? (
-                    <div className="flex flex-col items-center justify-center py-32 gap-4 text-zinc-400 animate-in fade-in duration-500">
-                        <Loader2 className="w-10 h-10 text-primary-main animate-spin" />
-                        <p className="font-medium text-sm">Refreshing records...</p>
-                    </div>
-                ) : students.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-20 gap-4 bg-surface-ground rounded-radius-large border border-dashed border-zinc-200 dark:border-zinc-800 text-center">
-                        <div className="w-16 h-16 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
-                            <Users className="w-8 h-8 text-zinc-300" />
+                {viewMode === 'grid' ? (
+                    loading ? (
+                        <div className="flex flex-col items-center justify-center py-32 gap-4 text-zinc-400 animate-in fade-in duration-500">
+                            <Loader2 className="w-10 h-10 text-primary-main animate-spin" />
+                            <p className="font-medium text-sm">Refreshing records...</p>
                         </div>
-                        <div className="space-y-1">
-                            <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">No students found</h3>
-                            <p className="text-sm text-zinc-500 italic">Try adjusting your search or filters.</p>
-                        </div>
-                        <button onClick={() => { setSearch(''); }} className="text-primary-main text-sm font-semibold hover:underline">Clear all filters</button>
-                    </div>
-                ) : viewMode === 'grid' ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-in slide-in-from-bottom-4 duration-500">
-                        {students.map((member) => (
-                            <div key={member.id} className="group p-5 rounded-radius-large bg-surface-paper dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-primary-main/30 transition-all hover:shadow-xl hover:shadow-primary-main/5 relative overflow-hidden flex flex-col">
-                                <div className="absolute top-0 right-0 p-4">
-                                    <div className="bg-surface-ground dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 px-2 py-1 rounded-lg text-[10px] font-bold font-mono">
-                                        #{member.gr_no}
-                                    </div>
-                                </div>
-
-                                <div className="flex flex-col items-center text-center mt-4 mb-6">
-                                    <div className="w-20 h-20 rounded-full bg-surface-ground dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-800 flex items-center justify-center shadow-sm mb-4 group-hover:scale-105 transition-transform overflow-hidden relative">
-                                        <UserCircle className="w-12 h-12 text-zinc-300 group-hover:text-primary-main/50 transition-colors" />
-                                        <div className="absolute inset-0 bg-primary-main/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                    </div>
-                                    <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 tracking-tight leading-tight group-hover:text-primary-main group-hover:italic transition-all">
-                                        {member.name} {member.surname}
-                                    </h3>
-                                    <p className="text-zinc-500 dark:text-zinc-400 text-xs font-medium mt-1 uppercase tracking-widest text-[9px] opacity-70">
-                                        Son of {member.father_name}
-                                    </p>
-                                </div>
-
-                                <div className="space-y-3 pt-5 border-t border-zinc-50 dark:border-zinc-800/50 flex-1">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2 text-[11px] font-bold text-zinc-400 uppercase tracking-widest">
-                                            <Calendar className="w-3.5 h-3.5 text-primary-main/70" />
-                                            DOB
-                                        </div>
-                                        <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 italic">
-                                            {new Date(member.dob).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2 text-[11px] font-bold text-zinc-400 uppercase tracking-widest">
-                                            <MapPin className="w-3.5 h-3.5 text-success/70" />
-                                            City
-                                        </div>
-                                        <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 italic">
-                                            {member.city}
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2 text-[11px] font-bold text-zinc-400 uppercase tracking-widest">
-                                            <Phone className="w-3.5 h-3.5 text-primary-main/70" />
-                                            Contact
-                                        </div>
-                                        <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 italic">
-                                            {member.mobile}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <Link href={`/students/edit?id=${member.id}`} className="mt-6 flex items-center justify-center gap-2 py-3 rounded-radius-medium bg-primary-main text-white hover:bg-primary-dark transition-all text-xs font-bold shadow-md shadow-primary-main/10 uppercase tracking-widest">
-                                    <Pencil className="w-3.5 h-3.5" />
-                                    Edit Profile
-                                </Link>
+                    ) : students.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-20 gap-4 bg-surface-ground rounded-radius-large border border-dashed border-zinc-200 dark:border-zinc-800 text-center">
+                            <div className="w-16 h-16 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+                                <Users className="w-8 h-8 text-zinc-300" />
                             </div>
-                        ))}
-                    </div>
+                            <div className="space-y-1">
+                                <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">No students found</h3>
+                                <p className="text-sm text-zinc-500 italic">Try adjusting your search or filters.</p>
+                            </div>
+                            <button onClick={() => { setSearch(''); }} className="text-primary-main text-sm font-semibold hover:underline">Clear all filters</button>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-in slide-in-from-bottom-4 duration-500">
+                            {students.map((member) => (
+                                <div key={member.id} className="group p-5 rounded-radius-large bg-surface-paper dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-primary-main/30 transition-all hover:shadow-xl hover:shadow-primary-main/5 relative overflow-hidden flex flex-col">
+                                    <div className="absolute top-0 right-0 p-4">
+                                        <div className="bg-surface-ground dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 px-2 py-1 rounded-lg text-[10px] font-bold font-mono">
+                                            #{member.gr_no}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-col items-center text-center mt-4 mb-6">
+                                        <div className="w-20 h-20 rounded-full bg-surface-ground dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-800 flex items-center justify-center shadow-sm mb-4 group-hover:scale-105 transition-transform overflow-hidden relative">
+                                            <UserCircle className="w-12 h-12 text-zinc-300 group-hover:text-primary-main/50 transition-colors" />
+                                            <div className="absolute inset-0 bg-primary-main/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        </div>
+                                        <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 tracking-tight leading-tight group-hover:text-primary-main group-hover:italic transition-all">
+                                            {member.name} {member.surname}
+                                        </h3>
+                                        <p className="text-zinc-500 dark:text-zinc-400 text-xs font-medium mt-1 uppercase tracking-widest text-[9px] opacity-70">
+                                            Son of {member.father_name}
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-3 pt-5 border-t border-zinc-50 dark:border-zinc-800/50 flex-1">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2 text-[11px] font-bold text-zinc-400 uppercase tracking-widest">
+                                                <Calendar className="w-3.5 h-3.5 text-primary-main/70" />
+                                                DOB
+                                            </div>
+                                            <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 italic">
+                                                {new Date(member.dob).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2 text-[11px] font-bold text-zinc-400 uppercase tracking-widest">
+                                                <MapPin className="w-3.5 h-3.5 text-success/70" />
+                                                City
+                                            </div>
+                                            <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 italic">
+                                                {member.city}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2 text-[11px] font-bold text-zinc-400 uppercase tracking-widest">
+                                                <Phone className="w-3.5 h-3.5 text-primary-main/70" />
+                                                Contact
+                                            </div>
+                                            <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 italic">
+                                                {member.mobile}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <Link href={`/students/edit?id=${member.id}`} className="mt-6 flex items-center justify-center gap-2 py-3 rounded-radius-medium bg-primary-main text-white hover:bg-primary-dark transition-all text-xs font-bold shadow-md shadow-primary-main/10 uppercase tracking-widest">
+                                        <Pencil className="w-3.5 h-3.5" />
+                                        Edit Profile
+                                    </Link>
+                                </div>
+                            ))}
+                        </div>
+                    )
                 ) : (
-                    <div className="bg-surface-paper dark:bg-zinc-900 rounded-radius-large border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-sm animate-in slide-in-from-bottom-4 duration-500">
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-separate border-spacing-0">
-                                <thead className="bg-surface-ground">
-                                    <tr>
-                                        <th onClick={() => handleSort('gr_no')} className="px-8 py-6 text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] cursor-pointer hover:text-primary-main border-b border-zinc-100 dark:border-zinc-800">
-                                            <div className="flex items-center gap-2">GR NO {sortBy === 'gr_no' ? (sortOrder === 'asc' ? <ArrowUp className="w-3 h-3 text-primary-main" /> : <ArrowDown className="w-3 h-3 text-primary-main" />) : <ArrowUpDown className="w-3 h-3 opacity-30" />}</div>
-                                        </th>
-                                        <th onClick={() => handleSort('name')} className="px-8 py-6 text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] cursor-pointer hover:text-primary-main border-b border-zinc-100 dark:border-zinc-800">
-                                            <div className="flex items-center gap-2">Student Name {sortBy === 'name' ? (sortOrder === 'asc' ? <ArrowUp className="w-3 h-3 text-primary-main" /> : <ArrowDown className="w-3 h-3 text-primary-main" />) : <ArrowUpDown className="w-3 h-3 opacity-30" />}</div>
-                                        </th>
-                                        <th onClick={() => handleSort('dob')} className="px-8 py-6 text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] cursor-pointer hover:text-primary-main border-b border-zinc-100 dark:border-zinc-800">
-                                            <div className="flex items-center gap-2">DOB {sortBy === 'dob' ? (sortOrder === 'asc' ? <ArrowUp className="w-3 h-3 text-primary-main" /> : <ArrowDown className="w-3 h-3 text-primary-main" />) : <ArrowUpDown className="w-3 h-3 opacity-30" />}</div>
-                                        </th>
-                                        <th className="px-8 py-6 text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] border-b border-zinc-100 dark:border-zinc-800">Contact</th>
-                                        <th onClick={() => handleSort('city')} className="px-8 py-6 text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] cursor-pointer hover:text-primary-main border-b border-zinc-100 dark:border-zinc-800">
-                                            <div className="flex items-center gap-2">City {sortBy === 'city' ? (sortOrder === 'asc' ? <ArrowUp className="w-3 h-3 text-primary-main" /> : <ArrowDown className="w-3 h-3 text-primary-main" />) : <ArrowUpDown className="w-3 h-3 opacity-30" />}</div>
-                                        </th>
-                                        <th className="px-8 py-6 border-b border-zinc-100 dark:border-zinc-800"></th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-zinc-50 dark:divide-zinc-800">
-                                    {students.map((member) => (
-                                        <tr key={member.id} className="group hover:bg-zinc-50/50 dark:hover:bg-zinc-950/50 transition-colors">
-                                            <td className="px-8 py-6">
-                                                <span className="text-xs font-bold font-mono text-zinc-500">#{member.gr_no}</span>
-                                            </td>
-                                            <td className="px-8 py-6">
-                                                <div className="flex flex-col">
-                                                    <span className="text-sm font-bold text-zinc-900 dark:text-zinc-100 leading-tight group-hover:text-primary-main group-hover:italic transition-all">{member.name} {member.surname}</span>
-                                                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest opacity-60">Son of {member.father_name}</span>
-                                                </div>
-                                            </td>
-                                            <td className="px-8 py-6 text-sm font-bold text-zinc-600 dark:text-zinc-400 italic">{new Date(member.dob).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
-                                            <td className="px-8 py-6 text-sm font-bold text-zinc-600 dark:text-zinc-400 italic">{member.mobile}</td>
-                                            <td className="px-8 py-6 text-sm font-bold text-zinc-600 dark:text-zinc-400 italic">{member.city}</td>
-                                            <td className="px-8 py-6 text-right">
-                                                <div className="flex items-center justify-end gap-2">
-                                                    <Link href={`/students/edit?id=${member.id}`} className="p-3 text-zinc-300 hover:text-primary-main hover:bg-primary-main/5 rounded-xl transition-all"><Pencil className="w-4.5 h-4.5" /></Link>
-                                                    <button className="p-3 text-zinc-200 hover:text-error hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all opacity-0 group-hover:opacity-100"><X className="w-4.5 h-4.5" /></button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                    <Table
+                        columns={columns}
+                        data={students}
+                        loading={loading}
+                        totalCount={total}
+                        page={page}
+                        pageSize={pageSize}
+                        onPageChange={setPage}
+                        onPageSizeChange={setPageSize}
+                        pageSizeOptions={PAGE_SIZE_OPTIONS}
+                        sortBy={sortBy}
+                        sortOrder={sortOrder}
+                        onSort={handleSort}
+                        emptyMessage="No students found matching your criteria."
+                    />
                 )}
-            </div>
-
-            {/* Footer / Pagination */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-8 pt-10 border-t border-zinc-200 dark:border-zinc-800">
-                <div className="flex items-center gap-10">
-                    <div className="flex items-center gap-4">
-                        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Rows per page</span>
-                        <div className="relative group">
-                            <select
-                                value={pageSize}
-                                onChange={(e) => setPageSize(Number(e.target.value))}
-                                className="appearance-none bg-surface-paper dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-radius-medium px-4 py-2 pr-10 text-[10px] font-bold text-zinc-600 dark:text-zinc-300 uppercase tracking-widest focus:outline-none focus:ring-4 focus:ring-primary-main/5 cursor-pointer shadow-sm"
-                            >
-                                {PAGE_SIZE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt} Records</option>)}
-                            </select>
-                            <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400 pointer-events-none" />
-                        </div>
-                    </div>
-                    <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
-                        Total Records: <span className="text-primary-main ml-1">{total}</span>
-                    </p>
-                </div>
-
-                <div className="flex items-center gap-3">
-                    <button
-                        disabled={page === 1}
-                        onClick={() => setPage(prev => prev - 1)}
-                        className="p-3 rounded-radius-medium border border-zinc-100 dark:border-zinc-800 bg-surface-paper dark:bg-zinc-900 text-zinc-500 hover:text-primary-main disabled:opacity-30 transition-all active:scale-95 shadow-sm"
-                    >
-                        <ChevronLeft className="w-5 h-5" />
-                    </button>
-                    <div className="flex items-center gap-2">
-                        {(() => {
-                            const maxPages = 5;
-                            let startPage = Math.max(1, page - Math.floor(maxPages / 2));
-                            let endPage = startPage + maxPages - 1;
-
-                            if (endPage > totalPages) {
-                                endPage = totalPages;
-                                startPage = Math.max(1, endPage - maxPages + 1);
-                            }
-
-                            const pages = [];
-                            for (let i = startPage; i <= endPage; i++) {
-                                pages.push(i);
-                            }
-
-                            return pages.map((p) => (
-                                <button
-                                    key={p}
-                                    onClick={() => setPage(p)}
-                                    className={cn(
-                                        "w-10 h-10 rounded-radius-medium text-[10px] font-bold uppercase transition-all shadow-sm",
-                                        page === p
-                                            ? "bg-primary-main text-white shadow-xl shadow-primary-main/20 ring-4 ring-primary-main/5 active:scale-95"
-                                            : "bg-surface-paper dark:bg-zinc-900 text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 border border-zinc-100 dark:border-zinc-800"
-                                    )}
-                                >
-                                    {p.toString().padStart(2, '0')}
-                                </button>
-                            ));
-                        })()}
-                    </div>
-                    <button
-                        disabled={page === totalPages}
-                        onClick={() => setPage(prev => prev + 1)}
-                        className="p-3 rounded-radius-medium border border-zinc-100 dark:border-zinc-800 bg-surface-paper dark:bg-zinc-900 text-zinc-500 hover:text-primary-main disabled:opacity-30 transition-all active:scale-95 shadow-sm"
-                    >
-                        <ChevronRight className="w-5 h-5" />
-                    </button>
-                </div>
             </div>
         </div>
     );
 }
+

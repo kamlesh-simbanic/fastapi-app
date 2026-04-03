@@ -126,7 +126,8 @@ const CalendarPicker = ({
 
     const weekDays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
-    const years = Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - 80 + i);
+    const currentYear = new Date().getFullYear();
+    const years = Array.from({ length: 41 }, (_, i) => currentYear - 20 + i);
 
     const handleYearChange = (year: number) => {
         setCurrentMonth(new Date(year, currentMonth.getMonth(), 1));
@@ -162,7 +163,7 @@ const CalendarPicker = ({
             {isOpen && (
                 <div className="absolute top-full left-0 mt-3 z-50 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl p-6 min-w-[280px] animate-in slide-in-from-top-4 fade-in duration-300">
                     <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-800/50 px-4 py-2 rounded-xl border border-zinc-100 dark:border-zinc-700/50 shadow-inner">
                             <select
                                 value={currentMonth.getMonth()}
                                 onChange={(e) => handleMonthChange(parseInt(e.target.value))}
@@ -172,10 +173,11 @@ const CalendarPicker = ({
                                     <option key={m} value={i} className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white font-sans">{m}</option>
                                 ))}
                             </select>
+                            <div className="w-[1px] h-3 bg-zinc-200 dark:bg-zinc-700 mx-1" />
                             <select
                                 value={currentMonth.getFullYear()}
                                 onChange={(e) => handleYearChange(parseInt(e.target.value))}
-                                className="bg-transparent text-sm font-bold text-zinc-400 outline-none cursor-pointer hover:text-blue-600 transition-colors appearance-none"
+                                className="bg-transparent text-sm font-bold text-zinc-500 dark:text-zinc-400 outline-none cursor-pointer hover:text-blue-600 transition-colors appearance-none"
                             >
                                 {years.map(y => (
                                     <option key={y} value={y} className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white font-sans">{y}</option>
@@ -240,14 +242,14 @@ const CalendarPicker = ({
                                             type="button"
                                             disabled={isDisabled || isOutsideRange || isHoliday}
                                             onClick={() => handleDateSelect(d)}
-                                            className={`h-9 w-9 text-xs font-bold rounded-xl flex items-center justify-center transition-all ${isSelected
-                                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+                                            className={`h-10 w-10 text-xs font-bold rounded-xl flex items-center justify-center transition-all duration-300 ${isSelected
+                                                ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/30 ring-4 ring-blue-600/10'
                                                 : isHoliday
-                                                    ? 'text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30 ring-2 ring-red-500/20'
+                                                    ? 'text-red-600 dark:text-red-400 bg-red-100/50 dark:bg-red-900/20 ring-2 ring-red-500/20'
                                                     : isToday
-                                                        ? 'text-blue-600 bg-blue-600/10'
-                                                        : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
-                                                } ${isDisabled || isOutsideRange || isHoliday ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110 active:scale-95'}`}
+                                                        ? 'text-blue-600 bg-blue-600/10 ring-2 ring-blue-600/20'
+                                                        : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-blue-600 dark:hover:text-blue-400'
+                                                } ${isDisabled || isOutsideRange || isHoliday ? 'opacity-30 cursor-not-allowed transform-none' : 'hover:scale-110 active:scale-95'}`}
                                         >
                                             {d}
                                         </button>

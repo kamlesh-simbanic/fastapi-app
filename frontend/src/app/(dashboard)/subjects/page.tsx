@@ -20,6 +20,9 @@ import { cn } from '@/lib/utils';
 import { ConfirmBox } from '@/components/ConfirmBox';
 import Link from 'next/link';
 
+import Table, { Column } from '@/components/Table';
+
+
 interface Subject {
     id: number;
     name: string;
@@ -32,6 +35,10 @@ export default function SubjectsPage() {
     const [loading, setLoading] = useState(true);
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [search, setSearch] = useState('');
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [sortBy, setSortBy] = useState('name');
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
     const [isAddOpen, setIsAddOpen] = useState(false);
     const [editingSubject, setEditingSubject] = useState<Subject | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -40,6 +47,40 @@ export default function SubjectsPage() {
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
     const [idToDelete, setIdToDelete] = useState<number | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
+
+    const columns: Column<Subject>[] = [
+        {
+            key: 'name',
+            label: 'Discipline Nomenclature',
+            sortable: true,
+            render: (sub) => (
+                <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-radius-medium bg-primary-main/5 flex items-center justify-center border border-primary-main/10 shadow-inner">
+                        <BookOpen className="w-5 h-5 text-primary-main opacity-60" />
+                    </div>
+                    <span className="text-sm font-black text-zinc-900 dark:text-white uppercase tracking-wider italic group-hover:text-primary-main transition-colors">{sub.name}</span>
+                </div>
+            )
+        },
+        {
+            key: 'actions',
+            label: '',
+            render: (sub) => (
+                <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Link
+                        href={`/subjects/assign?subjectId=${sub.id}`}
+                        className="p-3 bg-primary-main/5 text-primary-main rounded-radius-medium hover:bg-primary-main hover:text-white transition-all shadow-sm"
+                        title="Deploy Staff"
+                    >
+                        <UserPlus className="w-4.5 h-4.5" />
+                    </Link>
+                    <button onClick={() => openEdit(sub)} className="p-3 bg-zinc-50 dark:bg-zinc-800 text-zinc-400 hover:text-primary-main rounded-radius-medium hover:bg-white dark:hover:bg-zinc-700 transition-all shadow-sm"><Edit2 className="w-4.5 h-4.5" /></button>
+                    <button onClick={() => { setIdToDelete(sub.id); setDeleteConfirmOpen(true); }} className="p-3 bg-red-50 dark:bg-red-950/20 text-red-300 hover:text-error rounded-radius-medium hover:bg-white dark:hover:bg-red-500/10 transition-all shadow-sm"><Trash2 className="w-4.5 h-4.5" /></button>
+                </div>
+            ),
+            className: "text-right"
+        }
+    ];
 
     const fetchSubjects = useCallback(async () => {
         setLoading(true);
@@ -105,9 +146,27 @@ export default function SubjectsPage() {
         setIsAddOpen(true);
     };
 
-    const filteredSubjects = subjects.filter(s =>
-        s.name.toLowerCase().includes(search.toLowerCase())
-    );
+    const handleSort = (key: string) => {
+        if (sortBy === key) {
+            setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortBy(key);
+            setSortOrder('asc');
+        }
+    };
+
+    const sortedSubjects = [...subjects]
+        .filter(s => s.name.toLowerCase().includes(search.toLowerCase()))
+        .sort((a, b) => {
+            const aVal = a[sortBy as keyof Subject];
+            const bVal = b[sortBy as keyof Subject];
+            if (typeof aVal === 'string' && typeof bVal === 'string') {
+                return sortOrder === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+            }
+            return 0;
+        });
+
+    const paginatedSubjects = sortedSubjects.slice((page - 1) * pageSize, page * pageSize);
 
     if (!user) return null;
 
@@ -198,7 +257,7 @@ export default function SubjectsPage() {
                             <p className="text-[9px] font-bold text-zinc-400 animate-pulse italic mt-1 uppercase">Fetching Institutional Curriculum</p>
                         </div>
                     </div>
-                ) : filteredSubjects.length === 0 ? (
+                ) : sortedSubjects.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 gap-8 bg-surface-ground rounded-radius-large border border-dashed border-zinc-200 dark:border-zinc-800 text-center animate-in fade-in duration-500">
                         <div className="w-20 h-20 rounded-radius-large bg-primary-main/5 flex items-center justify-center border border-primary-main/10 shadow-inner">
                             <BookOpen className="w-10 h-10 text-primary-main opacity-30" />
@@ -216,7 +275,7 @@ export default function SubjectsPage() {
                     </div>
                 ) : viewMode === 'grid' ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                        {filteredSubjects.map((sub) => (
+                        {sortedSubjects.map((sub) => (
                             <div key={sub.id} className="group p-8 rounded-radius-large bg-surface-paper dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-primary-main/30 transition-all hover:shadow-2xl hover:shadow-primary-main/5 flex flex-col relative overflow-hidden">
                                 <div className="absolute top-0 right-0 p-1">
                                     <div className="w-24 h-24 bg-primary-main/5 rounded-full -mr-12 -mt-12 group-hover:bg-primary-main/10 transition-colors blur-2xl" />
@@ -252,45 +311,21 @@ export default function SubjectsPage() {
                         ))}
                     </div>
                 ) : (
-                    <div className="bg-surface-paper dark:bg-zinc-900 rounded-radius-large border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-sm">
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-separate border-spacing-0">
-                                <thead className="bg-surface-ground">
-                                    <tr>
-                                        <th className="px-8 py-6 text-[10px] font-bold text-zinc-400 uppercase tracking-[0.3em] border-b border-zinc-100 dark:border-zinc-800 italic">Discipline Nomenclature</th>
-                                        <th className="px-8 py-6 text-[10px] font-bold text-zinc-400 uppercase tracking-[0.3em] border-b border-zinc-100 dark:border-zinc-800 text-right italic">Registry Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-zinc-50 dark:divide-zinc-800/50">
-                                    {filteredSubjects.map((sub) => (
-                                        <tr key={sub.id} className="group hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 transition-colors">
-                                            <td className="px-8 py-6">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-10 h-10 rounded-radius-medium bg-primary-main/5 flex items-center justify-center border border-primary-main/10 shadow-inner">
-                                                        <BookOpen className="w-5 h-5 text-primary-main opacity-60" />
-                                                    </div>
-                                                    <span className="text-sm font-black text-zinc-900 dark:text-white uppercase tracking-wider italic group-hover:text-primary-main transition-colors">{sub.name}</span>
-                                                </div>
-                                            </td>
-                                            <td className="px-8 py-6 text-right">
-                                                <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <Link
-                                                        href={`/subjects/assign?subjectId=${sub.id}`}
-                                                        className="p-3 bg-primary-main/5 text-primary-main rounded-radius-medium hover:bg-primary-main hover:text-white transition-all shadow-sm"
-                                                        title="Deploy Staff"
-                                                    >
-                                                        <UserPlus className="w-4.5 h-4.5" />
-                                                    </Link>
-                                                    <button onClick={() => openEdit(sub)} className="p-3 bg-zinc-50 dark:bg-zinc-800 text-zinc-400 hover:text-primary-main rounded-radius-medium hover:bg-white dark:hover:bg-zinc-700 transition-all shadow-sm"><Edit2 className="w-4.5 h-4.5" /></button>
-                                                    <button onClick={() => { setIdToDelete(sub.id); setDeleteConfirmOpen(true); }} className="p-3 bg-red-50 dark:bg-red-950/20 text-red-300 hover:text-error rounded-radius-medium hover:bg-white dark:hover:bg-red-900/10 transition-all shadow-sm"><Trash2 className="w-4.5 h-4.5" /></button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                    <Table
+                        columns={columns}
+                        data={paginatedSubjects}
+                        loading={loading}
+                        totalCount={sortedSubjects.length}
+                        page={page}
+                        pageSize={pageSize}
+                        onPageChange={setPage}
+                        onPageSizeChange={setPageSize}
+                        pageSizeOptions={[10, 20, 50]}
+                        sortBy={sortBy}
+                        sortOrder={sortOrder}
+                        onSort={handleSort}
+                        emptyMessage="No disciplines found matching your catalog search."
+                    />
                 )}
             </div>
 

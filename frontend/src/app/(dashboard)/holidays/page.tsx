@@ -4,7 +4,6 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/components/AuthContext';
 import {
-    Calendar,
     Plus,
     Loader2,
     AlertCircle,
@@ -18,7 +17,7 @@ import {
 
 import { ConfirmBox } from '@/components/ConfirmBox';
 import CalendarPicker from '@/components/CalendarPicker';
-import { cn } from '@/lib/utils';
+
 
 interface Holiday {
     id: number;
@@ -112,7 +111,7 @@ export default function HolidaysPage() {
         setDeleteConfirmOpen(true);
     };
 
-    if (!user) return null;``
+    if (!user) return null;
 
     return (
         <div className="space-y-10 animate-in fade-in duration-500 pb-20">
@@ -226,7 +225,7 @@ export default function HolidaysPage() {
             {/* Add Holiday Modal */}
             {isAddModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-6 backdrop-blur-md bg-zinc-950/60 animate-in fade-in duration-500">
-                    <div className="bg-surface-paper dark:bg-zinc-900 w-full max-w-2xl rounded-radius-large shadow-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden animate-in zoom-in-95 duration-300 ring-1 ring-zinc-50 dark:ring-zinc-800/10">
+                    <div className="bg-surface-paper dark:bg-zinc-900 w-full max-w-2xl rounded-radius-large shadow-2xl border border-zinc-200 dark:border-zinc-800 animate-in zoom-in-95 duration-300 ring-1 ring-zinc-50 dark:ring-zinc-800/10">
                         <div className="p-12 space-y-12">
                             <div className="flex items-center justify-between">
                                 <div className="space-y-2">
