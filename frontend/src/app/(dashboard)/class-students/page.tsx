@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { api } from '@/lib/api';
+import { ClassStudent, SchoolClass } from '@/types';
 import { useAuth } from '@/components/AuthContext';
 import {
     Users,
@@ -21,20 +22,6 @@ import {
 import Table, { Column } from '@/components/Table';
 import { ConfirmBox } from '@/components/ConfirmBox';
 import Link from 'next/link';
-
-interface SchoolClass {
-    id: number;
-    standard: string;
-    division: string;
-}
-
-interface ClassStudent {
-    id: number;
-    academic_year: string;
-    class_id: number;
-    students: number[];
-    school_class?: SchoolClass;
-}
 
 export default function ClassStudentsPage() {
     const { user } = useAuth();

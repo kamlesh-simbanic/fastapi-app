@@ -23,19 +23,9 @@ import {
 } from 'lucide-react';
 import Table, { Column } from '@/components/Table';
 import { cn } from '@/lib/utils';
+import { Student } from '@/types';
 
 
-interface StudentMember {
-    id: number;
-    gr_no: string;
-    name: string;
-    father_name: string;
-    surname: string;
-    mobile: string;
-    dob: string;
-    city: string;
-    status: string;
-}
 
 const PAGE_SIZE_OPTIONS = [6, 12, 24, 50];
 
@@ -49,7 +39,7 @@ const SORT_OPTIONS = [
 export default function StudentsPage() {
     const { user } = useAuth();
 
-    const [students, setStudents] = useState<StudentMember[]>([]);
+    const [students, setStudents] = useState<Student[]>([]);
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(true);
@@ -93,7 +83,7 @@ export default function StudentsPage() {
         }
     };
 
-    const columns: Column<StudentMember>[] = [
+    const columns: Column<Student>[] = [
         {
             key: 'gr_no',
             label: 'GR No',

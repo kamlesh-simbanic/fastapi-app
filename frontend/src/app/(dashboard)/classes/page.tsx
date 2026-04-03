@@ -21,22 +21,8 @@ import {
 import Table, { Column } from '@/components/Table';
 import { cn } from '@/lib/utils';
 import { ConfirmBox } from '@/components/ConfirmBox';
+import { SchoolClass, Staff } from '@/types';
 
-interface SchoolClass {
-    id: number;
-    standard: string;
-    division: string;
-    class_teacher_id?: number;
-    class_teacher?: {
-        name: string;
-    };
-}
-
-interface Staff {
-    id: number;
-    name: string;
-    department: string;
-}
 
 export default function ClassesPage() {
     const { user } = useAuth();

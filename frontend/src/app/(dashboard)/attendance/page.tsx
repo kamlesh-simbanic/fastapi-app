@@ -16,19 +16,8 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import CalendarPicker from '@/components/CalendarPicker';
+import { SchoolClass, Student } from '@/types';
 
-interface SchoolClass {
-    id: number;
-    standard: string;
-    division: string;
-}
-
-interface Student {
-    id: number;
-    gr_no: string;
-    name: string;
-    surname: string;
-}
 
 export default function AttendancePage() {
     const { user } = useAuth();

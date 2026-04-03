@@ -21,24 +21,8 @@ import {
 import { cn } from '@/lib/utils';
 import { ConfirmBox } from '@/components/ConfirmBox';
 import Table, { Column } from '@/components/Table';
+import { Subject, Staff, Assignment } from '@/types';
 
-interface Subject {
-    id: number;
-    name: string;
-}
-
-interface Staff {
-    id: number;
-    name: string;
-    department?: string;
-}
-
-interface Assignment {
-    id: number;
-    subject_id: number;
-    teacher_id: number;
-    teacher?: Staff;
-}
 
 export default function SubjectsPage() {
     const { user } = useAuth();

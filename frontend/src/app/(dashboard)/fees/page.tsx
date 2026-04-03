@@ -17,24 +17,9 @@ import {
 } from 'lucide-react';
 import Table, { Column } from '@/components/Table';
 import { cn } from '@/lib/utils';
+import { FeePayment } from '@/types';
 
 
-interface FeePayment {
-    id: number;
-    gr_no: string;
-    student_id: number;
-    term: string;
-    year: number;
-    amount: number;
-    payment_method: string;
-    payment_details?: string;
-    created_at: string;
-    student?: {
-        name: string;
-        surname: string;
-        father_name: string;
-    };
-}
 
 const PAGE_SIZE_OPTIONS = [6, 12, 24, 50];
 

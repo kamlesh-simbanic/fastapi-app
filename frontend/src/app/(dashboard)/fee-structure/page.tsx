@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { api } from '@/lib/api';
+import { FeeStructure, SchoolClass } from '@/types';
 import { useAuth } from '@/components/AuthContext';
 import {
     CreditCard,
@@ -14,20 +15,6 @@ import {
     ChevronDown
 } from 'lucide-react';
 import Table, { Column } from '@/components/Table';
-
-interface SchoolClass {
-    id: number;
-    standard: string;
-    division: string;
-}
-
-interface FeeStructure {
-    id: number;
-    class_id: number;
-    year: number;
-    fee_amount: number;
-    school_class?: SchoolClass;
-}
 
 export default function FeeStructurePage() {
     const { user } = useAuth();

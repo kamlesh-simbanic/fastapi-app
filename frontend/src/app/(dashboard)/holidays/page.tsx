@@ -17,14 +17,8 @@ import {
 
 import { ConfirmBox } from '@/components/ConfirmBox';
 import CalendarPicker from '@/components/CalendarPicker';
+import { Holiday } from '@/types';
 
-interface Holiday {
-    id: number;
-    name: string;
-    date: string;
-    number_of_days: number;
-    created_at: string;
-}
 
 export default function HolidaysPage() {
     const { user } = useAuth();

@@ -16,20 +16,11 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-
-interface LeaveRequestData {
-    id: number;
-    staff_id: number;
-    leave_type: string;
-    start_date: string;
-    end_date: string;
-    reason: string;
-    status: string;
-}
+import { LeaveRequest } from '@/types';
 
 export default function LeaveManagementPage() {
-    const [leaveRequests, setLeaveRequests] = useState<LeaveRequestData[]>([]);
-    const [approvals, setApprovals] = useState<LeaveRequestData[]>([]);
+    const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>([]);
+    const [approvals, setApprovals] = useState<LeaveRequest[]>([]);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [showForm, setShowForm] = useState(false);

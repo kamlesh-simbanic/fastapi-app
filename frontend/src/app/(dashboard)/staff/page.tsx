@@ -24,18 +24,7 @@ import {
 import Table, { Column } from '@/components/Table';
 import { cn } from '@/lib/utils';
 import { DEPARTMENTS, getDepartmentColor } from '@/lib/departments';
-
-interface StaffMember {
-    id: number;
-    name: string;
-    mobile: string;
-    email: string;
-    department: string;
-    qualification: string;
-    city: string;
-    leave_balance: number;
-    created_at: string;
-}
+import { Staff } from '@/types';
 
 const PAGE_SIZE_OPTIONS = [6, 12, 24, 50];
 
@@ -49,7 +38,7 @@ const SORT_OPTIONS = [
 export default function StaffPage() {
     const { user } = useAuth();
 
-    const [staff, setStaff] = useState<StaffMember[]>([]);
+    const [staff, setStaff] = useState<Staff[]>([]);
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(true);
@@ -94,7 +83,7 @@ export default function StaffPage() {
         }
     };
 
-    const columns: Column<StaffMember>[] = [
+    const columns: Column<Staff>[] = [
         {
             key: 'name',
             label: 'Name',
