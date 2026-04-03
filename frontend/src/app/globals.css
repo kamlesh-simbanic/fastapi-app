@@ -6,6 +6,42 @@
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
+  /* MUI Palette Semantic Tokens */
+  --color-primary-main: var(--color-blue-600);
+  --color-primary-light: var(--color-blue-500);
+  --color-primary-dark: var(--color-blue-700);
+  --color-primary-contrast: #ffffff;
+
+  --color-secondary-main: var(--color-zinc-600);
+  --color-secondary-light: var(--color-zinc-500);
+  --color-secondary-dark: var(--color-zinc-700);
+  --color-secondary-contrast: #ffffff;
+
+  --color-surface-paper: white;
+  --color-surface-ground: var(--color-zinc-50);
+
+  /* Status Tokens */
+  --color-success: var(--color-green-600);
+  --color-error: var(--color-red-600);
+  --color-warning: var(--color-amber-500);
+  --color-info: var(--color-blue-400);
+
+  /* Typography Scale */
+  --text-h1: 2.25rem;
+  --text-h2: 1.875rem;
+  --text-h3: 1.5rem;
+  --text-h4: 1.25rem;
+  --text-h5: 1.125rem;
+  --text-h6: 1rem;
+
+  --font-weight-h1: var(--font-black);
+  --font-weight-h2: var(--font-bold);
+  --font-weight-body1: var(--font-medium);
+
+  /* Shaped System */
+  --radius-medium: 12px;
+  --radius-large: 16px;
 }
 
 @variant dark (&:where(.dark, .dark *));
@@ -13,11 +49,31 @@
 :root {
   --background: #ffffff;
   --foreground: #0a0a0a;
+
+  /* Explicitly define base colors if needed for custom vars */
+  --color-blue-600: #2563eb;
+  --color-blue-500: #3b82f6;
+  --color-blue-700: #1d4ed8;
+  --color-blue-400: #60a5fa;
+
+  --color-zinc-600: #52525b;
+  --color-zinc-500: #71717a;
+  --color-zinc-700: #3f3f46;
+  --color-zinc-50: #fafafa;
+
+  --color-green-600: #16a34a;
+  --color-red-600: #dc2626;
+  --color-amber-500: #f59e0b;
 }
 
 .dark {
   --background: #0a0a0a;
   --foreground: #ededed;
+
+  --color-surface-paper: #18181b;
+  /* zinc-900 */
+  --color-surface-ground: #09090b;
+  /* zinc-950 */
 }
 
 @layer base {

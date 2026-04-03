@@ -155,17 +155,17 @@ export default function ClassesPage() {
     if (!user) return null;
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500 pb-10">
+        <div className="space-y-10 animate-in fade-in duration-500 pb-12">
             {/* Header */}
-            <section className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div className="space-y-1">
-                    <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-2xl bg-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+            <section className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+                <div className="space-y-1.5">
+                    <h1 className="text-h2 font-weight-h2 text-zinc-900 dark:text-zinc-100 flex items-center gap-4 italic tracking-tight">
+                        <div className="p-3 rounded-radius-medium bg-primary-main shadow-2xl shadow-primary-main/20 ring-4 ring-primary-main/5">
                             <Layers className="w-6 h-6 text-white" />
                         </div>
-                        Class Management
+                        Academic Units
                     </h1>
-                    <p className="text-zinc-500 dark:text-zinc-400 text-sm font-medium">Manage standards, divisions, and class teachers.</p>
+                    <p className="text-zinc-500 dark:text-zinc-400 text-sm font-medium italic opacity-70 uppercase tracking-widest text-[10px]">Configure standards, sections, and assigned leadership.</p>
                 </div>
 
                 <button
@@ -174,100 +174,134 @@ export default function ClassesPage() {
                         setFormData({ standard: '', division: '', class_teacher_id: '' });
                         setIsAddOpen(true);
                     }}
-                    className="px-4 py-2 bg-indigo-500 text-white rounded-xl text-sm font-bold hover:bg-indigo-600 shadow-lg shadow-indigo-500/20 active:scale-95 transition-all flex items-center gap-2"
+                    className="px-8 py-4 bg-primary-main text-white rounded-radius-medium text-[10px] font-black uppercase tracking-[0.4em] hover:bg-primary-dark shadow-2xl shadow-primary-main/20 active:scale-95 transition-all flex items-center gap-3 italic ring-4 ring-primary-main/5"
                 >
                     <Plus className="w-4 h-4" />
-                    Create Class
+                    Initialize Class
                 </button>
             </section>
 
-            {/* Filters & Toggle */}
-            <section className="flex flex-col sm:flex-row items-center gap-4">
+            {/* Toolbar */}
+            <section className="flex flex-col sm:flex-row items-center gap-4 bg-surface-paper dark:bg-zinc-900/50 p-2 rounded-radius-large border border-zinc-200 dark:border-zinc-800 shadow-sm ring-1 ring-zinc-50 dark:ring-zinc-800/10">
                 <div className="relative group flex-1 w-full">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" />
+                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-zinc-300 group-focus-within:text-primary-main transition-colors pointer-events-none" />
                     <input
                         type="text"
-                        placeholder="Filter classes by standard or division..."
+                        placeholder="Search standard or division..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-3.5 pl-12 pr-12 text-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-sm"
+                        className="w-full bg-transparent border-none rounded-radius-medium py-3.5 pl-14 pr-12 text-sm focus:outline-none focus:ring-0 transition-all text-zinc-900 dark:text-zinc-100 font-black italic uppercase tracking-wider placeholder:opacity-30 placeholder:normal-case"
                     />
-                    {search && <button onClick={() => setSearch('')} className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 hover:bg-zinc-100 rounded-xl text-zinc-400"><X className="w-4 h-4" /></button>}
+                    {search && (
+                        <button
+                            onClick={() => setSearch('')}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg text-zinc-400 transition-colors"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
+                    )}
                 </div>
 
-                <div className="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl self-end sm:self-center">
+                <div className="h-10 w-px bg-zinc-200 dark:bg-zinc-800 hidden sm:block mx-1 opacity-50" />
+
+                <div className="flex items-center gap-1 p-1 bg-surface-ground dark:bg-zinc-800/50 rounded-radius-medium self-stretch border border-zinc-200/50 dark:border-zinc-800">
                     <button
                         onClick={() => setViewMode('grid')}
                         className={cn(
-                            "p-2 rounded-lg transition-all",
-                            viewMode === 'grid' ? "bg-white dark:bg-zinc-700 shadow-sm text-indigo-500" : "text-zinc-400 hover:text-zinc-500"
+                            "p-2.5 rounded-radius-medium transition-all",
+                            viewMode === 'grid'
+                                ? "bg-white dark:bg-zinc-700 shadow-xl text-primary-main italic scale-105"
+                                : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
                         )}
                     >
-                        <LayoutGrid className="w-4 h-4" />
+                        <LayoutGrid className="w-5 h-5" />
                     </button>
                     <button
                         onClick={() => setViewMode('list')}
                         className={cn(
-                            "p-2 rounded-lg transition-all",
-                            viewMode === 'list' ? "bg-white dark:bg-zinc-700 shadow-sm text-indigo-500" : "text-zinc-400 hover:text-zinc-500"
+                            "p-2.5 rounded-radius-medium transition-all",
+                            viewMode === 'list'
+                                ? "bg-white dark:bg-zinc-700 shadow-xl text-primary-main italic scale-105"
+                                : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
                         )}
                     >
-                        <List className="w-4 h-4" />
+                        <List className="w-5 h-5" />
                     </button>
                 </div>
             </section>
 
             {error && (
-                <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center gap-3 text-red-500 animate-in slide-in-from-top-2">
-                    <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                    <p className="text-sm font-bold">{error}</p>
+                <div className="p-5 rounded-radius-medium bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/40 flex items-center gap-4 text-error animate-in slide-in-from-top-2 shadow-sm italic">
+                    <AlertCircle className="w-6 h-6 flex-shrink-0" />
+                    <p className="text-sm font-black uppercase tracking-widest">{error}</p>
                 </div>
             )}
 
             {/* Main Content */}
             <div className="min-h-[400px]">
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center py-32 gap-4 text-zinc-500 animate-in fade-in duration-500">
-                        <Loader2 className="w-12 h-12 text-indigo-500 animate-spin" />
-                        <p className="font-bold text-sm tracking-widest uppercase opacity-70">Fetching classes...</p>
+                    <div className="flex flex-col items-center justify-center py-40 gap-6 text-zinc-500 animate-in fade-in">
+                        <Loader2 className="w-16 h-16 text-primary-main animate-spin" />
+                        <div className="text-center">
+                            <p className="font-bold text-[10px] tracking-[0.4em] uppercase opacity-70 italic">Cataloging Units...</p>
+                            <p className="text-[9px] font-bold text-zinc-400 animate-pulse italic mt-1 uppercase tracking-widest">Accessing Institutional Database</p>
+                        </div>
                     </div>
                 ) : classes.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-20 gap-4 bg-zinc-50 dark:bg-zinc-900/30 rounded-3xl border border-dashed border-zinc-200 dark:border-zinc-800 text-center">
-                        <Layers className="w-12 h-12 text-zinc-300" />
-                        <h3 className="text-lg font-bold text-zinc-900 dark:text-white">No classes found</h3>
-                        <p className="text-zinc-500 text-sm max-w-xs">Create your first class to start managing student groups.</p>
+                    <div className="flex flex-col items-center justify-center py-32 gap-8 bg-surface-ground rounded-radius-large border border-dashed border-zinc-200 dark:border-zinc-800 text-center animate-in scale-in-95">
+                        <div className="p-6 bg-surface-paper dark:bg-zinc-800 rounded-radius-large shadow-inner border border-zinc-100 dark:border-zinc-700">
+                            <Layers className="w-12 h-12 text-zinc-200 dark:text-zinc-700" />
+                        </div>
+                        <div className="space-y-2">
+                            <h3 className="text-2xl font-black text-zinc-900 dark:text-zinc-100 italic tracking-tight">Academic Units Registry Empty</h3>
+                            <p className="text-zinc-500 text-sm max-w-sm mx-auto leading-relaxed italic opacity-70 uppercase tracking-widest text-[10px]">Execute &quot;Initialize Class&quot; to begin building the institutional infrastructure.</p>
+                        </div>
                     </div>
                 ) : viewMode === 'grid' ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-in slide-in-from-bottom-4 duration-500">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 animate-in slide-in-from-bottom-6 duration-700">
                         {classes.map((cls) => (
-                            <div key={cls.id} className="group p-6 rounded-[2.5rem] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-indigo-500/30 transition-all hover:shadow-2xl hover:shadow-indigo-500/5 relative overflow-hidden flex flex-col">
-                                <div className="flex justify-between items-start mb-6">
-                                    <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center">
-                                        <span className="text-indigo-600 font-black text-lg">{cls.division}</span>
+                            <div key={cls.id} className="group p-8 rounded-radius-large bg-surface-paper dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-primary-main/40 transition-all hover:shadow-2xl hover:shadow-primary-main/5 relative flex flex-col overflow-hidden">
+                                <div className="absolute top-0 right-0 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div className="w-32 h-32 bg-primary-main/5 rounded-full -mr-16 -mt-16 blur-3xl" />
+                                </div>
+
+                                <div className="flex justify-between items-start mb-8 relative z-10">
+                                    <div className="w-14 h-14 rounded-radius-medium bg-primary-main/5 dark:bg-primary-main/10 flex items-center justify-center border border-primary-main/10 shadow-inner group-hover:bg-primary-main group-hover:text-white transition-all duration-500">
+                                        <span className="font-black text-xl italic group-hover:scale-110 transition-transform">{cls.division}</span>
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                        <button onClick={() => openEdit(cls)} className="p-2 text-zinc-400 hover:text-indigo-500 transition-colors"><Edit2 className="w-4 h-4" /></button>
-                                        <button onClick={() => triggerDelete(cls.id)} className="p-2 text-zinc-400 hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity translate-x-4 group-hover:translate-x-0 transition-transform">
+                                        <button
+                                            onClick={() => openEdit(cls)}
+                                            className="p-3 text-zinc-400 hover:text-primary-main bg-white dark:bg-zinc-800 rounded-radius-medium transition-all shadow-sm active:scale-90"
+                                        >
+                                            <Edit2 className="w-4.5 h-4.5" />
+                                        </button>
+                                        <button
+                                            onClick={() => triggerDelete(cls.id)}
+                                            className="p-3 text-zinc-400 hover:text-error bg-white dark:bg-zinc-800 rounded-radius-medium transition-all shadow-sm active:scale-90"
+                                        >
+                                            <Trash2 className="w-4.5 h-4.5" />
+                                        </button>
                                     </div>
                                 </div>
 
-                                <div className="space-y-1 mb-6">
-                                    <h3 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tighter italic">Standard {cls.standard}</h3>
-                                    <div className="flex items-center gap-2 text-zinc-500 text-xs font-bold uppercase tracking-widest">
-                                        <BadgeCheck className="w-3 h-3 text-emerald-500" />
+                                <div className="space-y-2 mb-8 relative z-10">
+                                    <h3 className="text-2xl font-black text-zinc-900 dark:text-zinc-100 tracking-tight italic uppercase group-hover:text-primary-main transition-colors">Unit {cls.standard}</h3>
+                                    <div className="flex items-center gap-2.5 text-zinc-400 text-[10px] font-black uppercase tracking-[0.3em] italic">
+                                        <BadgeCheck className="w-4 h-4 text-success opacity-80" />
                                         Division {cls.division}
                                     </div>
                                 </div>
 
-                                <div className="mt-auto pt-6 border-t border-zinc-100 dark:border-zinc-800/50">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
-                                            <User className="w-4 h-4 text-zinc-400" />
+                                <div className="mt-auto pt-6 border-t border-zinc-100 dark:border-zinc-800/50 relative z-10">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-full bg-surface-ground border border-zinc-100 dark:border-zinc-800 flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform">
+                                            <User className="w-5 h-5 text-zinc-200 dark:text-zinc-700 group-hover:text-primary-main transition-colors" />
                                         </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Class Teacher</span>
-                                            <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
-                                                {cls.class_teacher?.name || 'Not assigned'}
+                                        <div className="flex flex-col min-w-0">
+                                            <span className="text-[9px] font-black text-zinc-300 dark:text-zinc-500 uppercase tracking-[0.2em] italic">Head Instructor</span>
+                                            <span className="text-xs font-black text-zinc-600 dark:text-zinc-400 truncate italic hover:text-zinc-900 dark:hover:text-white transition-colors uppercase">
+                                                {cls.class_teacher?.name || 'Vacant Selection'}
                                             </span>
                                         </div>
                                     </div>
@@ -276,137 +310,156 @@ export default function ClassesPage() {
                         ))}
                     </div>
                 ) : (
-                    <div className="bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-sm animate-in fade-in duration-500">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="bg-zinc-50/50 dark:bg-zinc-900/50">
-                                    <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest border-b border-zinc-100 dark:border-zinc-800">Standard / Level</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest border-b border-zinc-100 dark:border-zinc-800">Division</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest border-b border-zinc-100 dark:border-zinc-800">Class Teacher</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest border-b border-zinc-100 dark:border-zinc-800 text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/50">
-                                {classes.map((cls) => (
-                                    <tr key={cls.id} className="group hover:bg-zinc-50/[0.5] dark:hover:bg-zinc-800/30 transition-colors">
-                                        <td className="px-8 py-5">
-                                            <span className="text-sm font-black text-zinc-900 dark:text-white tracking-tight italic uppercase">
-                                                Standard {cls.standard}
-                                            </span>
-                                        </td>
-                                        <td className="px-8 py-5">
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-500 font-black text-[10px]">
+                    <div className="bg-surface-paper dark:bg-zinc-900 rounded-radius-large border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-sm animate-in fade-in duration-700">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-separate border-spacing-0">
+                                <thead className="bg-surface-ground">
+                                    <tr>
+                                        <th className="px-10 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em] border-b border-zinc-100 dark:border-zinc-800 italic">Academic Standard</th>
+                                        <th className="px-10 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em] border-b border-zinc-100 dark:border-zinc-800 italic">Division Registry</th>
+                                        <th className="px-10 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em] border-b border-zinc-100 dark:border-zinc-800 italic">Head Instructor</th>
+                                        <th className="px-10 py-6 text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em] border-b border-zinc-100 dark:border-zinc-800 text-right italic">Unit Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-zinc-50 dark:divide-zinc-800/50">
+                                    {classes.map((cls) => (
+                                        <tr key={cls.id} className="group hover:bg-zinc-50/[0.3] dark:hover:bg-zinc-800/30 transition-all">
+                                            <td className="px-10 py-7">
+                                                <span className="text-sm font-black text-zinc-900 dark:text-white uppercase italic group-hover:text-primary-main transition-colors">
+                                                    Standard {cls.standard}
+                                                </span>
+                                            </td>
+                                            <td className="px-10 py-7">
+                                                <div className="inline-flex items-center px-4 py-1.5 bg-primary-main/5 dark:bg-primary-main/10 rounded-radius-medium text-primary-main font-black text-xs italic tracking-widest border border-primary-main/10">
                                                     {cls.division}
                                                 </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-8 py-5">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
-                                                    <User className="w-4 h-4 text-zinc-400" />
+                                            </td>
+                                            <td className="px-10 py-7">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-10 h-10 rounded-full bg-surface-ground flex items-center justify-center border border-zinc-100 dark:border-zinc-800 shadow-inner">
+                                                        <User className="w-5 h-5 text-zinc-200 dark:text-zinc-700 group-hover:text-primary-main transition-colors" />
+                                                    </div>
+                                                    <span className="text-sm font-black text-zinc-600 dark:text-zinc-400 italic group-hover:text-zinc-900 dark:hover:text-white transition-colors uppercase">
+                                                        {cls.class_teacher?.name || 'Vacant Selection'}
+                                                    </span>
                                                 </div>
-                                                <span className="text-sm font-bold text-zinc-700 dark:text-zinc-300">
-                                                    {cls.class_teacher?.name || 'Not assigned'}
-                                                </span>
-                                            </div>
-                                        </td>
-                                        <td className="px-8 py-5 text-right">
-                                            <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button
-                                                    onClick={() => openEdit(cls)}
-                                                    className="p-2 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-xl hover:bg-indigo-100 transition-all active:scale-95"
-                                                >
-                                                    <Edit2 className="w-4 h-4" />
-                                                </button>
-                                                <button
-                                                    onClick={() => triggerDelete(cls.id)}
-                                                    className="p-2 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-100 transition-all active:scale-95"
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                            </td>
+                                            <td className="px-10 py-7 text-right">
+                                                <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity translate-x-4 group-hover:translate-x-0 transition-transform">
+                                                    <button
+                                                        onClick={() => openEdit(cls)}
+                                                        className="p-3 text-zinc-400 hover:text-primary-main bg-white dark:bg-zinc-800 rounded-radius-medium transition-all shadow-sm active:scale-90"
+                                                    >
+                                                        <Edit2 className="w-4.5 h-4.5" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => triggerDelete(cls.id)}
+                                                        className="p-3 text-zinc-400 hover:text-error bg-white dark:bg-zinc-800 rounded-radius-medium transition-all shadow-sm active:scale-90"
+                                                    >
+                                                        <Trash2 className="w-4.5 h-4.5" />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 )}
             </div>
 
-            {/* Add/Edit Dialog */}
+            {/* Add/Edit Modal */}
             {isAddOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-white dark:bg-zinc-950 w-full max-w-lg rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
-                        <div className="p-8 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
-                            <h2 className="text-xl font-black text-zinc-900 dark:text-white flex items-center gap-3">
-                                <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-500">
-                                    <Layers className="w-5 h-5" />
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-zinc-950/60 backdrop-blur-md animate-in fade-in duration-300">
+                    <div className="bg-surface-paper dark:bg-zinc-950 w-full max-w-md rounded-radius-large border border-primary-main/20 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 relative">
+                        <div className="absolute top-0 right-0 w-40 h-40 bg-primary-main/5 rounded-full -mr-20 -mt-20 blur-3xl" />
+
+                        <div className="px-10 py-8 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-surface-ground/50 relative z-10">
+                            <div className="flex items-center gap-4">
+                                <div className="p-2.5 rounded-radius-medium bg-primary-main shadow-xl shadow-primary-main/20 ring-4 ring-primary-main/5">
+                                    <Layers className="w-5 h-5 text-white" />
                                 </div>
-                                {editingClass ? 'Edit Class' : 'Create New Class'}
-                            </h2>
-                            <button onClick={() => setIsAddOpen(false)} className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-xl transition-colors"><X className="w-5 h-5" /></button>
+                                <div className="space-y-0.5">
+                                    <h2 className="text-xl font-black text-zinc-900 dark:text-white italic tracking-tight uppercase leading-none">
+                                        {editingClass ? 'Update Registry' : 'Initialize Unit'}
+                                    </h2>
+                                    <p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest italic">Core Academic Infrastructure</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setIsAddOpen(false)}
+                                className="p-3 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full text-zinc-400 transition-all active:scale-90"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="p-8 space-y-6">
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2 block">Standard</label>
+                        <form onSubmit={handleSubmit} className="p-10 space-y-8 relative z-10">
+                            <div className="space-y-6">
+                                <div className="space-y-2.5">
+                                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em] ml-1 italic">Academic Standard / Level</label>
                                     <input
                                         required
                                         type="text"
-                                        placeholder="e.g. 1st, 10th, BSc-IT"
+                                        placeholder="e.g. GRADE 10, SCIENCE WING"
                                         value={formData.standard}
                                         onChange={(e) => setFormData({ ...formData, standard: e.target.value })}
-                                        className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-3 px-4 text-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-bold"
+                                        className="w-full bg-surface-ground dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-radius-medium py-4.5 px-6 text-sm focus:outline-none focus:ring-4 focus:ring-primary-main/5 focus:border-primary-main transition-all font-black text-zinc-900 dark:text-zinc-100 italic placeholder:opacity-30 placeholder:normal-case uppercase"
                                     />
                                 </div>
 
-                                <div>
-                                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2 block">Division</label>
+                                <div className="space-y-2.5">
+                                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em] ml-1 italic">Division / Section Designation</label>
                                     <input
                                         required
                                         type="text"
-                                        placeholder="e.g. A, B, Section-1"
+                                        placeholder="e.g. ALPHA, SECTION-1"
                                         value={formData.division}
                                         onChange={(e) => setFormData({ ...formData, division: e.target.value })}
-                                        className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-3 px-4 text-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-bold"
+                                        className="w-full bg-surface-ground dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-radius-medium py-4.5 px-6 text-sm focus:outline-none focus:ring-4 focus:ring-primary-main/5 focus:border-primary-main transition-all font-black text-zinc-900 dark:text-zinc-100 italic placeholder:opacity-30 placeholder:normal-case uppercase"
                                     />
                                 </div>
 
-                                <div>
-                                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2 block">Class Teacher</label>
+                                <div className="space-y-2.5">
+                                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em] ml-1 italic">Leadership Deployment</label>
                                     <div className="relative group">
                                         <select
                                             value={formData.class_teacher_id}
                                             onChange={(e) => setFormData({ ...formData, class_teacher_id: e.target.value })}
-                                            className="w-full appearance-none bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-3 px-4 pr-10 text-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-bold text-zinc-700 dark:text-zinc-300 cursor-pointer"
+                                            className="w-full appearance-none bg-surface-ground dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-radius-medium py-4.5 px-6 pr-12 text-sm focus:outline-none focus:ring-4 focus:ring-primary-main/5 focus:border-primary-main transition-all font-black text-zinc-700 dark:text-zinc-300 cursor-pointer italic uppercase tracking-wider"
                                         >
-                                            <option value="">Select a teacher</option>
+                                            <option value="">Select head instructor (optional)</option>
                                             {staff.map((s) => (
-                                                <option key={s.id} value={s.id}>{s.name}</option>
+                                                <option key={s.id} value={s.id}>{s.name.toUpperCase()}</option>
                                             ))}
                                         </select>
-                                        <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
+                                        <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-zinc-300 pointer-events-none group-focus-within:text-primary-main transition-colors" />
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="flex gap-4 pt-4">
-                                <button
-                                    type="button"
-                                    onClick={() => setIsAddOpen(false)}
-                                    className="flex-1 py-3.5 rounded-2xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-black uppercase tracking-widest hover:bg-zinc-200 transition-all"
-                                >
-                                    Cancel
-                                </button>
+                            <div className="flex flex-col gap-4 pt-4">
                                 <button
                                     type="submit"
                                     disabled={submitting}
-                                    className="flex-1 py-3.5 rounded-2xl bg-indigo-500 text-white text-xs font-black uppercase tracking-widest hover:bg-indigo-600 shadow-lg shadow-indigo-500/20 active:scale-95 transition-all flex items-center justify-center gap-2"
+                                    className="w-full py-5 rounded-radius-medium bg-primary-main text-white text-[10px] font-black uppercase tracking-[0.4em] hover:bg-primary-dark shadow-2xl shadow-primary-main/20 active:scale-95 transition-all flex items-center justify-center gap-3 italic ring-4 ring-primary-main/5"
                                 >
-                                    {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : (editingClass ? 'Update Class' : 'Create Class')}
+                                    {submitting ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                    ) : (
+                                        <>
+                                            {editingClass ? 'Update Central Record' : 'Establish Unit'}
+                                            <BadgeCheck className="w-4.5 h-4.5" />
+                                        </>
+                                    )}
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsAddOpen(false)}
+                                    className="w-full py-5 rounded-radius-medium bg-surface-ground dark:bg-zinc-900 text-zinc-400 text-[10px] font-black uppercase tracking-[0.4em] hover:text-zinc-900 dark:hover:text-white transition-all italic active:scale-95"
+                                >
+                                    Abort Operation
                                 </button>
                             </div>
                         </form>
@@ -416,10 +469,10 @@ export default function ClassesPage() {
 
             {/* Pagination Footer */}
             {!loading && total > 0 && (
-                <div className="mt-8 bg-white dark:bg-zinc-900 p-6 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
-                    <div className="flex items-center gap-4 order-2 md:order-1">
-                        <div className="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl">
-                            {[5, 10, 20, 50].map((size) => (
+                <div className="bg-surface-paper dark:bg-zinc-900/50 p-6 rounded-radius-large border border-zinc-200 dark:border-zinc-800 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-1.5 p-1.5 bg-surface-ground dark:bg-zinc-800/50 rounded-radius-medium border border-zinc-100 dark:border-zinc-800 shadow-inner">
+                            {[5, 10, 20].map((size) => (
                                 <button
                                     key={size}
                                     onClick={() => {
@@ -427,26 +480,26 @@ export default function ClassesPage() {
                                         setPage(1);
                                     }}
                                     className={cn(
-                                        "px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                                        "px-4 py-1.5 rounded-md text-[10px] font-black uppercase transition-all tracking-wider italic",
                                         pageSize === size
-                                            ? "bg-white dark:bg-zinc-700 shadow-sm text-indigo-500"
-                                            : "text-zinc-400 hover:text-zinc-500"
+                                            ? "bg-white dark:bg-zinc-700 shadow-xl text-primary-main scale-105"
+                                            : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-400"
                                     )}
                                 >
                                     {size}
                                 </button>
                             ))}
                         </div>
-                        <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Rows per page</span>
+                        <span className="text-[9px] font-black text-zinc-300 dark:text-zinc-500 uppercase tracking-[0.3em] italic">Units/View</span>
                     </div>
 
-                    <div className="flex items-center gap-2 order-1 md:order-2">
+                    <div className="flex items-center gap-3">
                         {(() => {
                             const totalPages = Math.ceil(total / pageSize);
                             let startPage = Math.max(1, page - 2);
-                            const endPage = Math.min(totalPages, startPage + 5);
-                            if (endPage - startPage < 5) {
-                                startPage = Math.max(1, endPage - 5);
+                            const endPage = Math.min(totalPages, startPage + 4);
+                            if (endPage - startPage < 4) {
+                                startPage = Math.max(1, endPage - 4);
                             }
 
                             return (
@@ -454,52 +507,52 @@ export default function ClassesPage() {
                                     <button
                                         disabled={page === 1}
                                         onClick={() => setPage(p => p - 1)}
-                                        className="p-2 rounded-xl border border-zinc-200 dark:border-zinc-800 disabled:opacity-30 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all font-bold"
+                                        className="p-2.5 rounded-radius-medium border border-zinc-100 dark:border-zinc-800 disabled:opacity-20 hover:bg-surface-ground dark:hover:bg-zinc-800 transition-all text-zinc-400 shadow-sm active:scale-90"
                                     >
-                                        &larr;
+                                        <ChevronDown className="w-5 h-5 rotate-90" />
                                     </button>
-                                    <div className="flex items-center gap-1">
+                                    <div className="flex items-center gap-2">
                                         {Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map((p) => (
                                             <button
                                                 key={p}
                                                 onClick={() => setPage(p)}
                                                 className={cn(
-                                                    "w-10 h-10 rounded-xl text-sm font-bold transition-all",
+                                                    "w-10 h-10 rounded-radius-medium text-[10px] font-black transition-all italic tracking-widest",
                                                     page === p
-                                                        ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/20"
-                                                        : "hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500"
+                                                        ? "bg-primary-main text-white shadow-xl shadow-primary-main/20 scale-110"
+                                                        : "hover:bg-surface-ground dark:hover:bg-zinc-800 text-zinc-400"
                                                 )}
                                             >
-                                                {p}
+                                                {p.toString().padStart(2, '0')}
                                             </button>
                                         ))}
                                     </div>
                                     <button
                                         disabled={page === totalPages}
                                         onClick={() => setPage(p => p + 1)}
-                                        className="p-2 rounded-xl border border-zinc-200 dark:border-zinc-800 disabled:opacity-30 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all font-bold"
+                                        className="p-2.5 rounded-radius-medium border border-zinc-100 dark:border-zinc-800 disabled:opacity-20 hover:bg-surface-ground dark:hover:bg-zinc-800 transition-all text-zinc-400 shadow-sm active:scale-90"
                                     >
-                                        &rarr;
+                                        <ChevronDown className="w-5 h-5 -rotate-90" />
                                     </button>
                                 </>
                             );
                         })()}
                     </div>
 
-                    <div className="text-[10px] font-black text-zinc-400 uppercase tracking-widest order-3">
-                        Showing {(page - 1) * pageSize + 1} to {Math.min(page * pageSize, total)} of {total} Results
+                    <div className="text-[9px] font-black text-zinc-300 dark:text-zinc-500 uppercase tracking-[0.3em] italic">
+                        Record Sequence: {Math.min(page * pageSize, total).toString().padStart(total.toString().length, '0')} of {total} Units
                     </div>
                 </div>
             )}
-            {/* Confirm Box */}
+
             <ConfirmBox
                 isOpen={deleteConfirmOpen}
                 loading={isDeleting}
-                title="Delete Class"
-                description="Are you sure you want to delete this class? This will also affect student assignments."
+                title="Decommission Academic Unit"
+                description="Institutional Security Protocol: Are you certain you wish to purge this unit from the registry? This action will permanently decommission the record and affect associated student assignments."
                 onConfirm={handleDelete}
                 onCancel={() => setDeleteConfirmOpen(false)}
-                confirmText="Delete"
+                confirmText="Execute Decommission"
                 variant="danger"
             />
         </div>

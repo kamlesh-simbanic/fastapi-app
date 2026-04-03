@@ -17,11 +17,13 @@ import {
     Loader2,
     CheckCircle2,
     AlertCircle,
-    Trash2
+    Trash2,
+    AlertTriangle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DEPARTMENTS, QUALIFICATIONS, getDepartmentColor } from '@/lib/departments';
 import CalendarPicker from '@/components/CalendarPicker';
+import { ConfirmBox } from '@/components/ConfirmBox';
 
 function EditStaffForm() {
     const { user } = useAuth();
@@ -34,6 +36,7 @@ function EditStaffForm() {
     const [deleting, setDeleting] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
     const [formData, setFormData] = useState({
         name: '',
@@ -160,8 +163,6 @@ function EditStaffForm() {
     };
 
     const handleDelete = async () => {
-        if (!window.confirm('Are you sure you want to delete this staff member? This action cannot be undone.')) return;
-
         setDeleting(true);
         setError(null);
 
@@ -181,83 +182,85 @@ function EditStaffForm() {
     if (fetching) {
         return (
             <div className="flex flex-col items-center justify-center py-20 gap-4">
-                <Loader2 className="w-10 h-10 text-indigo-500 animate-spin" />
-                <p className="text-zinc-500 text-sm font-medium animate-pulse">Loading staff profile...</p>
+                <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
+                <p className="text-zinc-500 text-sm font-bold animate-pulse">Synchronizing profile details...</p>
             </div>
         );
     }
 
     return (
-        <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
             {/* Header */}
             <section className="flex items-center justify-between">
                 <div className="space-y-1">
                     <button
-                        onClick={() => router.back()}
-                        className="flex items-center gap-2 text-sm text-zinc-500 hover:text-indigo-500 transition-colors mb-4 group"
+                        onClick={() => router.push('/staff')}
+                        className="flex items-center gap-2 text-sm text-zinc-500 hover:text-blue-600 transition-colors mb-4 group font-medium"
                     >
                         <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                        Back to Directory
+                        Directory
                     </button>
                     <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">
-                        Edit Staff Member
+                        Modify Member Profile
                     </h1>
-                    <p className="text-zinc-500 dark:text-zinc-400 text-sm">
-                        Update professional and personal details for <span className="text-indigo-500 font-bold">{formData.name}</span>.
+                    <p className="text-zinc-500 dark:text-zinc-400 text-sm font-medium">
+                        Update professional credentials or personal records for <span className="text-blue-600 font-bold">{formData.name}</span>.
                     </p>
                 </div>
 
-                <button
-                    onClick={handleDelete}
-                    disabled={deleting}
-                    className="p-3 text-red-500 hover:bg-red-500/10 rounded-2xl transition-colors active:scale-95 disabled:opacity-50"
-                    title="Delete Staff Member"
-                >
-                    {deleting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
-                </button>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => setShowDeleteConfirm(true)}
+                        disabled={deleting}
+                        className="p-3 text-red-500 hover:bg-red-500/10 rounded-xl transition-colors active:scale-95 disabled:opacity-50 border border-transparent hover:border-red-500/20"
+                        title="Decommission Profile"
+                    >
+                        {deleting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
+                    </button>
+                </div>
             </section>
 
             {success ? (
-                <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-3xl p-12 text-center space-y-4">
+                <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-12 text-center space-y-4">
                     <div className="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center mx-auto shadow-xl shadow-emerald-500/20">
                         <CheckCircle2 className="w-10 h-10 text-white" />
                     </div>
-                    <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Profile Updated!</h2>
-                    <p className="text-zinc-500">The staff profile has been updated successfully. Redirecting...</p>
+                    <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Information Updated</h2>
+                    <p className="text-zinc-500 font-medium">The member profile has been synchronized successfully. Redirecting...</p>
                 </div>
             ) : (
-                <form onSubmit={handleSubmit} className="space-y-6 pb-20">
+                <form onSubmit={handleSubmit} className="space-y-6">
                     {error && (
-                        <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm flex items-center gap-3">
-                            <AlertCircle className="w-5 h-5" />
-                            {error}
+                        <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm flex items-center gap-3 animate-in shake duration-300">
+                            <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                            <p className="font-medium">{error}</p>
                         </div>
                     )}
 
-                    {/* Personal Information */}
-                    <div className="p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-8 shadow-sm">
+                    {/* Identity Profile */}
+                    <div className="p-8 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-8 shadow-sm">
                         <div className="flex items-center gap-3 text-lg font-bold text-zinc-900 dark:text-white pb-6 border-b border-zinc-100 dark:border-zinc-800">
-                            <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center">
-                                <User className="w-5 h-5 text-indigo-500" />
+                            <div className="w-10 h-10 rounded-xl bg-blue-600/10 flex items-center justify-center border border-blue-600/20">
+                                <User className="w-5 h-5 text-blue-600" />
                             </div>
-                            Personal Details
+                            Identity Profile
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 ml-1">Full Name</label>
+                                <label className="text-sm font-bold text-zinc-700 dark:text-zinc-300 ml-1">Full Name</label>
                                 <div className="relative group">
-                                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" />
+                                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-blue-600 transition-colors" />
                                     <input
                                         name="name"
                                         value={formData.name}
                                         onChange={handleChange}
                                         placeholder="e.g. John Doe"
                                         className={cn(
-                                            "w-full bg-zinc-50 dark:bg-zinc-950 border rounded-2xl py-3 pl-11 pr-4 text-sm focus:outline-none focus:ring-4 transition-all text-zinc-900 dark:text-white",
+                                            "w-full bg-zinc-50 dark:bg-zinc-950 border rounded-xl py-3.5 pl-11 pr-4 text-sm focus:outline-none focus:ring-4 transition-all text-zinc-900 dark:text-white font-medium",
                                             errors.name
                                                 ? "border-red-500 focus:ring-red-500/10 focus:border-red-500"
-                                                : "border-zinc-200 dark:border-zinc-800 focus:ring-indigo-500/10 focus:border-indigo-500"
+                                                : "border-zinc-200 dark:border-zinc-800 focus:ring-blue-600/5 focus:border-blue-600"
                                         )}
                                     />
                                 </div>
@@ -265,9 +268,9 @@ function EditStaffForm() {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 ml-1">Email Address</label>
+                                <label className="text-sm font-bold text-zinc-700 dark:text-zinc-300 ml-1">Official Email</label>
                                 <div className="relative group">
-                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" />
+                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-blue-600 transition-colors" />
                                     <input
                                         type="text"
                                         name="email"
@@ -275,10 +278,10 @@ function EditStaffForm() {
                                         onChange={handleChange}
                                         placeholder="e.g. john@example.com"
                                         className={cn(
-                                            "w-full bg-zinc-50 dark:bg-zinc-950 border rounded-2xl py-3 pl-11 pr-4 text-sm focus:outline-none focus:ring-4 transition-all text-zinc-900 dark:text-white",
+                                            "w-full bg-zinc-50 dark:bg-zinc-950 border rounded-xl py-3.5 pl-11 pr-4 text-sm focus:outline-none focus:ring-4 transition-all text-zinc-900 dark:text-white font-medium",
                                             errors.email
                                                 ? "border-red-500 focus:ring-red-500/10 focus:border-red-500"
-                                                : "border-zinc-200 dark:border-zinc-800 focus:ring-indigo-500/10 focus:border-indigo-500"
+                                                : "border-zinc-200 dark:border-zinc-800 focus:ring-blue-600/5 focus:border-blue-600"
                                         )}
                                     />
                                 </div>
@@ -286,19 +289,19 @@ function EditStaffForm() {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 ml-1">Mobile Number</label>
+                                <label className="text-sm font-bold text-zinc-700 dark:text-zinc-300 ml-1">Mobile Contact</label>
                                 <div className="relative group">
-                                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" />
+                                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-blue-600 transition-colors" />
                                     <input
                                         name="mobile"
                                         value={formData.mobile}
                                         onChange={handleChange}
                                         placeholder="e.g. 9876543210"
                                         className={cn(
-                                            "w-full bg-zinc-50 dark:bg-zinc-950 border rounded-2xl py-3 pl-11 pr-4 text-sm focus:outline-none focus:ring-4 transition-all text-zinc-900 dark:text-white",
+                                            "w-full bg-zinc-50 dark:bg-zinc-950 border rounded-xl py-3.5 pl-11 pr-4 text-sm focus:outline-none focus:ring-4 transition-all text-zinc-900 dark:text-white font-medium",
                                             errors.mobile
                                                 ? "border-red-500 focus:ring-red-500/10 focus:border-red-500"
-                                                : "border-zinc-200 dark:border-zinc-800 focus:ring-indigo-500/10 focus:border-indigo-500"
+                                                : "border-zinc-200 dark:border-zinc-800 focus:ring-blue-600/5 focus:border-blue-600"
                                         )}
                                     />
                                 </div>
@@ -307,7 +310,7 @@ function EditStaffForm() {
 
                             <div className="space-y-2">
                                 <CalendarPicker
-                                    label="Date of Birth"
+                                    label="Birth Date"
                                     value={formData.dob}
                                     onChange={(date) => {
                                         setFormData(prev => ({ ...prev, dob: date }));
@@ -323,32 +326,31 @@ function EditStaffForm() {
                                     error={errors.dob}
                                 />
                             </div>
-
                         </div>
                     </div>
 
-                    {/* Professional Information */}
-                    <div className="p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-8 shadow-sm">
+                    {/* Workplace Details */}
+                    <div className="p-8 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-8 shadow-sm">
                         <div className="flex items-center gap-3 text-lg font-bold text-zinc-900 dark:text-white pb-6 border-b border-zinc-100 dark:border-zinc-800">
                             <div className={cn(
                                 "w-10 h-10 rounded-xl flex items-center justify-center transition-colors border",
-                                getDepartmentColor(formData.department)
+                                getDepartmentColor(formData.department).replace('indigo', 'blue')
                             )}>
-                                <Briefcase className="w-5 h-5" />
+                                <Briefcase className="w-5 h-5 text-blue-600" />
                             </div>
-                            Professional Details
+                            Workplace Details
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 ml-1">Department</label>
+                                <label className="text-sm font-bold text-zinc-700 dark:text-zinc-300 ml-1">Department</label>
                                 <div className="relative group">
-                                    <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-indigo-500 transition-colors pointer-events-none" />
+                                    <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-blue-600 transition-colors pointer-events-none" />
                                     <select
                                         name="department"
                                         value={formData.department}
                                         onChange={handleChange}
-                                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-3 pl-11 pr-4 text-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all text-zinc-900 dark:text-white appearance-none cursor-pointer"
+                                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-3.5 pl-11 pr-4 text-sm focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-600 transition-all text-zinc-900 dark:text-white appearance-none cursor-pointer font-medium"
                                     >
                                         {DEPARTMENTS.map(dept => (
                                             <option key={dept.value} value={dept.value}>{dept.label}</option>
@@ -356,15 +358,16 @@ function EditStaffForm() {
                                     </select>
                                 </div>
                             </div>
+
                             <div className="space-y-2">
-                                <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 ml-1">Qualification</label>
+                                <label className="text-sm font-bold text-zinc-700 dark:text-zinc-300 ml-1">Highest Qualification</label>
                                 <div className="relative group">
-                                    <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-indigo-500 transition-colors pointer-events-none" />
+                                    <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-blue-600 transition-colors pointer-events-none" />
                                     <select
                                         name="qualification"
                                         value={formData.qualification}
                                         onChange={handleChange}
-                                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-3 pl-11 pr-4 text-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all text-zinc-900 dark:text-white appearance-none cursor-pointer"
+                                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-3.5 pl-11 pr-4 text-sm focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-600 transition-all text-zinc-900 dark:text-white appearance-none cursor-pointer font-medium"
                                     >
                                         {QUALIFICATIONS.map(qual => (
                                             <option key={qual.value} value={qual.value}>{qual.label}</option>
@@ -374,36 +377,36 @@ function EditStaffForm() {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 ml-1">Leave Balance (Days)</label>
+                                <label className="text-sm font-bold text-zinc-700 dark:text-zinc-300 ml-1">Leave Balance (Days)</label>
                                 <div className="relative group">
-                                    <CalendarIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-indigo-500 transition-colors pointer-events-none" />
+                                    <CalendarIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-blue-600 transition-colors pointer-events-none" />
                                     <input
                                         type="number"
                                         name="leave_balance"
                                         value={formData.leave_balance}
                                         readOnly
-                                        className="w-full bg-zinc-100 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-3 pl-11 pr-4 text-sm text-zinc-500 dark:text-zinc-400 cursor-not-allowed opacity-80"
+                                        className="w-full bg-zinc-50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 rounded-xl py-3.5 pl-11 pr-4 text-sm text-zinc-500 dark:text-zinc-400 cursor-not-allowed opacity-80 font-medium"
                                     />
                                 </div>
-                                <p className="text-[10px] font-bold text-zinc-400 ml-1 mt-1 uppercase tracking-wider italic">This field is managed by Administration.</p>
+                                <p className="text-[10px] font-bold text-zinc-400 ml-1 mt-1 uppercase tracking-wider italic">Protected by System Administration.</p>
                             </div>
                         </div>
                     </div>
 
-                    {/* Address Information */}
-                    <div className="p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-8 shadow-sm">
+                    {/* Contact & Address */}
+                    <div className="p-8 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-8 shadow-sm">
                         <div className="flex items-center gap-3 text-lg font-bold text-zinc-900 dark:text-white pb-6 border-b border-zinc-100 dark:border-zinc-800">
-                            <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
-                                <MapPin className="w-5 h-5 text-amber-500" />
+                            <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center border border-orange-500/20">
+                                <MapPin className="w-5 h-5 text-orange-500" />
                             </div>
                             Contact & Address
                         </div>
 
                         <div className="space-y-6">
                             <div className="space-y-2">
-                                <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 ml-1">Full Address</label>
+                                <label className="text-sm font-bold text-zinc-700 dark:text-zinc-300 ml-1">Residential Address</label>
                                 <div className="relative group">
-                                    <MapPin className="absolute left-4 top-4 w-4 h-4 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" />
+                                    <MapPin className="absolute left-4 top-4 w-4 h-4 text-zinc-400 group-focus-within:text-blue-600 transition-colors" />
                                     <textarea
                                         name="address"
                                         value={formData.address}
@@ -411,10 +414,10 @@ function EditStaffForm() {
                                         rows={3}
                                         placeholder="e.g. 123 Main St, Apartment 4B"
                                         className={cn(
-                                            "w-full bg-zinc-50 dark:bg-zinc-950 border rounded-2xl py-3 pl-11 pr-4 text-sm focus:outline-none focus:ring-4 transition-all text-zinc-900 dark:text-white resize-none",
+                                            "w-full bg-zinc-50 dark:bg-zinc-950 border rounded-xl py-3.5 pl-11 pr-4 text-sm focus:outline-none focus:ring-4 transition-all text-zinc-900 dark:text-white resize-none font-medium",
                                             errors.address
                                                 ? "border-red-500 focus:ring-red-500/10 focus:border-red-500"
-                                                : "border-zinc-200 dark:border-zinc-800 focus:ring-indigo-500/10 focus:border-indigo-500"
+                                                : "border-zinc-200 dark:border-zinc-800 focus:ring-blue-600/5 focus:border-blue-600"
                                         )}
                                     />
                                 </div>
@@ -423,69 +426,98 @@ function EditStaffForm() {
 
                             <div className="grid grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 ml-1">City</label>
+                                    <label className="text-sm font-bold text-zinc-700 dark:text-zinc-300 ml-1">City</label>
                                     <input
                                         name="city"
                                         value={formData.city}
                                         onChange={handleChange}
                                         placeholder="e.g. New York"
                                         className={cn(
-                                            "w-full bg-zinc-50 dark:bg-zinc-950 border rounded-2xl py-3 px-4 text-sm focus:outline-none focus:ring-4 transition-all text-zinc-900 dark:text-white",
+                                            "w-full bg-zinc-50 dark:bg-zinc-950 border rounded-xl py-3.5 px-4 text-sm focus:outline-none focus:ring-4 transition-all text-zinc-900 dark:text-white font-medium",
                                             errors.city
                                                 ? "border-red-500 focus:ring-red-500/10 focus:border-red-500"
-                                                : "border-zinc-200 dark:border-zinc-800 focus:ring-indigo-500/10 focus:border-indigo-500"
+                                                : "border-zinc-200 dark:border-zinc-800 focus:ring-blue-600/5 focus:border-blue-600"
                                         )}
                                     />
+                                    {errors.city && <p className="text-[10px] font-bold text-red-500 ml-1 mt-1 uppercase tracking-wider">{errors.city}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 ml-1">Zip Code</label>
+                                    <label className="text-sm font-bold text-zinc-700 dark:text-zinc-300 ml-1">Zip Code</label>
                                     <input
                                         name="zip_code"
                                         value={formData.zip_code}
                                         onChange={handleChange}
                                         placeholder="e.g. 110001"
                                         className={cn(
-                                            "w-full bg-zinc-50 dark:bg-zinc-950 border rounded-2xl py-3 px-4 text-sm focus:outline-none focus:ring-4 transition-all text-zinc-900 dark:text-white",
+                                            "w-full bg-zinc-50 dark:bg-zinc-950 border rounded-xl py-3.5 px-4 text-sm focus:outline-none focus:ring-4 transition-all text-zinc-900 dark:text-white font-medium",
                                             errors.zip_code
                                                 ? "border-red-500 focus:ring-red-500/10 focus:border-red-500"
-                                                : "border-zinc-200 dark:border-zinc-800 focus:ring-indigo-500/10 focus:border-indigo-500"
+                                                : "border-zinc-200 dark:border-zinc-800 focus:ring-blue-600/5 focus:border-blue-600"
                                         )}
                                     />
+                                    {errors.zip_code && <p className="text-[10px] font-bold text-red-500 ml-1 mt-1 uppercase tracking-wider">{errors.zip_code}</p>}
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    {/* Danger Zone */}
+                    <div className="p-8 rounded-2xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 space-y-6">
+                        <div className="flex items-center gap-3 text-lg font-bold text-red-800 dark:text-red-400">
+                            <AlertTriangle className="w-5 h-5 text-red-600" />
+                            Critical Zone
+                        </div>
+                        <p className="text-sm text-red-600 dark:text-red-400 font-medium">Removing this profile will permanently erase all associated academic records and historical data from the system.</p>
+                        <button
+                            type="button"
+                            onClick={() => setShowDeleteConfirm(true)}
+                            className="px-6 py-3 bg-white dark:bg-zinc-900 border border-red-200 dark:border-red-900/50 text-red-600 rounded-xl text-sm font-bold hover:bg-red-600 hover:text-white transition-all shadow-sm active:scale-95"
+                        >
+                            Decommission Profile
+                        </button>
                     </div>
 
                     {/* Form Actions */}
                     <div className="flex items-center justify-end gap-4 pt-6">
                         <button
                             type="button"
-                            onClick={() => router.back()}
-                            className="px-6 py-3 rounded-2xl text-sm font-bold text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors"
+                            onClick={() => router.push('/staff')}
+                            className="px-6 py-3 rounded-xl text-sm font-bold text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors"
                         >
-                            Cancel
+                            Discard
                         </button>
                         <button
                             type="submit"
                             disabled={loading}
-                            className="px-12 py-4 bg-indigo-500 text-white rounded-2xl text-sm font-bold hover:bg-indigo-600 transition-all shadow-lg shadow-indigo-500/20 active:scale-95 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-12 py-4 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20 active:scale-95 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {loading ? (
                                 <>
                                     <Loader2 className="w-4 h-4 animate-spin" />
-                                    Saving Changes...
+                                    Synchronizing...
                                 </>
                             ) : (
                                 <>
                                     <Save className="w-4 h-4" />
-                                    Update Staff Profile
+                                    Synchronize Records
                                 </>
                             )}
                         </button>
                     </div>
                 </form>
-            )
-            }
+            )}
+
+            {/* Confirm Delete */}
+            <ConfirmBox
+                isOpen={showDeleteConfirm}
+                onConfirm={handleDelete}
+                onCancel={() => setShowDeleteConfirm(false)}
+                title="Decommission Profile"
+                description={`Are you absolutely sure you want to remove ${formData.name}? This action is irreversible and will purge all staff data.`}
+                confirmText="Permanent Delete"
+                variant="danger"
+                loading={deleting}
+            />
         </div>
     );
 }

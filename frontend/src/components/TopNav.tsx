@@ -30,11 +30,11 @@ export const TopNav = React.memo(function TopNav({ onMenuClick }: TopNavProps) {
                 </button>
 
                 <div className="max-w-md w-full relative group hidden md:block">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-500 group-focus-within:text-indigo-500 dark:group-focus-within:text-indigo-400 transition-colors" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-500 group-focus-within:text-blue-600 dark:group-focus-within:text-blue-400 transition-colors" />
                     <input
                         type="text"
-                        placeholder="Search everything..."
-                        className="w-full bg-zinc-50/50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-zinc-900 dark:text-zinc-100"
+                        placeholder="Search institutional registry..."
+                        className="w-full bg-zinc-50/50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 pl-10 pr-4 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all text-zinc-900 dark:text-zinc-100 placeholder:italic italic"
                     />
                 </div>
             </div>
@@ -44,20 +44,20 @@ export const TopNav = React.memo(function TopNav({ onMenuClick }: TopNavProps) {
 
                 <button className="p-2 text-zinc-400 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-lg relative transition-all">
                     <Bell className="w-5 h-5" />
-                    <span className="absolute top-2 right-2 w-2 h-2 bg-indigo-500 rounded-full border-2 border-white dark:border-zinc-950" />
+                    <span className="absolute top-2 right-2 w-2 h-2 bg-blue-600 rounded-full border-2 border-white dark:border-zinc-950" />
                 </button>
 
-                <div className="w-px h-6 bg-zinc-200 dark:bg-zinc-800 mx-1" />
+                <div className="w-px h-6 bg-zinc-200 dark:border-zinc-800 mx-1" />
 
                 <div className="flex items-center gap-3 pl-2 group cursor-pointer">
                     <div className="flex flex-col items-end hidden sm:flex">
                         <span className="text-sm font-semibold text-zinc-900 dark:text-white leading-none mb-1">{user?.name}</span>
-                        <span className="text-[10px] text-zinc-500 dark:text-zinc-500 font-medium uppercase tracking-wider">Administrator</span>
+                        <span className="text-[10px] text-zinc-500 dark:text-zinc-500 font-medium uppercase tracking-wider">Administrative Officer</span>
                     </div>
 
                     <div className="relative group/user">
                         <button className="flex items-center gap-2 p-1 rounded-full border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all">
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-md">
                                 <User className="w-4 h-4 text-white" />
                             </div>
                             <ChevronDown className="w-4 h-4 text-zinc-500 mr-1 opacity-60 group-hover/user:opacity-100" />

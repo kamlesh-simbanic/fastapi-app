@@ -12,10 +12,12 @@ import {
     ChevronDown,
     AlertCircle,
     ClipboardCheck,
-    FileText
+    FileText,
+    Calendar
 } from 'lucide-react';
 import Link from 'next/link';
 import CalendarPicker from '@/components/CalendarPicker';
+import { cn } from '@/lib/utils';
 
 interface SchoolClass {
     id: number;
@@ -114,7 +116,7 @@ export default function AttendancePage() {
 
             // Holiday check (using state from Calendar)
             if (selectedDateIsHoliday) {
-                return { invalid: true, reason: 'This date is a holiday' };
+                return { invalid: true, reason: 'This date is a institutional holiday' };
             }
         }
         return { invalid: false };
@@ -125,7 +127,7 @@ export default function AttendancePage() {
             const dateStatus = checkIsInvalidDate(date);
             if (dateStatus.invalid) {
                 setStudents([]);
-                setError(`Attendance cannot be marked: ${dateStatus.reason}`);
+                setError(`Attendance cannot be recorded: ${dateStatus.reason}`);
                 return;
             }
 
@@ -155,7 +157,7 @@ export default function AttendancePage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!selectedClass) {
-            setError('Please select a class.');
+            setError('Please select a target class.');
             return;
         }
 
@@ -174,10 +176,10 @@ export default function AttendancePage() {
                 class_id: parseInt(selectedClass),
                 records: recordsArray
             });
-            setSuccess('Attendance recorded successfully!');
+            setSuccess('Registry successfully updated!');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (err: unknown) {
-            const msg = err instanceof Error ? err.message : 'Failed to submit attendance.';
+            const msg = err instanceof Error ? err.message : 'Failed to record attendance.';
             setError(msg);
         } finally {
             setSubmitting(false);
@@ -187,47 +189,55 @@ export default function AttendancePage() {
     if (!user) return null;
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500 pb-20">
+        <div className="space-y-10 animate-in fade-in duration-500 pb-20">
             {/* Header */}
-            <section className="flex flex-col md:flex-row md:items-center justify-between gap-6 font-space">
-                <div className="space-y-1">
-                    <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-2xl bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                            <ClipboardCheck className="w-6 h-6 text-white" />
-                        </div>
-                        Mark Attendance
-                    </h1>
-                    <p className="text-zinc-500 dark:text-zinc-400 text-sm font-medium">Record daily student attendance by class.</p>
+            <section className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+                <div className="flex items-center gap-6">
+                    <div className="w-16 h-16 rounded-radius-medium bg-primary-main flex items-center justify-center shadow-2xl shadow-primary-main/20 ring-4 ring-primary-main/5">
+                        <ClipboardCheck className="w-8 h-8 text-white" />
+                    </div>
+                    <div className="space-y-1">
+                        <h1 className="text-h2 font-weight-h2 text-zinc-900 dark:text-white flex items-center gap-4 italic tracking-tight uppercase">
+                            Registry Input
+                        </h1>
+                        <p className="text-primary-main/60 font-black text-[10px] uppercase tracking-[0.3em] italic leading-none">Attendance Management Protocol</p>
+                    </div>
                 </div>
 
                 <Link
                     href="/attendance/report"
-                    className="px-6 py-3 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-zinc-200 transition-all flex items-center gap-2 group"
+                    className="px-8 py-4 bg-surface-paper dark:bg-zinc-800 text-zinc-500 hover:text-primary-main border border-zinc-100 dark:border-zinc-700 rounded-radius-medium text-[10px] font-black uppercase tracking-[0.4em] transition-all flex items-center gap-4 shadow-sm hover:shadow-xl group italic ring-1 ring-zinc-50 dark:ring-zinc-800/10"
                 >
-                    <FileText className="w-4 h-4 text-indigo-500 group-hover:scale-110 transition-transform" />
-                    Monthly Report
+                    <FileText className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                    Archive Analysis
                 </Link>
             </section>
 
             {error && (
-                <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center gap-3 text-red-500 animate-in slide-in-from-top-2">
-                    <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                    <p className="text-sm font-bold">{error}</p>
+                <div className="p-6 rounded-radius-medium bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 flex items-center gap-5 text-error animate-in slide-in-from-top-2 shadow-sm font-black uppercase tracking-widest italic text-[11px]">
+                    <div className="w-10 h-10 rounded-radius-medium bg-red-100 dark:bg-red-900/40 flex items-center justify-center flex-shrink-0">
+                        <AlertCircle className="w-5 h-5" />
+                    </div>
+                    {error}
                 </div>
             )}
 
             {success && (
-                <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-3 text-emerald-600 animate-in slide-in-from-top-2">
-                    <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
-                    <p className="text-sm font-bold">{success}</p>
+                <div className="p-6 rounded-radius-medium bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30 flex items-center gap-5 text-primary-main animate-in slide-in-from-top-2 shadow-sm font-black uppercase tracking-widest italic text-[11px]">
+                    <div className="w-10 h-10 rounded-radius-medium bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center flex-shrink-0">
+                        <CheckCircle2 className="w-5 h-5" />
+                    </div>
+                    {success}
                 </div>
             )}
 
             {/* Selection Controls */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white dark:bg-zinc-900 p-8 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all duration-300">
-                <div className="space-y-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 bg-surface-paper dark:bg-zinc-900 p-12 rounded-radius-large border border-zinc-200 dark:border-zinc-800 shadow-sm relative overflow-hidden ring-1 ring-zinc-50 dark:ring-zinc-800/10">
+                <div className="absolute top-0 right-0 w-80 h-80 bg-primary-main/5 rounded-full -mr-40 -mt-40 blur-3xl opacity-50" />
+
+                <div className="space-y-4 z-10 flex flex-col justify-end">
                     <CalendarPicker
-                        label="Date"
+                        label="Evaluation Epoch (Date)"
                         value={date}
                         onChange={(d, isHoliday) => {
                             setDate(d);
@@ -236,29 +246,29 @@ export default function AttendancePage() {
                         maxDate={new Date().toISOString().split('T')[0]}
                         disableHolidays={true}
                         shouldDisableDate={(d) => d.getDay() === 0}
-                        error={checkIsInvalidDate(date).invalid ? `Attendance cannot be marked: ${checkIsInvalidDate(date).reason}` : undefined}
+                        error={checkIsInvalidDate(date).invalid ? checkIsInvalidDate(date).reason?.toUpperCase() : undefined}
                     />
                 </div>
 
-                <div className="space-y-2">
-                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2">
-                        <Users className="w-3 h-3" /> Select Class
+                <div className="space-y-3 z-10">
+                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.4em] flex items-center gap-3 mb-2 ml-1 italic leading-none">
+                        <Users className="w-4 h-4 text-primary-main" /> Target Academic Unit
                     </label>
-                    <div className="relative">
+                    <div className="relative group">
                         <select
                             value={selectedClass}
                             onChange={(e) => setSelectedClass(e.target.value)}
                             disabled={classesLoading}
-                            className="w-full appearance-none bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-3 px-4 pr-10 text-sm focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-bold text-zinc-700 dark:text-zinc-300 cursor-pointer disabled:opacity-50"
+                            className="w-full appearance-none bg-surface-ground dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-800 rounded-radius-medium py-4.5 px-6 pr-12 text-sm focus:outline-none focus:ring-4 focus:ring-primary-main/5 focus:border-primary-main transition-all font-black text-zinc-900 dark:text-zinc-100 cursor-pointer disabled:opacity-50 italic uppercase tracking-wider"
                         >
-                            <option value="">Choose a class...</option>
+                            <option value="">Select Target Unit...</option>
                             {classes.map((cls) => (
                                 <option key={cls.id} value={cls.id}>
-                                    Standard {cls.standard} - {cls.division}
+                                    Standard {cls.standard.toUpperCase()} &ndash; {cls.division.toUpperCase()}
                                 </option>
                             ))}
                         </select>
-                        <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
+                        <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-300 group-hover:text-primary-main transition-colors pointer-events-none" />
                     </div>
                 </div>
             </div>
@@ -266,113 +276,132 @@ export default function AttendancePage() {
             {/* Student List */}
             <div className="min-h-[400px]">
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center py-32 gap-4 text-zinc-500 animate-in fade-in duration-500">
-                        <Loader2 className="w-12 h-12 text-emerald-500 animate-spin" />
-                        <p className="font-bold text-sm tracking-widest uppercase opacity-70">Loading student roster...</p>
+                    <div className="flex flex-col items-center justify-center py-44 gap-8 text-zinc-500 animate-in fade-in duration-700">
+                        <Loader2 className="w-20 h-20 text-primary-main animate-spin" />
+                        <div className="text-center space-y-2">
+                            <p className="font-black text-[11px] tracking-[0.5em] uppercase opacity-70 italic">Synchronizing Roster Streams...</p>
+                            <p className="text-[10px] font-black text-zinc-400 animate-pulse italic uppercase tracking-widest leading-none">Accessing Central Registry</p>
+                        </div>
                     </div>
                 ) : students.length === 0 ? (
                     selectedClass ? (
-                        <div className="flex flex-col items-center justify-center py-20 gap-4 bg-zinc-50 dark:bg-zinc-900/30 rounded-3xl border border-dashed border-zinc-200 dark:border-zinc-800 text-center">
-                            <Users className="w-12 h-12 text-zinc-300" />
-                            <h3 className="text-lg font-bold text-zinc-900 dark:text-white">No students found</h3>
-                            <p className="text-zinc-500 text-sm max-w-xs">There are no students mapped to this class yet.</p>
+                        <div className="flex flex-col items-center justify-center py-32 gap-8 bg-surface-ground dark:bg-zinc-950/30 rounded-radius-large border border-dashed border-zinc-200 dark:border-zinc-800 text-center animate-in scale-in-95">
+                            <div className="w-24 h-24 rounded-radius-large bg-surface-paper dark:bg-zinc-800 flex items-center justify-center border border-zinc-50 dark:border-zinc-700 shadow-inner">
+                                <Users className="w-12 h-12 text-zinc-100 dark:text-zinc-700" />
+                            </div>
+                            <div className="space-y-2">
+                                <h3 className="text-2xl font-black text-zinc-900 dark:text-white italic tracking-tight uppercase leading-none">Unit Roster Vacant</h3>
+                                <p className="text-zinc-500 text-[10px] max-w-xs font-black italic uppercase tracking-widest leading-relaxed opacity-60">No academic members are currently deployed in this specific unit.</p>
+                            </div>
                         </div>
                     ) : (
-                        <div className="flex flex-col items-center justify-center py-32 gap-6 bg-zinc-50 dark:bg-zinc-900/30 rounded-[3rem] border border-dashed border-zinc-200 dark:border-zinc-800 text-center animate-in fade-in duration-700">
-                            <div className="w-20 h-20 rounded-full bg-emerald-500/5 flex items-center justify-center">
-                                <Users className="w-10 h-10 text-emerald-500/40" />
+                        <div className="flex flex-col items-center justify-center py-44 gap-10 bg-surface-ground/30 dark:bg-zinc-900/10 rounded-radius-large border border-dashed border-zinc-200 dark:border-zinc-800 text-center animate-in fade-in duration-700">
+                            <div className="relative">
+                                <div className="absolute inset-0 bg-primary-main/10 rounded-full blur-[100px] animate-pulse"></div>
+                                <div className="relative w-28 h-28 rounded-radius-large bg-primary-main/5 flex items-center justify-center border border-primary-main/10 shadow-inner">
+                                    <ClipboardCheck className="w-14 h-14 text-primary-main opacity-20" />
+                                </div>
                             </div>
-                            <div>
-                                <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2">Ready to start?</h3>
-                                <p className="text-zinc-500 text-sm max-w-sm mx-auto">Select a class from the dropdown above to load the student list and mark attendance.</p>
+                            <div className="space-y-3">
+                                <h3 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight italic uppercase">Awaiting Selection</h3>
+                                <p className="text-zinc-500 text-[10px] max-w-sm mx-auto font-black italic uppercase tracking-[0.3em] leading-loose opacity-60">Define a target unit from the configuration registry above to initialize the attendance input flow.</p>
                             </div>
                         </div>
                     )
                 ) : (
-                    <div className="space-y-6">
-                        <div className="flex items-center justify-between px-4">
-                            <h2 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">Student Roster ({students.length})</h2>
-                            <div className="flex gap-2">
+                    <div className="space-y-10 animate-in slide-in-from-bottom-10 duration-700">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 px-4">
+                            <div className="space-y-2">
+                                <h2 className="text-h2 font-weight-h2 text-zinc-900 dark:text-white tracking-tight italic uppercase leading-none">Unit Roster</h2>
+                                <p className="text-[10px] font-black text-primary-main uppercase tracking-[0.4em] italic leading-none">{students.length.toString().padStart(2, '0')} Members Detected</p>
+                            </div>
+                            <div className="flex items-center gap-4 bg-surface-paper dark:bg-zinc-900 p-2 rounded-radius-medium border border-zinc-200 dark:border-zinc-800 shadow-sm ring-1 ring-zinc-50 dark:ring-zinc-800/10">
                                 <button
                                     onClick={() => toggleAll(true)}
-                                    className="text-[10px] font-black text-emerald-600 uppercase tracking-widest hover:underline"
+                                    className="px-6 py-2.5 text-[9px] font-black text-primary-main uppercase tracking-[0.4em] hover:bg-primary-main/5 rounded-radius-medium transition-all active:scale-95 italic"
                                 >
-                                    Mark All Present
+                                    Force Present
                                 </button>
-                                <span className="text-zinc-300">•</span>
+                                <div className="w-[1px] h-5 bg-zinc-200 dark:bg-zinc-800"></div>
                                 <button
                                     onClick={() => toggleAll(false)}
-                                    className="text-[10px] font-black text-red-500 uppercase tracking-widest hover:underline"
+                                    className="px-6 py-2.5 text-[9px] font-black text-error uppercase tracking-[0.4em] hover:bg-error/5 rounded-radius-medium transition-all active:scale-95 italic"
                                 >
-                                    Mark All Absent
+                                    Force Absent
                                 </button>
                             </div>
                         </div>
 
-                        <div className="overflow-hidden rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-xl shadow-zinc-200/50 dark:shadow-none">
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="bg-zinc-50 dark:bg-zinc-900/50 border-b border-zinc-200 dark:border-zinc-800">
-                                        <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest">Student</th>
-                                        <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest text-right">Attendance</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                                    {students.map((student) => (
-                                        <tr key={student.id} className="group hover:bg-zinc-50 dark:hover:bg-zinc-900/40 transition-colors">
-                                            <td className="px-8 py-5">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center font-black text-zinc-400 text-xs">
-                                                        {student.name[0]}{student.surname[0]}
-                                                    </div>
-                                                    <div>
-                                                        <p className="font-bold text-zinc-900 dark:text-zinc-100 italic">{student.name} {student.surname}</p>
-                                                        <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">GR No: {student.gr_no}</p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-8 py-5">
-                                                <div className="flex items-center justify-end gap-3">
-                                                    <button
-                                                        onClick={() => handleStatusChange(student.id, 'P')}
-                                                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${attendance[student.id] === 'P'
-                                                            ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
-                                                            : 'bg-zinc-100 dark:bg-zinc-900 text-zinc-500 hover:bg-zinc-200'
-                                                            }`}
-                                                    >
-                                                        <CheckCircle2 className={`w-4 h-4 ${attendance[student.id] === 'P' ? 'text-white' : 'text-zinc-400'}`} />
-                                                        Present
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleStatusChange(student.id, 'A')}
-                                                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${attendance[student.id] === 'A'
-                                                            ? 'bg-red-500 text-white shadow-lg shadow-red-500/20'
-                                                            : 'bg-zinc-100 dark:bg-zinc-900 text-zinc-500 hover:bg-zinc-200'
-                                                            }`}
-                                                    >
-                                                        <XCircle className={`w-4 h-4 ${attendance[student.id] === 'A' ? 'text-white' : 'text-zinc-400'}`} />
-                                                        Absent
-                                                    </button>
-                                                </div>
-                                            </td>
+                        <div className="overflow-hidden rounded-radius-large border border-zinc-200 dark:border-zinc-800 bg-surface-paper dark:bg-zinc-950 shadow-sm relative ring-1 ring-zinc-50 dark:ring-zinc-800/10">
+                            <div className="overflow-x-auto text-[10px]">
+                                <table className="w-full text-left border-separate border-spacing-0">
+                                    <thead className="bg-surface-ground">
+                                        <tr>
+                                            <th className="px-10 py-6 font-black text-zinc-400 uppercase tracking-[0.4em] border-b border-zinc-100 dark:border-zinc-800 italic">Academic Member Identity</th>
+                                            <th className="px-10 py-6 font-black text-zinc-400 uppercase tracking-[0.4em] border-b border-zinc-100 dark:border-zinc-800 text-right italic">Status Vector</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody className="divide-y divide-zinc-50 dark:divide-zinc-800/50">
+                                        {students.map((student) => (
+                                            <tr key={student.id} className="group hover:bg-zinc-50/[0.3] dark:hover:bg-zinc-800/30 transition-all">
+                                                <td className="px-10 py-7">
+                                                    <div className="flex items-center gap-8">
+                                                        <div className="w-14 h-14 rounded-radius-medium bg-surface-ground dark:bg-zinc-800 border border-zinc-50 dark:border-zinc-700 flex items-center justify-center font-black text-primary-main text-lg italic group-hover:bg-primary-main group-hover:text-white transition-all transform group-hover:scale-105 duration-500 shadow-inner">
+                                                            {student.name[0]}{student.surname[0]}
+                                                        </div>
+                                                        <div className="space-y-1.5 min-w-0">
+                                                            <p className="font-black text-zinc-900 dark:text-zinc-100 tracking-tight text-lg italic uppercase truncate leading-none">{student.name} {student.surname}</p>
+                                                            <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em] leading-none">Admission ID: {student.gr_no}</p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-10 py-7">
+                                                    <div className="flex items-center justify-end gap-5">
+                                                        <button
+                                                            onClick={() => handleStatusChange(student.id, 'P')}
+                                                            className={cn(
+                                                                "flex items-center gap-3 px-8 py-3.5 rounded-radius-medium text-[9px] font-black uppercase tracking-[0.3em] transition-all shadow-sm active:scale-95 italic",
+                                                                attendance[student.id] === 'P'
+                                                                    ? 'bg-primary-main text-white shadow-2xl shadow-primary-main/20 ring-4 ring-primary-main/5'
+                                                                    : 'bg-surface-ground dark:bg-zinc-900 text-zinc-400 hover:text-primary-main hover:bg-primary-main/5 border border-zinc-100 dark:border-zinc-800'
+                                                            )}
+                                                        >
+                                                            <CheckCircle2 className="w-4.5 h-4.5" />
+                                                            Present
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleStatusChange(student.id, 'A')}
+                                                            className={cn(
+                                                                "flex items-center gap-3 px-8 py-3.5 rounded-radius-medium text-[9px] font-black uppercase tracking-[0.3em] transition-all shadow-sm active:scale-95 italic",
+                                                                attendance[student.id] === 'A'
+                                                                    ? 'bg-error text-white shadow-2xl shadow-error/20 ring-4 ring-error/5'
+                                                                    : 'bg-surface-ground dark:bg-zinc-900 text-zinc-400 hover:text-error hover:bg-error/5 border border-zinc-100 dark:border-zinc-800'
+                                                            )}
+                                                        >
+                                                            <XCircle className="w-4.5 h-4.5" />
+                                                            Absent
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
 
-                        <div className="flex justify-end pt-6">
+                        <div className="flex justify-end pt-10">
                             <button
                                 onClick={handleSubmit}
                                 disabled={submitting || checkIsInvalidDate(date).invalid}
-                                className="px-8 py-4 bg-emerald-500 text-white rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-emerald-600 shadow-xl shadow-emerald-500/20 active:scale-95 transition-all flex items-center gap-3 disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed"
+                                className="px-12 py-6 bg-primary-main text-white rounded-radius-medium text-[11px] font-black uppercase tracking-[0.5em] hover:bg-primary-dark shadow-2xl shadow-primary-main/30 active:scale-95 transition-all flex items-center gap-5 disabled:opacity-30 disabled:grayscale disabled:cursor-not-allowed group italic ring-4 ring-primary-main/5"
                             >
                                 {submitting ? (
                                     <Loader2 className="w-5 h-5 animate-spin" />
                                 ) : (
                                     <>
-                                        <Save className="w-5 h-5" />
-                                        Submit Attendance
+                                        <Save className="w-5.5 h-5.5 group-hover:scale-110 transition-transform" />
+                                        Commit Registry State
                                     </>
                                 )}
                             </button>

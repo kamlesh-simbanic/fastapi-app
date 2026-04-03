@@ -13,11 +13,11 @@ import {
     UserCircle,
     Phone,
     MapPin,
-    Calendar,
     ShieldCheck
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import CalendarPicker from '@/components/CalendarPicker';
 
 interface FormState {
     name: string;
@@ -62,6 +62,17 @@ export default function AddStudentPage() {
             setErrors(prev => {
                 const updated = { ...prev };
                 delete updated[name];
+                return updated;
+            });
+        }
+    };
+
+    const handleDateChange = (date: string) => {
+        setForm(prev => ({ ...prev, dob: date }));
+        if (errors.dob) {
+            setErrors(prev => {
+                const updated = { ...prev };
+                delete updated.dob;
                 return updated;
             });
         }
@@ -121,241 +132,232 @@ export default function AddStudentPage() {
     if (!user) return null;
 
     return (
-        <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 mb-12">
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="space-y-1">
-                    <Link href="/students" className="inline-flex items-center gap-2 text-zinc-500 hover:text-indigo-500 text-sm font-bold transition-all mb-4 group">
+                    <Link href="/students" className="inline-flex items-center gap-2 text-zinc-500 hover:text-blue-600 text-sm font-semibold transition-all mb-2 group">
                         <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                         Back to Students
                     </Link>
-                    <h1 className="text-3xl font-black tracking-tight text-zinc-900 dark:text-white flex items-center gap-3">
-                        <div className="p-3 rounded-2xl bg-indigo-500 shadow-lg shadow-indigo-500/20">
-                            <Users className="w-6 h-6 text-white" />
+                    <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 flex items-center gap-3">
+                        <div className="p-2.5 rounded-xl bg-blue-600 shadow-lg shadow-blue-600/20">
+                            <Users className="w-5 h-5 text-white" />
                         </div>
-                        Admission Portal
+                        New Student Enrollment
                     </h1>
-                    <p className="text-zinc-500 text-sm font-medium">Registers a new academic profile into the central system.</p>
+                    <p className="text-zinc-500 dark:text-zinc-400 text-sm font-medium">Please enter the student&apos;s details to create a new academic profile.</p>
                 </div>
 
-                <div className="flex items-center gap-3 px-4 py-2 bg-zinc-100 dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 self-start md:self-center">
-                    <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600 dark:text-zinc-400">System Ready</span>
+                <div className="flex items-center gap-2.5 px-3 py-1.5 bg-zinc-100 dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 self-start md:self-center transition-colors">
+                    <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">Environment Ready</span>
                 </div>
             </div>
 
             {/* Main Form Card */}
             <div className={cn(
-                "relative bg-white dark:bg-zinc-900 rounded-[2.5rem] border transition-all duration-500 overflow-hidden shadow-sm",
+                "relative bg-white dark:bg-zinc-900 rounded-2xl border transition-all duration-500 overflow-hidden shadow-sm",
                 success ? "border-emerald-500 shadow-2xl shadow-emerald-500/10" : "border-zinc-200 dark:border-zinc-800"
             )}>
                 {success ? (
                     <div className="flex flex-col items-center justify-center py-32 space-y-6 animate-in zoom-in duration-500">
-                        <div className="w-24 h-24 rounded-full bg-emerald-500 flex items-center justify-center shadow-2xl shadow-emerald-500/20">
-                            <Check className="w-12 h-12 text-white" />
+                        <div className="w-20 h-20 rounded-full bg-emerald-500 flex items-center justify-center shadow-xl shadow-emerald-500/20">
+                            <Check className="w-10 h-10 text-white" />
                         </div>
-                        <div className="text-center space-y-2">
-                            <h3 className="text-2xl font-black text-zinc-900 dark:text-white">Admission Successful</h3>
-                            <p className="text-zinc-500 text-sm font-bold">The student record has been cataloged. Redirecting...</p>
+                        <div className="text-center space-y-1">
+                            <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Enrollment Successful</h3>
+                            <p className="text-zinc-500 text-sm font-medium">The student record has been added to the database.</p>
                         </div>
                     </div>
                 ) : (
-                    <form onSubmit={handleSubmit} className="p-6 sm:p-8 md:p-12 space-y-10">
+                    <form onSubmit={handleSubmit} className="p-6 sm:p-8 md:p-10 space-y-12">
                         {/* Personal Info Section */}
                         <div className="space-y-8">
-                            <div className="flex items-center gap-3 pb-4 border-b border-zinc-100 dark:border-zinc-800/50">
-                                <UserCircle className="w-5 h-5 text-indigo-500" />
-                                <h2 className="text-sm font-black text-zinc-900 dark:text-white uppercase tracking-[0.2em]">Identity Profile</h2>
+                            <div className="flex items-center gap-3 pb-3 border-b border-zinc-100 dark:border-zinc-800/50">
+                                <UserCircle className="w-4.5 h-4.5 text-blue-600" />
+                                <h2 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-widest">Personal Information</h2>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest px-1">First Name</label>
+                                    <label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 px-1">First Name</label>
                                     <input
                                         name="name"
                                         value={form.name}
                                         onChange={handleChange}
-                                        placeholder="John"
+                                        placeholder="Enter first name"
                                         className={cn(
-                                            "w-full bg-zinc-50 dark:bg-zinc-950/50 border rounded-2xl px-5 py-4 text-sm font-bold focus:outline-none focus:ring-4 transition-all text-zinc-900 dark:text-white",
+                                            "w-full bg-zinc-50 dark:bg-zinc-950/30 border rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-4 transition-all text-zinc-900 dark:text-zinc-100",
                                             errors.name
                                                 ? "border-red-500 focus:ring-red-500/10 focus:border-red-500"
-                                                : "border-zinc-200 dark:border-zinc-800 focus:ring-indigo-500/10 focus:border-indigo-500"
+                                                : "border-zinc-200 dark:border-zinc-800 focus:ring-blue-600/5 focus:border-blue-600/50"
                                         )}
                                     />
-                                    {errors.name && <p className="text-[10px] font-bold text-red-500 uppercase tracking-wider ml-1">{errors.name}</p>}
+                                    {errors.name && <p className="text-[11px] font-medium text-red-500 ml-1">{errors.name}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest px-1">Father Name</label>
+                                    <label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 px-1">Father&apos;s Name</label>
                                     <input
                                         name="father_name"
                                         value={form.father_name}
                                         onChange={handleChange}
-                                        placeholder="David"
+                                        placeholder="Enter father's name"
                                         className={cn(
-                                            "w-full bg-zinc-50 dark:bg-zinc-950/50 border rounded-2xl px-5 py-4 text-sm font-bold focus:outline-none focus:ring-4 transition-all text-zinc-900 dark:text-white",
+                                            "w-full bg-zinc-50 dark:bg-zinc-950/30 border rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-4 transition-all text-zinc-900 dark:text-zinc-100",
                                             errors.father_name
                                                 ? "border-red-500 focus:ring-red-500/10 focus:border-red-500"
-                                                : "border-zinc-200 dark:border-zinc-800 focus:ring-indigo-500/10 focus:border-indigo-500"
+                                                : "border-zinc-200 dark:border-zinc-800 focus:ring-blue-600/5 focus:border-blue-600/50"
                                         )}
                                     />
-                                    {errors.father_name && <p className="text-[10px] font-bold text-red-500 uppercase tracking-wider ml-1">{errors.father_name}</p>}
+                                    {errors.father_name && <p className="text-[11px] font-medium text-red-500 ml-1">{errors.father_name}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest px-1">Surname</label>
+                                    <label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 px-1">Surname</label>
                                     <input
                                         name="surname"
                                         value={form.surname}
                                         onChange={handleChange}
-                                        placeholder="Doe"
+                                        placeholder="Enter surname"
                                         className={cn(
-                                            "w-full bg-zinc-50 dark:bg-zinc-950/50 border rounded-2xl px-5 py-4 text-sm font-bold focus:outline-none focus:ring-4 transition-all text-zinc-900 dark:text-white",
+                                            "w-full bg-zinc-50 dark:bg-zinc-950/30 border rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-4 transition-all text-zinc-900 dark:text-zinc-100",
                                             errors.surname
                                                 ? "border-red-500 focus:ring-red-500/10 focus:border-red-500"
-                                                : "border-zinc-200 dark:border-zinc-800 focus:ring-indigo-500/10 focus:border-indigo-500"
+                                                : "border-zinc-200 dark:border-zinc-800 focus:ring-blue-600/5 focus:border-blue-600/50"
                                         )}
                                     />
-                                    {errors.surname && <p className="text-[10px] font-bold text-red-500 uppercase tracking-wider ml-1">{errors.surname}</p>}
+                                    {errors.surname && <p className="text-[11px] font-medium text-red-500 ml-1">{errors.surname}</p>}
                                 </div>
                             </div>
                         </div>
 
-                        {/* Bio & Contact Section */}
+                        {/* Contact & Birth Details */}
                         <div className="space-y-8">
-                            <div className="flex items-center gap-3 pb-4 border-b border-zinc-100 dark:border-zinc-800/50">
-                                <Phone className="w-5 h-5 text-emerald-500" />
-                                <h2 className="text-sm font-black text-zinc-900 dark:text-white uppercase tracking-[0.2em]">Contact & Birth</h2>
+                            <div className="flex items-center gap-3 pb-3 border-b border-zinc-100 dark:border-zinc-800/50">
+                                <Phone className="w-4.5 h-4.5 text-emerald-600" />
+                                <h2 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-widest">Contact & Birth Details</h2>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest px-1">Mobile Access</label>
+                                    <label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 px-1">Mobile Number</label>
                                     <input
                                         name="mobile"
                                         value={form.mobile}
                                         onChange={handleChange}
                                         placeholder="e.g. 9876543210"
                                         className={cn(
-                                            "w-full bg-zinc-50 dark:bg-zinc-950/50 border rounded-2xl px-5 py-4 text-sm font-bold focus:outline-none focus:ring-4 transition-all text-zinc-900 dark:text-white font-mono",
+                                            "w-full bg-zinc-50 dark:bg-zinc-950/30 border rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-4 transition-all text-zinc-900 dark:text-zinc-100 font-mono",
                                             errors.mobile
                                                 ? "border-red-500 focus:ring-red-500/10 focus:border-red-500"
-                                                : "border-zinc-200 dark:border-zinc-800 focus:ring-indigo-500/10 focus:border-indigo-500"
+                                                : "border-zinc-200 dark:border-zinc-800 focus:ring-blue-600/5 focus:border-blue-600/50"
                                         )}
                                     />
-                                    {errors.mobile && <p className="text-[10px] font-bold text-red-500 uppercase tracking-wider ml-1">{errors.mobile}</p>}
+                                    {errors.mobile && <p className="text-[11px] font-medium text-red-500 ml-1">{errors.mobile}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest px-1">Date of Birth</label>
-                                    <div className="relative group">
-                                        <Calendar className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-indigo-500 pointer-events-none transition-colors" />
-                                        <input
-                                            type="date"
-                                            name="dob"
-                                            value={form.dob}
-                                            onChange={handleChange}
-                                            className={cn(
-                                                "w-full bg-zinc-50 dark:bg-zinc-950/50 border rounded-2xl pl-12 pr-5 py-4 text-sm font-bold focus:outline-none focus:ring-4 transition-all text-zinc-900 dark:text-white",
-                                                errors.dob
-                                                    ? "border-red-500 focus:ring-red-500/10 focus:border-red-500"
-                                                    : "border-zinc-200 dark:border-zinc-800 focus:ring-indigo-500/10 focus:border-indigo-500"
-                                            )}
-                                        />
-                                    </div>
-                                    {errors.dob && <p className="text-[10px] font-bold text-red-500 uppercase tracking-wider ml-1">{errors.dob}</p>}
+                                    <CalendarPicker
+                                        label="Date of Birth"
+                                        value={form.dob}
+                                        onChange={handleDateChange}
+                                        error={errors.dob}
+                                        placeholder="Choose student's DOB"
+                                        maxDate={new Date().toISOString().split('T')[0]}
+                                    />
                                 </div>
                             </div>
                         </div>
 
-                        {/* Location Section */}
+                        {/* Address Details */}
                         <div className="space-y-8">
-                            <div className="flex items-center gap-3 pb-4 border-b border-zinc-100 dark:border-zinc-800/50">
-                                <MapPin className="w-5 h-5 text-amber-500" />
-                                <h2 className="text-sm font-black text-zinc-900 dark:text-white uppercase tracking-[0.2em]">Geospatial Data</h2>
+                            <div className="flex items-center gap-3 pb-3 border-b border-zinc-100 dark:border-zinc-800/50">
+                                <MapPin className="w-4.5 h-4.5 text-amber-600" />
+                                <h2 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-widest">Address Details</h2>
                             </div>
 
-                            <div className="space-y-8">
+                            <div className="space-y-6">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest px-1">Full Primary Address</label>
+                                    <label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 px-1">Residence Address</label>
                                     <textarea
                                         name="address"
                                         rows={2}
                                         value={form.address}
                                         onChange={handleChange}
-                                        placeholder="Unit 7, Academic Court..."
+                                        placeholder="House No, Street, Landmark..."
                                         className={cn(
-                                            "w-full bg-zinc-50 dark:bg-zinc-950/50 border rounded-2xl px-5 py-4 text-sm font-bold focus:outline-none focus:ring-4 transition-all text-zinc-900 dark:text-white resize-none",
+                                            "w-full bg-zinc-50 dark:bg-zinc-950/30 border rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-4 transition-all text-zinc-900 dark:text-zinc-100 resize-none",
                                             errors.address
                                                 ? "border-red-500 focus:ring-red-500/10 focus:border-red-500"
-                                                : "border-zinc-200 dark:border-zinc-800 focus:ring-indigo-500/10 focus:border-indigo-500"
+                                                : "border-zinc-200 dark:border-zinc-800 focus:ring-blue-600/5 focus:border-blue-600/50"
                                         )}
                                     />
-                                    {errors.address && <p className="text-[10px] font-bold text-red-500 uppercase tracking-wider ml-1">{errors.address}</p>}
+                                    {errors.address && <p className="text-[11px] font-medium text-red-500 ml-1">{errors.address}</p>}
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest px-1">Settlement/City</label>
+                                        <label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 px-1">City</label>
                                         <input
                                             name="city"
                                             value={form.city}
                                             onChange={handleChange}
-                                            placeholder="Oxford"
+                                            placeholder="Enter city"
                                             className={cn(
-                                                "w-full bg-zinc-50 dark:bg-zinc-950/50 border rounded-2xl px-5 py-4 text-sm font-bold focus:outline-none focus:ring-4 transition-all text-zinc-900 dark:text-white",
+                                                "w-full bg-zinc-50 dark:bg-zinc-950/30 border rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-4 transition-all text-zinc-900 dark:text-zinc-100",
                                                 errors.city
                                                     ? "border-red-500 focus:ring-red-500/10 focus:border-red-500"
-                                                    : "border-zinc-200 dark:border-zinc-800 focus:ring-indigo-500/10 focus:border-indigo-500"
+                                                    : "border-zinc-200 dark:border-zinc-800 focus:ring-blue-600/5 focus:border-blue-600/50"
                                             )}
                                         />
-                                        {errors.city && <p className="text-[10px] font-bold text-red-500 uppercase tracking-wider ml-1">{errors.city}</p>}
+                                        {errors.city && <p className="text-[11px] font-medium text-red-500 ml-1">{errors.city}</p>}
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest px-1">Postal Code</label>
+                                        <label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 px-1">Pin Code</label>
                                         <input
                                             name="zip_code"
                                             value={form.zip_code}
                                             onChange={handleChange}
-                                            placeholder="6 digits code"
+                                            placeholder="6 digits"
                                             className={cn(
-                                                "w-full bg-zinc-50 dark:bg-zinc-950/50 border rounded-2xl px-5 py-4 text-sm font-bold focus:outline-none focus:ring-4 transition-all text-zinc-900 dark:text-white font-mono uppercase tracking-widest",
+                                                "w-full bg-zinc-50 dark:bg-zinc-950/30 border rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-4 transition-all text-zinc-900 dark:text-zinc-100 font-mono",
                                                 errors.zip_code
                                                     ? "border-red-500 focus:ring-red-500/10 focus:border-red-500"
-                                                    : "border-zinc-200 dark:border-zinc-800 focus:ring-indigo-500/10 focus:border-indigo-500"
+                                                    : "border-zinc-200 dark:border-zinc-800 focus:ring-blue-600/5 focus:border-blue-600/50"
                                             )}
                                         />
-                                        {errors.zip_code && <p className="text-[10px] font-bold text-red-500 uppercase tracking-wider ml-1">{errors.zip_code}</p>}
+                                        {errors.zip_code && <p className="text-[11px] font-medium text-red-500 ml-1">{errors.zip_code}</p>}
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Feedback & Actions */}
+                        {/* Actions */}
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pt-10 border-t border-zinc-100 dark:border-zinc-800/50">
                             {error && (
-                                <div className="flex items-center gap-3 text-red-500 px-5 py-3 bg-red-500/10 border border-red-500/20 rounded-2xl animate-shake">
+                                <div className="flex items-center gap-3 text-red-600 px-4 py-3 bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 rounded-xl animate-in fade-in duration-300">
                                     <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                                    <p className="text-xs font-black uppercase tracking-wide leading-tight">{error}</p>
+                                    <p className="text-xs font-semibold leading-tight">{error}</p>
                                 </div>
                             )}
-                            <div className="hidden md:block" />
+                            <div className="flex-1" />
 
                             <div className="flex items-center gap-4">
-                                <Link href="/students" className="px-8 py-4 text-zinc-500 hover:text-zinc-900 dark:hover:text-white text-sm font-black uppercase tracking-widest transition-all">
+                                <Link href="/students" className="px-6 py-3 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300 text-sm font-bold transition-all">
                                     Cancel
                                 </Link>
                                 <button
                                     type="submit"
                                     disabled={submitting}
-                                    className="px-12 py-4 bg-indigo-500 text-white rounded-[1.25rem] text-sm font-black uppercase tracking-[0.2em] hover:bg-indigo-600 shadow-2xl shadow-indigo-500/30 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+                                    className="px-10 py-3.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 shadow-lg shadow-blue-600/10 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                 >
                                     {submitting ? (
                                         <>
                                             <Loader2 className="w-4 h-4 animate-spin" />
-                                            Processing
+                                            Processing...
                                         </>
                                     ) : (
                                         <>
-                                            Confirm Admission
+                                            Register Student
                                             <Check className="w-4 h-4" />
                                         </>
                                     )}
@@ -366,14 +368,14 @@ export default function AddStudentPage() {
                 )}
             </div>
 
-            {/* Info Note */}
-            <div className="flex items-start gap-4 p-8 bg-zinc-50 dark:bg-zinc-900/50 rounded-[2rem] border border-zinc-100 dark:border-zinc-800/50">
-                <ShieldCheck className="w-6 h-6 text-indigo-500 flex-shrink-0" />
+            {/* Hint Note */}
+            <div className="flex items-start gap-4 p-6 bg-blue-50/50 dark:bg-blue-900/10 rounded-2xl border border-blue-100/50 dark:border-blue-900/20">
+                <ShieldCheck className="w-6 h-6 text-blue-600 flex-shrink-0" />
                 <div className="space-y-1">
-                    <h4 className="text-xs font-black text-zinc-900 dark:text-white uppercase tracking-widest">Automatic Cataloging</h4>
-                    <p className="text-xs font-medium text-zinc-500 leading-relaxed">
-                        A unique <span className="text-indigo-500 font-bold tracking-widest uppercase">GR Number</span> will be automatically generated upon submission based on the current academic cycle.
-                        Ensure the Name and Father&apos;s Name exactly match supporting identification.
+                    <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">Data Integrity Note</h4>
+                    <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                        A unique <span className="text-blue-600 font-bold">GR Number</span> will be automatically assigned to the student upon successful registration.
+                        Please ensure all identity details are accurate according to official records.
                     </p>
                 </div>
             </div>

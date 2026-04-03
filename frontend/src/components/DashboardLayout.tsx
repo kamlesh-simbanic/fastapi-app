@@ -29,9 +29,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                     <TopNav onMenuClick={() => setIsSidebarOpen(true)} />
                 </div>
 
-                <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-10 relative print:p-0">
+                <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-12 relative print:p-0">
                     {/* Subtle Page Background Decoration */}
-                    <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-600/5 dark:bg-indigo-600/10 blur-[120px] rounded-full pointer-events-none -z-10 print:hidden" />
+                    <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/5 dark:bg-blue-600/10 blur-[120px] rounded-full pointer-events-none -z-10 print:hidden" />
 
                     <div className="max-w-7xl mx-auto h-full print:max-w-none">
                         {children}
