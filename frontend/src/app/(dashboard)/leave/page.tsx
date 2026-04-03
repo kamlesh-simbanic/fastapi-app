@@ -4,19 +4,18 @@ import React, { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import CalendarPicker from '@/components/CalendarPicker';
 import {
-    Calendar as CalendarIcon,
-    Clock,
-    CheckCircle2,
-    XCircle,
-    Plus,
-    AlertCircle,
     Loader2,
+    CheckCircle2,
+    AlertCircle,
+    Plus,
+    Clock,
     ChevronRight,
-    LayoutGrid
+    LayoutGrid,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import Link from 'next/link';
-import { LeaveRequest } from '@/types';
+import { LeaveRequest } from './types';
+import Table from '@/components/Table';
+import { getPersonalLeaveColumns } from './utils';
 
 export default function LeaveManagementPage() {
     const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>([]);
@@ -84,13 +83,6 @@ export default function LeaveManagementPage() {
         }
     };
 
-    const getStatusIcon = (status: string) => {
-        switch (status) {
-            case 'approved': return <CheckCircle2 className="w-4 h-4 text-emerald-500" />;
-            case 'rejected': return <XCircle className="w-4 h-4 text-red-500" />;
-            default: return <Clock className="w-4 h-4 text-amber-500" />;
-        }
-    };
 
     if (loading) {
         return (
@@ -253,48 +245,12 @@ export default function LeaveManagementPage() {
                                 <h3 className="font-black text-xl italic mb-6">Today&apos;s Activity</h3>
                                 <button className="text-indigo-500 text-xs font-black uppercase tracking-widest flex items-center gap-1 hover:gap-2 transition-all">View All <ChevronRight className="w-3 h-3" /></button>
                             </div>
-                            <div className="divide-y-2 divide-zinc-50 dark:divide-zinc-800/50">
-                                {leaveRequests.length === 0 ? (
-                                    <div className="p-20 text-center flex flex-col items-center gap-4">
-                                        <div className="w-16 h-16 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
-                                            <CalendarIcon className="w-8 h-8 text-zinc-300" />
-                                        </div>
-                                        <p className="text-zinc-500 font-bold italic tracking-tight">No leave requests found in your history.</p>
-                                    </div>
-                                ) : (
-                                    leaveRequests.map((req) => (
-                                        <div key={req.id} className="p-8 hover:bg-zinc-50/80 dark:hover:bg-zinc-950/80 transition-all group">
-                                            <div className="flex items-center justify-between mb-3">
-                                                <div className="flex items-center gap-5">
-                                                    <div className="w-14 h-14 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center transition-transform group-hover:scale-110">
-                                                        <CalendarIcon className="w-6 h-6 text-zinc-600 dark:text-zinc-400" />
-                                                    </div>
-                                                    <div>
-                                                        <p className="font-black text-lg text-zinc-900 dark:white capitalize italic tracking-tight">{req.leave_type} Leave</p>
-                                                        <p className="text-xs font-black text-zinc-400 flex items-center gap-2 uppercase tracking-wide">
-                                                            {new Date(req.start_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
-                                                            <ChevronRight className="w-3 h-3" />
-                                                            {new Date(req.end_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div className={cn(
-                                                    "flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest",
-                                                    req.status === 'approved' ? "bg-emerald-500/10 text-emerald-600 ring-1 ring-emerald-500/20" :
-                                                        req.status === 'rejected' ? "bg-red-500/10 text-red-600 ring-1 ring-red-500/20" :
-                                                            "bg-amber-500/10 text-amber-600 ring-1 ring-amber-500/20"
-                                                )}>
-                                                    {getStatusIcon(req.status)}
-                                                    {req.status}
-                                                </div>
-                                            </div>
-                                            <div className="pl-[76px]">
-                                                <p className="text-sm text-zinc-600 dark:text-zinc-400 font-medium leading-relaxed italic border-l-4 border-zinc-100 dark:border-zinc-800 pl-4 py-1">&quot;{req.reason}&quot;</p>
-                                            </div>
-                                        </div>
-                                    ))
-                                )}
-                            </div>
+                            <Table
+                                columns={getPersonalLeaveColumns()}
+                                data={leaveRequests}
+                                loading={loading}
+                                emptyMessage="No leave requests found in your history."
+                            />
                         </div>
                     </div>
                 </div>

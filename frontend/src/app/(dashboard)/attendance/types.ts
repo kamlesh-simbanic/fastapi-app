@@ -1,5 +1,5 @@
-import { SchoolClass } from './class';
-import { Student } from './student';
+import { SchoolClass } from '../classes/types';
+import { Student } from '../students/types';
 
 export interface AttendanceRecord {
     id: number;

@@ -4,19 +4,21 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/components/AuthContext';
 import {
-    Users,
-    CheckCircle2,
-    XCircle,
-    Loader2,
     Save,
-    ChevronDown,
+    Loader2,
+    CheckCircle2,
     AlertCircle,
     ClipboardCheck,
-    FileText
+    FileText,
+    Users,
+    ChevronDown
 } from 'lucide-react';
 import Link from 'next/link';
 import CalendarPicker from '@/components/CalendarPicker';
-import { SchoolClass, Student } from '@/types';
+import { SchoolClass } from '../classes/types';
+import { Student } from '../students/types';
+import Table from '@/components/Table';
+import { getAttendanceColumns } from './utils';
 
 
 export default function AttendancePage() {
@@ -298,57 +300,15 @@ export default function AttendancePage() {
                             </div>
                         </div>
 
-                        <div className="overflow-hidden rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-xl shadow-zinc-200/50 dark:shadow-none">
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="bg-zinc-50 dark:bg-zinc-900/50 border-b border-zinc-200 dark:border-zinc-800">
-                                        <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest">Student</th>
-                                        <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest text-right">Attendance</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                                    {students.map((student) => (
-                                        <tr key={student.id} className="group hover:bg-zinc-50 dark:hover:bg-zinc-900/40 transition-colors">
-                                            <td className="px-8 py-5">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center font-black text-zinc-400 text-xs">
-                                                        {student.name[0]}{student.surname[0]}
-                                                    </div>
-                                                    <div>
-                                                        <p className="font-bold text-zinc-900 dark:text-zinc-100 italic">{student.name} {student.surname}</p>
-                                                        <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">GR No: {student.gr_no}</p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-8 py-5">
-                                                <div className="flex items-center justify-end gap-3">
-                                                    <button
-                                                        onClick={() => handleStatusChange(student.id, 'P')}
-                                                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${attendance[student.id] === 'P'
-                                                            ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
-                                                            : 'bg-zinc-100 dark:bg-zinc-900 text-zinc-500 hover:bg-zinc-200'
-                                                            }`}
-                                                    >
-                                                        <CheckCircle2 className={`w-4 h-4 ${attendance[student.id] === 'P' ? 'text-white' : 'text-zinc-400'}`} />
-                                                        Present
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleStatusChange(student.id, 'A')}
-                                                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${attendance[student.id] === 'A'
-                                                            ? 'bg-red-500 text-white shadow-lg shadow-red-500/20'
-                                                            : 'bg-zinc-100 dark:bg-zinc-900 text-zinc-500 hover:bg-zinc-200'
-                                                            }`}
-                                                    >
-                                                        <XCircle className={`w-4 h-4 ${attendance[student.id] === 'A' ? 'text-white' : 'text-zinc-400'}`} />
-                                                        Absent
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                        <Table
+                            columns={getAttendanceColumns({
+                                attendance,
+                                onStatusChange: handleStatusChange
+                            })}
+                            data={students}
+                            loading={loading}
+                            emptyMessage="No students found for this class."
+                        />
 
                         <div className="flex justify-end pt-6">
                             <button

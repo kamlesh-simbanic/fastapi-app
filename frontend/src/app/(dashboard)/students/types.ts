@@ -9,5 +9,3 @@ export interface Student {
     city: string;
     status: string;
 }
-
-export type StudentMember = Student;

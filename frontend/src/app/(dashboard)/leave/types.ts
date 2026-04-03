@@ -1,3 +1,9 @@
+export interface StaffMember {
+    id: number;
+    name: string;
+    department: string;
+}
+
 export interface LeaveRequest {
     id: number;
     staff_id: number;
@@ -6,4 +12,6 @@ export interface LeaveRequest {
     end_date: string;
     reason: string;
     status: string;
+    staff?: StaffMember;
+    created_at?: string;
 }

@@ -19,27 +19,13 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { LeaveRequest } from '../types';
+import Table from '@/components/Table';
+import { getLeaveApprovalColumns } from '../utils';
 
-interface StaffMember {
-    id: number;
-    name: string;
-    department: string;
-}
-
-interface LeaveRequestData {
-    id: number;
-    staff_id: number;
-    leave_type: string;
-    start_date: string;
-    end_date: string;
-    reason: string;
-    status: string;
-    staff?: StaffMember;
-    created_at: string;
-}
 
 export default function LeaveApprovalsPage() {
-    const [requests, setRequests] = useState<LeaveRequestData[]>([]);
+    const [requests, setRequests] = useState<LeaveRequest[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<'pending' | 'approved' | 'rejected'>('pending');
@@ -227,75 +213,80 @@ export default function LeaveApprovalsPage() {
                     </div>
                 </div>
             ) : (
-                <div className={cn(
-                    viewMode === 'grid'
-                        ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-                        : "space-y-4"
-                )}>
-                    {filteredRequests.map((req) => (
-                        <div
-                            key={req.id}
-                            className={cn(
-                                "bg-white dark:bg-zinc-900 border-2 border-zinc-100 dark:border-zinc-800 hover:border-indigo-500/30 transition-all group",
-                                viewMode === 'grid' ? "rounded-[2.5rem] p-8 shadow-sm flex flex-col h-full" : "rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6"
-                            )}
-                        >
-                            <div className={cn(viewMode === 'grid' ? "space-y-6 flex-grow" : "flex flex-col md:flex-row items-start md:items-center gap-6 flex-grow")}>
-                                {/* User Info */}
-                                <div className="flex items-center gap-4">
-                                    <div className="w-14 h-14 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                        <User className="w-6 h-6 text-zinc-600 dark:text-zinc-400" />
-                                    </div>
-                                    <div>
-                                        <p className="font-black text-lg italic tracking-tight leading-none mb-1.5">{req.staff?.name}</p>
-                                        <div className="flex items-center gap-2">
-                                            <span className="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded text-[9px] font-black uppercase tracking-widest text-zinc-500">{req.staff?.department}</span>
-                                            <span className="text-[9px] font-black text-zinc-400 uppercase italic">ID: {req.staff_id}</span>
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    {viewMode === 'grid' ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {filteredRequests.map((req) => (
+                                <div
+                                    key={req.id}
+                                    className="bg-white dark:bg-zinc-900 border-2 border-zinc-100 dark:border-zinc-800 rounded-[2.5rem] p-8 shadow-sm hover:border-indigo-500/30 transition-all group flex flex-col h-full"
+                                >
+                                    <div className="space-y-6 flex-grow">
+                                        {/* User Info */}
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-14 h-14 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                                <User className="w-6 h-6 text-zinc-600 dark:text-zinc-400" />
+                                            </div>
+                                            <div>
+                                                <p className="font-black text-lg italic tracking-tight leading-none mb-1.5">{req.staff?.name}</p>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded text-[9px] font-black uppercase tracking-widest text-zinc-500">{req.staff?.department}</span>
+                                                    <span className="text-[9px] font-black text-zinc-400 uppercase italic">ID: {req.staff_id}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Leave Details */}
+                                        <div className="space-y-3">
+                                            <div className="flex items-center gap-3">
+                                                <div className="px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg text-[10px] font-black uppercase tracking-widest italic">{req.leave_type} Leave</div>
+                                                <div className="text-[10px] font-bold text-zinc-400 flex items-center gap-1"><CalendarIcon className="w-3 h-3" /> {new Date(req.start_date).toLocaleDateString()} - {new Date(req.end_date).toLocaleDateString()}</div>
+                                            </div>
+                                            <div className="relative px-4 py-3 bg-zinc-50 dark:bg-zinc-950/50 rounded-2xl border border-zinc-100 dark:border-zinc-800">
+                                                <p className="text-xs text-zinc-600 dark:text-zinc-400 font-medium italic italic line-clamp-3 leading-relaxed">&quot;{req.reason}&quot;</p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                {/* Leave Details */}
-                                <div className={cn("space-y-3", viewMode === 'grid' ? "" : "md:flex-1 md:space-y-1")}>
-                                    <div className="flex items-center gap-3">
-                                        <div className="px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg text-[10px] font-black uppercase tracking-widest italic">{req.leave_type} Leave</div>
-                                        <div className="text-[10px] font-bold text-zinc-400 flex items-center gap-1"><CalendarIcon className="w-3 h-3" /> {new Date(req.start_date).toLocaleDateString()} - {new Date(req.end_date).toLocaleDateString()}</div>
-                                    </div>
-                                    <div className="relative px-4 py-3 bg-zinc-50 dark:bg-zinc-950/50 rounded-2xl border border-zinc-100 dark:border-zinc-800">
-                                        <p className="text-xs text-zinc-600 dark:text-zinc-400 font-medium italic italic line-clamp-3 leading-relaxed">&quot;{req.reason}&quot;</p>
+                                    {/* Actions */}
+                                    <div className="mt-8 pt-6 border-t-2 border-zinc-50 dark:border-zinc-800 flex gap-2">
+                                        {req.status === 'pending' ? (
+                                            <>
+                                                <button
+                                                    onClick={() => handleUpdateStatus(req.id, 'approved')}
+                                                    className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-emerald-500/20 active:scale-95 transition-all"
+                                                >
+                                                    Approve
+                                                </button>
+                                                <button
+                                                    onClick={() => handleUpdateStatus(req.id, 'rejected')}
+                                                    className="flex-1 bg-white dark:bg-zinc-900 border-2 border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white px-5 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest active:scale-95 transition-all"
+                                                >
+                                                    Reject
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <div className={cn(
+                                                "w-full text-center px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2",
+                                                req.status === 'approved' ? "bg-emerald-500/10 text-emerald-600" : "bg-red-500/10 text-red-600"
+                                            )}>
+                                                {req.status === 'approved' ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
+                                                {req.status}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
-                            </div>
-
-                            {/* Actions */}
-                            <div className={cn("flex gap-2", viewMode === 'grid' ? "mt-8 pt-6 border-t-2 border-zinc-50 dark:border-zinc-800" : "flex-shrink-0")}>
-                                {req.status === 'pending' ? (
-                                    <>
-                                        <button
-                                            onClick={() => handleUpdateStatus(req.id, 'approved')}
-                                            className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-emerald-500/20 active:scale-95 transition-all"
-                                        >
-                                            Approve
-                                        </button>
-                                        <button
-                                            onClick={() => handleUpdateStatus(req.id, 'rejected')}
-                                            className="flex-1 bg-white dark:bg-zinc-900 border-2 border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white px-5 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest active:scale-95 transition-all"
-                                        >
-                                            Reject
-                                        </button>
-                                    </>
-                                ) : (
-                                    <div className={cn(
-                                        "px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2",
-                                        req.status === 'approved' ? "bg-emerald-500/10 text-emerald-600" : "bg-red-500/10 text-red-600"
-                                    )}>
-                                        {req.status === 'approved' ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
-                                        {req.status}
-                                    </div>
-                                )}
-                            </div>
+                            ))}
                         </div>
-                    ))}
+                    ) : (
+                        <Table
+                            columns={getLeaveApprovalColumns({
+                                onUpdateStatus: handleUpdateStatus
+                            })}
+                            data={filteredRequests}
+                            emptyMessage="No requests matches your filter."
+                        />
+                    )}
                 </div>
             )}
         </div>

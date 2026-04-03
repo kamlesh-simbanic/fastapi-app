@@ -1,4 +1,4 @@
-import { Staff } from './staff';
+import { Staff } from '../staff/types';
 
 export interface Subject {
     id: number;

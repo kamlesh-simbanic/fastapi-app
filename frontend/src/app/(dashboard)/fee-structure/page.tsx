@@ -2,19 +2,19 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { api } from '@/lib/api';
-import { FeeStructure, SchoolClass } from '@/types';
+import { FeeStructure } from './types';
+import { SchoolClass } from '../classes/types';
+import { getFeeStructureColumns } from './utils';
 import { useAuth } from '@/components/AuthContext';
 import {
     CreditCard,
     Plus,
     Loader2,
     X,
-    Edit2,
-    Trash2,
     AlertCircle,
     ChevronDown
 } from 'lucide-react';
-import Table, { Column } from '@/components/Table';
+import Table from '@/components/Table';
 
 export default function FeeStructurePage() {
     const { user } = useAuth();
@@ -75,7 +75,7 @@ export default function FeeStructurePage() {
         }
     };
 
-    const handleEdit = (fee: FeeStructure) => {
+    const openEdit = (fee: FeeStructure) => {
         setFormData({
             class_id: fee.class_id.toString(),
             year: fee.year.toString(),
@@ -86,7 +86,7 @@ export default function FeeStructurePage() {
         setShowModal(true);
     };
 
-    const handleDelete = async (id: number) => {
+    const triggerDelete = async (id: number) => {
         if (!confirm('Are you sure you want to delete this fee structure?')) return;
         try {
             await api.deleteFeeStructure(id);
@@ -95,41 +95,6 @@ export default function FeeStructurePage() {
             setError(err instanceof Error ? err.message : 'Failed to delete');
         }
     };
-    const columns: Column<FeeStructure>[] = [
-        {
-            key: 'class',
-            label: 'Class',
-            className: 'font-black text-zinc-900 dark:text-white capitalize',
-            render: (fee) => fee.school_class ? `${fee.school_class.standard} - ${fee.school_class.division}` : 'Unknown Class'
-        },
-        {
-            key: 'year',
-            label: 'Academic Year',
-            className: 'font-bold text-zinc-600 dark:text-zinc-400',
-            render: (fee) => fee.year
-        },
-        {
-            key: 'fee_amount',
-            label: 'Fee Amount',
-            className: 'font-black text-emerald-600 dark:text-emerald-400 text-lg',
-            render: (fee) => `$${fee.fee_amount.toLocaleString()}`
-        },
-        {
-            key: 'actions',
-            label: 'Actions',
-            className: 'text-right',
-            render: (fee) => (
-                <div className="flex items-center justify-end gap-2">
-                    <button onClick={() => handleEdit(fee)} className="p-2 text-zinc-400 hover:text-indigo-500 hover:bg-white dark:hover:bg-zinc-800 rounded-xl transition-all shadow-sm">
-                        <Edit2 className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => handleDelete(fee.id)} className="p-2 text-zinc-400 hover:text-red-500 hover:bg-white dark:hover:bg-zinc-800 rounded-xl transition-all shadow-sm">
-                        <Trash2 className="w-4 h-4" />
-                    </button>
-                </div>
-            )
-        }
-    ];
 
     if (!user) return null;
 
@@ -180,7 +145,10 @@ export default function FeeStructurePage() {
                     </div>
                 ) : (
                     <Table
-                        columns={columns}
+                        columns={getFeeStructureColumns({
+                            onEdit: openEdit,
+                            onDelete: triggerDelete
+                        })}
                         data={structures}
                         loading={loading}
                         emptyMessage="No fee structures defined yet."

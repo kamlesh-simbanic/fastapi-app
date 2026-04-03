@@ -1,4 +1,4 @@
-export interface StaffMember {
+export interface Staff {
     id: number;
     name: string;
     mobile: string;
@@ -9,6 +9,3 @@ export interface StaffMember {
     leave_balance: number;
     created_at: string;
 }
-
-// Alias for generic use
-export type Staff = StaffMember;

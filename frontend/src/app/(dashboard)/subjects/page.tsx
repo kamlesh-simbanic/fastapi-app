@@ -21,7 +21,9 @@ import {
 import { cn } from '@/lib/utils';
 import { ConfirmBox } from '@/components/ConfirmBox';
 import Table, { Column } from '@/components/Table';
-import { Subject, Staff, Assignment } from '@/types';
+import { Subject, Assignment } from './types';
+import { Staff } from '../staff/types';
+import { getSubjectColumns } from './utils';
 
 
 export default function SubjectsPage() {
@@ -173,45 +175,6 @@ export default function SubjectsPage() {
         }
     };
 
-    const columns: Column<Subject>[] = [
-        {
-            key: 'name',
-            label: 'Subject Name',
-            className: 'text-sm font-bold text-zinc-900 dark:text-white uppercase tracking-tight'
-        },
-        {
-            key: 'actions',
-            label: 'Actions',
-            className: 'text-right',
-            render: (sub) => (
-                <div className="flex items-center justify-end gap-3">
-                    <button
-                        onClick={() => setSelectedSubject(sub)}
-                        className={cn(
-                            "p-2 rounded-xl transition-all",
-                            selectedSubject?.id === sub.id ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/20" : "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100"
-                        )}
-                        title="View Teachers"
-                    >
-                        <UserPlus className="w-4 h-4" />
-                    </button>
-                    <button
-                        onClick={() => openEdit(sub)}
-                        className="p-2 bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded-xl hover:bg-zinc-100 transition-all font-bold"
-                    >
-                        <Edit2 className="w-4 h-4" />
-                    </button>
-                    <button
-                        onClick={() => { setIdToDelete(sub.id); setDeleteConfirmOpen(true); }}
-                        className="p-2 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-100 transition-all font-bold"
-                    >
-                        <Trash2 className="w-4 h-4" />
-                    </button>
-                </div>
-            )
-        }
-    ];
-
     if (!user) return null;
 
     return (
@@ -336,7 +299,12 @@ export default function SubjectsPage() {
                         </div>
                     ) : (
                         <Table
-                            columns={columns}
+                            columns={getSubjectColumns({
+                                selectedSubjectId: selectedSubject?.id,
+                                onViewTeachers: setSelectedSubject,
+                                onEdit: openEdit,
+                                onDelete: (id) => { setIdToDelete(id); setDeleteConfirmOpen(true); }
+                            })}
                             data={filteredSubjects}
                             loading={loading}
                             emptyMessage="No subjects found matching your search."

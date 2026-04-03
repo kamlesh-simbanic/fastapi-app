@@ -10,14 +10,14 @@ import {
     AlertCircle,
     CheckCircle2,
     CalendarDays,
-    Clock,
     X,
-    Trash2
 } from 'lucide-react';
 
 import { ConfirmBox } from '@/components/ConfirmBox';
 import CalendarPicker from '@/components/CalendarPicker';
-import { Holiday } from '@/types';
+import { Holiday } from './types';
+import Table from '@/components/Table';
+import { getHolidayColumns } from './utils';
 
 
 export default function HolidaysPage() {
@@ -149,55 +149,15 @@ export default function HolidaysPage() {
                     <Loader2 className="w-12 h-12 text-indigo-500 animate-spin" />
                     <p className="font-bold text-sm tracking-widest uppercase opacity-70">Syncing holidays...</p>
                 </div>
-            ) : holidays.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-32 gap-6 text-center italic bg-zinc-50 dark:bg-zinc-900/50 rounded-[2.5rem] border-2 border-dashed border-zinc-200 dark:border-zinc-800">
-                    <Calendar className="w-16 h-16 text-zinc-200 dark:text-zinc-800" />
-                    <div>
-                        <h3 className="text-xl font-bold text-zinc-400">No holidays scheduled</h3>
-                        <p className="text-zinc-400 text-sm max-w-sm mx-auto">Start by adding a holiday for the academic year.</p>
-                    </div>
-                </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {holidays.map((holiday) => (
-                        <div
-                            key={holiday.id}
-                            className="group bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 p-8 shadow-sm hover:shadow-xl transition-all hover:border-amber-500/30 relative overflow-hidden"
-                        >
-                            {/* Decorative elements */}
-                            <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/5 -mr-8 -mt-8 rounded-full blur-2xl group-hover:bg-amber-500/10 transition-colors" />
-
-                            <div className="flex flex-col h-full space-y-4">
-                                <div className="flex items-start justify-between">
-                                    <div className="p-3 bg-zinc-50 dark:bg-zinc-950 rounded-2xl text-zinc-500 group-hover:text-amber-500 transition-colors group-hover:scale-110 duration-500">
-                                        <CalendarDays className="w-6 h-6" />
-                                    </div>
-                                    <button
-                                        onClick={() => triggerDelete(holiday.id)}
-                                        className="p-2 text-zinc-300 hover:text-red-500 transition-colors"
-                                    >
-                                        <Trash2 className="w-5 h-5" />
-                                    </button>
-                                </div>
-
-                                <div>
-                                    <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 group-hover:italic transition-all uppercase tracking-tight">
-                                        {holiday.name}
-                                    </h3>
-                                    <div className="mt-2 flex flex-wrap gap-2">
-                                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 text-[10px] font-black uppercase text-zinc-500 tracking-wider">
-                                            <Clock className="w-3 h-3 text-amber-500" />
-                                            {new Date(holiday.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                                        </span>
-                                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-900/20 text-[10px] font-black uppercase text-amber-600 dark:text-amber-400 tracking-wider">
-                                            {holiday.number_of_days} Day{holiday.number_of_days > 1 ? 's' : ''}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                <Table
+                    columns={getHolidayColumns({
+                        onDelete: triggerDelete
+                    })}
+                    data={holidays}
+                    loading={loading}
+                    emptyMessage="No holidays scheduled yet."
+                />
             )}
 
             {/* Add Holiday Modal */}
