@@ -12,18 +12,16 @@ import {
     Phone,
     MapPin,
     Briefcase,
-    ChevronRight,
     Loader2,
     X,
     LayoutGrid,
     List,
-    ChevronLeft,
     Pencil,
     ChevronDown,
     ArrowUp,
-    ArrowDown,
-    ArrowUpDown
+    ArrowDown
 } from 'lucide-react';
+import Table, { Column } from '@/components/Table';
 import { cn } from '@/lib/utils';
 import { DEPARTMENTS, getDepartmentColor } from '@/lib/departments';
 
@@ -96,6 +94,71 @@ export default function StaffPage() {
         }
     };
 
+    const columns: Column<StaffMember>[] = [
+        {
+            key: 'name',
+            label: 'Name',
+            sortable: true,
+            className: 'font-bold text-zinc-900 dark:text-white text-sm'
+        },
+        {
+            key: 'department',
+            label: 'Department',
+            render: (member) => (
+                <span className={cn("px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest border", getDepartmentColor(member.department))}>
+                    {member.department}
+                </span>
+            )
+        },
+        {
+            key: 'qualification',
+            label: 'Degree',
+            sortable: true,
+            className: 'text-xs font-medium text-zinc-500'
+        },
+        {
+            key: 'contact',
+            label: 'Contact Info',
+            render: (member) => (
+                <div className="text-[11px] text-zinc-400">
+                    <div className="text-zinc-600 dark:text-zinc-300 font-medium">{member.email}</div>
+                    <div>{member.mobile}</div>
+                </div>
+            )
+        },
+        {
+            key: 'city',
+            label: 'City',
+            sortable: true,
+            className: 'text-xs text-zinc-500'
+        },
+        {
+            key: 'created_at',
+            label: 'Joined',
+            sortable: true,
+            render: (member) => (
+                <span className="text-xs text-zinc-500">
+                    {new Date(member.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                </span>
+            )
+        },
+        {
+            key: 'actions',
+            label: '',
+            className: 'text-right',
+            render: (member) => (
+                <div className="flex items-center justify-end gap-1">
+                    <Link href={`/staff/edit?id=${member.id}`} className="p-2 text-zinc-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-xl transition-all">
+                        <Pencil className="w-4 h-4" />
+                    </Link>
+                    <button className="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all">
+                        <X className="w-4 h-4" />
+                    </button>
+                </div>
+            )
+        }
+    ];
+
     useEffect(() => {
         if (user) {
             const timer = setTimeout(() => {
@@ -132,7 +195,6 @@ export default function StaffPage() {
 
     if (!user) return null;
 
-    const totalPages = Math.ceil(total / pageSize);
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500 pb-10">
@@ -276,127 +338,24 @@ export default function StaffPage() {
                         ))}
                     </div>
                 ) : (
-                    <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-sm animate-in slide-in-from-bottom-4 duration-500">
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse">
-                                <thead className="bg-zinc-50/50 dark:bg-zinc-950/50 border-b border-zinc-200 dark:border-zinc-800">
-                                    <tr>
-                                        <th onClick={() => handleSort('name')} className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-widest cursor-pointer hover:text-indigo-500 transition-colors">
-                                            <div className="flex items-center gap-2">Name {sortBy === 'name' ? (sortOrder === 'asc' ? <ArrowUp className="w-3 h-3 text-indigo-500" /> : <ArrowDown className="w-3 h-3 text-indigo-500" />) : <ArrowUpDown className="w-3 h-3 text-zinc-300" />}</div>
-                                        </th>
-                                        <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-widest">Department</th>
-                                        <th onClick={() => handleSort('qualification')} className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-widest cursor-pointer hover:text-indigo-500 transition-colors">
-                                            <div className="flex items-center gap-2">Degree {sortBy === 'qualification' ? (sortOrder === 'asc' ? <ArrowUp className="w-3 h-3 text-indigo-500" /> : <ArrowDown className="w-3 h-3 text-indigo-500" />) : <ArrowUpDown className="w-3 h-3 text-zinc-300" />}</div>
-                                        </th>
-                                        <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-widest">Contact Info</th>
-                                        <th onClick={() => handleSort('city')} className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-widest cursor-pointer hover:text-indigo-500 transition-colors">
-                                            <div className="flex items-center gap-2">City {sortBy === 'city' ? (sortOrder === 'asc' ? <ArrowUp className="w-3 h-3 text-indigo-500" /> : <ArrowDown className="w-3 h-3 text-indigo-500" />) : <ArrowUpDown className="w-3 h-3 text-zinc-300" />}</div>
-                                        </th>
-                                        <th onClick={() => handleSort('created_at')} className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-widest cursor-pointer hover:text-indigo-500 transition-colors">
-                                            <div className="flex items-center gap-2">Joined {sortBy === 'created_at' ? (sortOrder === 'asc' ? <ArrowUp className="w-3 h-3 text-indigo-500" /> : <ArrowDown className="w-3 h-3 text-indigo-500" />) : <ArrowUpDown className="w-3 h-3 text-zinc-300" />}</div>
-                                        </th>
-                                        <th className="px-6 py-4 text-right"></th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
-                                    {staff.map((member) => (
-                                        <tr key={member.id} className="group hover:bg-zinc-50 dark:hover:bg-zinc-950/50 transition-colors">
-                                            <td className="px-6 py-4 font-bold text-zinc-900 dark:text-white text-sm">{member.name}</td>
-                                            <td className="px-6 py-4">
-                                                <span className={cn("px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest border", getDepartmentColor(member.department))}>{member.department}</span>
-                                            </td>
-                                            <td className="px-6 py-4 text-xs font-medium text-zinc-500">{member.qualification}</td>
-                                            <td className="px-6 py-4 text-[11px] text-zinc-400">
-                                                <div className="text-zinc-600 dark:text-zinc-300 font-medium">{member.email}</div>
-                                                <div>{member.mobile}</div>
-                                            </td>
-                                            <td className="px-6 py-4 text-xs text-zinc-500">{member.city}</td>
-                                            <td className="px-6 py-4 text-xs text-zinc-500">{new Date(member.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</td>
-                                            <td className="px-6 py-4 text-right">
-                                                <div className="flex items-center justify-end gap-1">
-                                                    <Link href={`/staff/edit?id=${member.id}`} className="p-2 text-zinc-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-xl transition-all"><Pencil className="w-4 h-4" /></Link>
-                                                    <button className="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all"><X className="w-4 h-4" /></button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                    <Table
+                        columns={columns}
+                        data={staff}
+                        loading={loading}
+                        totalCount={total}
+                        page={page}
+                        pageSize={pageSize}
+                        onPageChange={setPage}
+                        onPageSizeChange={setPageSize}
+                        pageSizeOptions={PAGE_SIZE_OPTIONS}
+                        sortBy={sortBy}
+                        sortOrder={sortOrder}
+                        onSort={handleSort}
+                        emptyMessage="No personnel found matching your filters."
+                    />
                 )}
             </div>
 
-            {/* Footer / Pagination */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-6 border-t border-zinc-200 dark:border-zinc-800">
-                <div className="flex flex-col sm:flex-row items-center gap-8">
-                    <div className="flex items-center gap-3">
-                        <span className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Viewing:</span>
-                        <div className="relative group">
-                            <select
-                                value={pageSize}
-                                onChange={(e) => setPageSize(Number(e.target.value))}
-                                className="appearance-none bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-2 pr-10 text-xs font-black text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 cursor-pointer shadow-sm"
-                            >
-                                {PAGE_SIZE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt} Row{opt > 1 ? 's' : ''}</option>)}
-                            </select>
-                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400 pointer-events-none" />
-                        </div>
-                    </div>
-                    <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">
-                        Found <span className="text-indigo-500 mx-1">{total}</span> Personnel Records
-                    </p>
-                </div>
-
-                <div className="flex items-center gap-2">
-                    <button
-                        disabled={page === 1}
-                        onClick={() => setPage(prev => prev - 1)}
-                        className="p-2 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-30 transition-all active:scale-95"
-                    >
-                        <ChevronLeft className="w-5 h-5" />
-                    </button>
-                    <div className="flex items-center gap-1">
-                        {(() => {
-                            const maxPages = 6;
-                            let startPage = Math.max(1, page - Math.floor(maxPages / 2));
-                            let endPage = startPage + maxPages - 1;
-
-                            if (endPage > totalPages) {
-                                endPage = totalPages;
-                                startPage = Math.max(1, endPage - maxPages + 1);
-                            }
-
-                            const pages = [];
-                            for (let i = startPage; i <= endPage; i++) {
-                                pages.push(i);
-                            }
-
-                            return pages.map((p) => (
-                                <button
-                                    key={p}
-                                    onClick={() => setPage(p)}
-                                    className={cn(
-                                        "w-9 h-9 rounded-xl text-xs font-bold transition-all",
-                                        page === p
-                                            ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/20"
-                                            : "text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                                    )}
-                                >
-                                    {p}
-                                </button>
-                            ));
-                        })()}
-                    </div>
-                    <button
-                        disabled={page === totalPages}
-                        onClick={() => setPage(prev => prev + 1)}
-                        className="p-2 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-30 transition-all active:scale-95"
-                    >
-                        <ChevronRight className="w-5 h-5" />
-                    </button>
-                </div>
-            </div>
         </div>
     );
 }

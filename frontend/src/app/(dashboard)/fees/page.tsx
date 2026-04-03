@@ -9,14 +9,13 @@ import {
     Search,
     LayoutGrid,
     List,
-    ChevronLeft,
-    ChevronRight,
     Loader2,
     ChevronDown,
     X,
     Eye,
     Plus
 } from 'lucide-react';
+import Table, { Column } from '@/components/Table';
 import { cn } from '@/lib/utils';
 
 
@@ -94,9 +93,86 @@ export default function FeesPage() {
         setPage(1);
     }, [search, pageSize, term, year, sortBy, sortOrder]);
 
+    const handleSort = (field: string) => {
+        if (sortBy === field) {
+            setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortBy(field);
+            setSortOrder('asc');
+        }
+    };
+
+    const columns: Column<FeePayment>[] = [
+        {
+            key: 'student',
+            label: 'Student',
+            render: (payment) => (
+                <div className="flex flex-col">
+                    <span className="text-sm font-black text-zinc-900 dark:text-white leading-tight">
+                        {payment.student?.name} {payment.student?.surname}
+                    </span>
+                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
+                        GR: {payment.gr_no}
+                    </span>
+                </div>
+            )
+        },
+        {
+            key: 'term',
+            label: 'Term/Year',
+            render: (payment) => (
+                <span className="text-xs font-bold text-zinc-600 dark:text-zinc-300 uppercase">
+                    {payment.term} - {payment.year}
+                </span>
+            )
+        },
+        {
+            key: 'amount',
+            label: 'Amount',
+            sortable: true,
+            render: (payment) => (
+                <span className="text-sm font-black text-emerald-600 dark:text-emerald-400">
+                    ${payment.amount.toLocaleString()}
+                </span>
+            )
+        },
+        {
+            key: 'payment_method',
+            label: 'Method',
+            sortable: true,
+            render: (payment) => (
+                <span className="text-[10px] font-black bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded uppercase tracking-widest">
+                    {payment.payment_method}
+                </span>
+            )
+        },
+        {
+            key: 'created_at',
+            label: 'Date',
+            sortable: true,
+            render: (payment) => (
+                <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
+                    {new Date(payment.created_at).toLocaleDateString()}
+                </span>
+            )
+        },
+        {
+            key: 'actions',
+            label: '',
+            className: 'text-right',
+            render: (payment) => (
+                <button
+                    onClick={() => setSelectedPayment(payment)}
+                    className="p-2.5 text-zinc-400 hover:text-emerald-500 hover:bg-white dark:hover:bg-zinc-800 rounded-xl transition-all shadow-sm"
+                >
+                    <Eye className="w-4 h-4" />
+                </button>
+            )
+        }
+    ];
+
     if (!user) return null;
 
-    const totalPages = Math.ceil(total / pageSize) || 1;
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500 pb-10">
@@ -258,127 +334,24 @@ export default function FeesPage() {
                         ))}
                     </div>
                 ) : (
-                    <div className="bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-sm animate-in slide-in-from-bottom-4 duration-500">
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-separate border-spacing-0">
-                                <thead className="bg-zinc-50/50 dark:bg-zinc-950/50">
-                                    <tr>
-                                        <th className="px-8 py-5 text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] border-b border-zinc-100 dark:border-zinc-800">Student</th>
-                                        <th className="px-8 py-5 text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] border-b border-zinc-100 dark:border-zinc-800">Term/Year</th>
-                                        <th className="px-8 py-5 text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] border-b border-zinc-100 dark:border-zinc-800">Amount</th>
-                                        <th className="px-8 py-5 text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] border-b border-zinc-100 dark:border-zinc-800">Method</th>
-                                        <th className="px-8 py-5 text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] border-b border-zinc-100 dark:border-zinc-800">Date</th>
-                                        <th className="px-8 py-5 border-b border-zinc-100 dark:border-zinc-800"></th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                                    {payments.map((payment) => (
-                                        <tr key={payment.id} className="group hover:bg-zinc-50 dark:hover:bg-zinc-950/50 transition-colors">
-                                            <td className="px-8 py-5">
-                                                <div className="flex flex-col">
-                                                    <span className="text-sm font-black text-zinc-900 dark:text-white leading-tight">{payment.student?.name} {payment.student?.surname}</span>
-                                                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">GR: {payment.gr_no}</span>
-                                                </div>
-                                            </td>
-                                            <td className="px-8 py-5">
-                                                <span className="text-xs font-bold text-zinc-600 dark:text-zinc-300 uppercase">{payment.term} - {payment.year}</span>
-                                            </td>
-                                            <td className="px-8 py-5 text-sm font-black text-emerald-600 dark:text-emerald-400">
-                                                ${payment.amount.toLocaleString()}
-                                            </td>
-                                            <td className="px-8 py-5">
-                                                <span className="text-[10px] font-black bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded uppercase tracking-widest">{payment.payment_method}</span>
-                                            </td>
-                                            <td className="px-8 py-5 text-xs font-bold text-zinc-500 uppercase tracking-widest">
-                                                {new Date(payment.created_at).toLocaleDateString()}
-                                            </td>
-                                            <td className="px-8 py-5 text-right">
-                                                <button
-                                                    onClick={() => setSelectedPayment(payment)}
-                                                    className="p-2.5 text-zinc-400 hover:text-emerald-500 hover:bg-white dark:hover:bg-zinc-800 rounded-xl transition-all shadow-sm"
-                                                >
-                                                    <Eye className="w-4 h-4" />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                    <Table
+                        columns={columns}
+                        data={payments}
+                        loading={loading}
+                        totalCount={total}
+                        page={page}
+                        pageSize={pageSize}
+                        onPageChange={setPage}
+                        onPageSizeChange={setPageSize}
+                        pageSizeOptions={PAGE_SIZE_OPTIONS}
+                        sortBy={sortBy}
+                        sortOrder={sortOrder}
+                        onSort={handleSort}
+                        emptyMessage="No payments recorded"
+                    />
                 )}
             </div>
 
-            {/* Footer / Pagination */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-8 pt-10 border-t border-zinc-200 dark:border-zinc-800">
-                <div className="flex flex-col sm:flex-row items-center gap-8">
-                    <div className="flex items-center gap-3">
-                        <span className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Viewing:</span>
-                        <div className="relative group">
-                            <select
-                                value={pageSize}
-                                onChange={(e) => setPageSize(Number(e.target.value))}
-                                className="appearance-none bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-2 pr-10 text-xs font-black text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 cursor-pointer shadow-sm"
-                            >
-                                {PAGE_SIZE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt} Row{opt > 1 ? 's' : ''}</option>)}
-                            </select>
-                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400 pointer-events-none" />
-                        </div>
-                    </div>
-                    <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">
-                        Found <span className="text-emerald-500 mx-1">{total}</span> Transaction Records
-                    </p>
-                </div>
-
-                <div className="flex items-center gap-2">
-                    <button
-                        disabled={page === 1}
-                        onClick={() => setPage(prev => prev - 1)}
-                        className="p-3 rounded-2xl border border-zinc-200 dark:border-zinc-800 hover:bg-white dark:hover:bg-zinc-800 disabled:opacity-30 transition-all active:scale-95 shadow-sm"
-                    >
-                        <ChevronLeft className="w-5 h-5" />
-                    </button>
-                    <div className="flex items-center gap-1.5 overflow-x-auto max-w-[200px] sm:max-w-none">
-                        {(() => {
-                            const maxPages = 6;
-                            let startPage = Math.max(1, page - Math.floor(maxPages / 2));
-                            let endPage = startPage + maxPages - 1;
-
-                            if (endPage > totalPages) {
-                                endPage = totalPages;
-                                startPage = Math.max(1, endPage - maxPages + 1);
-                            }
-
-                            const pages = [];
-                            for (let i = startPage; i <= endPage; i++) {
-                                pages.push(i);
-                            }
-
-                            return pages.map((p) => (
-                                <button
-                                    key={p}
-                                    onClick={() => setPage(p)}
-                                    className={cn(
-                                        "w-11 h-11 rounded-2xl text-xs font-black transition-all shadow-sm",
-                                        page === p
-                                            ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 active:scale-95"
-                                            : "bg-white dark:bg-zinc-900 text-zinc-500 hover:bg-zinc-50"
-                                    )}
-                                >
-                                    {p}
-                                </button>
-                            ));
-                        })()}
-                    </div>
-                    <button
-                        disabled={page === totalPages}
-                        onClick={() => setPage(prev => prev + 1)}
-                        className="p-3 rounded-2xl border border-zinc-200 dark:border-zinc-800 hover:bg-white dark:hover:bg-zinc-800 disabled:opacity-30 transition-all active:scale-95 shadow-sm"
-                    >
-                        <ChevronRight className="w-5 h-5" />
-                    </button>
-                </div>
-            </div>
 
             {/* Payment Summary Dialog */}
             {selectedPayment && (

@@ -13,6 +13,7 @@ import {
     AlertCircle,
     ChevronDown
 } from 'lucide-react';
+import Table, { Column } from '@/components/Table';
 
 interface SchoolClass {
     id: number;
@@ -107,6 +108,41 @@ export default function FeeStructurePage() {
             setError(err instanceof Error ? err.message : 'Failed to delete');
         }
     };
+    const columns: Column<FeeStructure>[] = [
+        {
+            key: 'class',
+            label: 'Class',
+            className: 'font-black text-zinc-900 dark:text-white capitalize',
+            render: (fee) => fee.school_class ? `${fee.school_class.standard} - ${fee.school_class.division}` : 'Unknown Class'
+        },
+        {
+            key: 'year',
+            label: 'Academic Year',
+            className: 'font-bold text-zinc-600 dark:text-zinc-400',
+            render: (fee) => fee.year
+        },
+        {
+            key: 'fee_amount',
+            label: 'Fee Amount',
+            className: 'font-black text-emerald-600 dark:text-emerald-400 text-lg',
+            render: (fee) => `$${fee.fee_amount.toLocaleString()}`
+        },
+        {
+            key: 'actions',
+            label: 'Actions',
+            className: 'text-right',
+            render: (fee) => (
+                <div className="flex items-center justify-end gap-2">
+                    <button onClick={() => handleEdit(fee)} className="p-2 text-zinc-400 hover:text-indigo-500 hover:bg-white dark:hover:bg-zinc-800 rounded-xl transition-all shadow-sm">
+                        <Edit2 className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => handleDelete(fee.id)} className="p-2 text-zinc-400 hover:text-red-500 hover:bg-white dark:hover:bg-zinc-800 rounded-xl transition-all shadow-sm">
+                        <Trash2 className="w-4 h-4" />
+                    </button>
+                </div>
+            )
+        }
+    ];
 
     if (!user) return null;
 
@@ -156,43 +192,12 @@ export default function FeeStructurePage() {
                         <p className="font-bold">No fee structures defined yet.</p>
                     </div>
                 ) : (
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-separate border-spacing-0">
-                            <thead className="bg-zinc-50/50 dark:bg-zinc-950/50">
-                                <tr>
-                                    <th className="px-8 py-5 text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] border-b border-zinc-100 dark:border-zinc-800">Class</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] border-b border-zinc-100 dark:border-zinc-800">Academic Year</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] border-b border-zinc-100 dark:border-zinc-800">Fee Amount</th>
-                                    <th className="px-8 py-5 border-b border-zinc-100 dark:border-zinc-800 text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                                {structures.map((fee) => (
-                                    <tr key={fee.id} className="group hover:bg-zinc-50 dark:hover:bg-zinc-950/50 transition-colors">
-                                        <td className="px-8 py-5 font-black text-zinc-900 dark:text-white capitalize">
-                                            {fee.school_class ? `${fee.school_class.standard} - ${fee.school_class.division}` : 'Unknown Class'}
-                                        </td>
-                                        <td className="px-8 py-5 font-bold text-zinc-600 dark:text-zinc-400">
-                                            {fee.year}
-                                        </td>
-                                        <td className="px-8 py-5 font-black text-emerald-600 dark:text-emerald-400 text-lg">
-                                            ${fee.fee_amount.toLocaleString()}
-                                        </td>
-                                        <td className="px-8 py-5 text-right">
-                                            <div className="flex items-center justify-end gap-2">
-                                                <button onClick={() => handleEdit(fee)} className="p-2 text-zinc-400 hover:text-indigo-500 hover:bg-white dark:hover:bg-zinc-800 rounded-xl transition-all shadow-sm">
-                                                    <Edit2 className="w-4 h-4" />
-                                                </button>
-                                                <button onClick={() => handleDelete(fee.id)} className="p-2 text-zinc-400 hover:text-red-500 hover:bg-white dark:hover:bg-zinc-800 rounded-xl transition-all shadow-sm">
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                    <Table
+                        columns={columns}
+                        data={structures}
+                        loading={loading}
+                        emptyMessage="No fee structures defined yet."
+                    />
                 )}
             </div>
 

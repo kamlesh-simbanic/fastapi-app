@@ -14,15 +14,30 @@ import {
     LayoutGrid,
     List,
     AlertCircle,
-    UserPlus
+    UserPlus,
+    UserMinus,
+    ArrowRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ConfirmBox } from '@/components/ConfirmBox';
-import Link from 'next/link';
+import Table, { Column } from '@/components/Table';
 
 interface Subject {
     id: number;
     name: string;
+}
+
+interface Staff {
+    id: number;
+    name: string;
+    department?: string;
+}
+
+interface Assignment {
+    id: number;
+    subject_id: number;
+    teacher_id: number;
+    teacher?: Staff;
 }
 
 export default function SubjectsPage() {
@@ -40,6 +55,12 @@ export default function SubjectsPage() {
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
     const [idToDelete, setIdToDelete] = useState<number | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
+    const [assignments, setAssignments] = useState<Assignment[]>([]);
+    const [loadingAssignments, setLoadingAssignments] = useState(false);
+    const [allStaff, setAllStaff] = useState<Staff[]>([]);
+    const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+    const [assigningTeacherId, setAssigningTeacherId] = useState<string>('');
 
     const fetchSubjects = useCallback(async () => {
         setLoading(true);
@@ -47,19 +68,50 @@ export default function SubjectsPage() {
         try {
             const data = await api.getSubjects();
             setSubjects(data);
+            if (data.length > 0 && !selectedSubject) {
+                setSelectedSubject(data[0]);
+            }
         } catch (err: unknown) {
             console.error('Failed to fetch subjects:', err);
             setError('Failed to load subjects.');
         } finally {
             setLoading(false);
         }
+    }, [selectedSubject]);
+
+    const fetchAssignments = useCallback(async (subjectId: number) => {
+        setLoadingAssignments(true);
+        try {
+            const data = await api.getSubjectAssignments(subjectId);
+            setAssignments(data);
+        } catch (err: unknown) {
+            console.error('Failed to fetch assignments:', err);
+        } finally {
+            setLoadingAssignments(false);
+        }
+    }, []);
+
+    const fetchStaff = useCallback(async () => {
+        try {
+            const data = await api.getStaff({ limit: 100 });
+            setAllStaff(data.items);
+        } catch (err: unknown) {
+            console.error('Failed to fetch staff:', err);
+        }
     }, []);
 
     useEffect(() => {
         if (user) {
             fetchSubjects();
+            fetchStaff();
         }
-    }, [fetchSubjects, user]);
+    }, [user]);
+
+    useEffect(() => {
+        if (selectedSubject) {
+            fetchAssignments(selectedSubject.id);
+        }
+    }, [selectedSubject, fetchAssignments]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -108,6 +160,73 @@ export default function SubjectsPage() {
     const filteredSubjects = subjects.filter(s =>
         s.name.toLowerCase().includes(search.toLowerCase())
     );
+
+    const handleAssign = async () => {
+        if (!selectedSubject || !assigningTeacherId) return;
+        setSubmitting(true);
+        try {
+            await api.assignTeacher({
+                subject_id: selectedSubject.id,
+                teacher_id: parseInt(assigningTeacherId)
+            });
+            fetchAssignments(selectedSubject.id);
+            setAssigningTeacherId('');
+            setIsAssignModalOpen(false);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Failed to assign teacher');
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const handleUnassign = async (assignmentId: number) => {
+        if (!selectedSubject) return;
+        try {
+            await api.unassignTeacher(assignmentId);
+            fetchAssignments(selectedSubject.id);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Failed to unassign teacher');
+        }
+    };
+
+    const columns: Column<Subject>[] = [
+        {
+            key: 'name',
+            label: 'Subject Name',
+            className: 'text-sm font-bold text-zinc-900 dark:text-white uppercase tracking-tight'
+        },
+        {
+            key: 'actions',
+            label: 'Actions',
+            className: 'text-right',
+            render: (sub) => (
+                <div className="flex items-center justify-end gap-3">
+                    <button
+                        onClick={() => setSelectedSubject(sub)}
+                        className={cn(
+                            "p-2 rounded-xl transition-all",
+                            selectedSubject?.id === sub.id ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/20" : "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100"
+                        )}
+                        title="View Teachers"
+                    >
+                        <UserPlus className="w-4 h-4" />
+                    </button>
+                    <button
+                        onClick={() => openEdit(sub)}
+                        className="p-2 bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded-xl hover:bg-zinc-100 transition-all font-bold"
+                    >
+                        <Edit2 className="w-4 h-4" />
+                    </button>
+                    <button
+                        onClick={() => { setIdToDelete(sub.id); setDeleteConfirmOpen(true); }}
+                        className="p-2 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-100 transition-all font-bold"
+                    >
+                        <Trash2 className="w-4 h-4" />
+                    </button>
+                </div>
+            )
+        }
+    ];
 
     if (!user) return null;
 
@@ -182,77 +301,148 @@ export default function SubjectsPage() {
             )}
 
             {/* Content */}
-            <div className="min-h-[400px]">
-                {loading ? (
-                    <div className="flex flex-col items-center justify-center py-32 gap-4 text-zinc-500">
-                        <Loader2 className="w-12 h-12 text-indigo-500 animate-spin" />
-                        <p className="font-bold text-sm tracking-widest uppercase opacity-70">Loading subjects...</p>
-                    </div>
-                ) : filteredSubjects.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-20 gap-4 bg-zinc-50 dark:bg-zinc-900/30 rounded-3xl border border-dashed border-zinc-200 dark:border-zinc-800 text-center">
-                        <BookOpen className="w-12 h-12 text-zinc-300" />
-                        <h3 className="text-lg font-bold text-zinc-900 dark:text-white">No subjects found</h3>
-                        <p className="text-zinc-500 text-sm max-w-xs">Create subjects to start assigning them to teachers.</p>
-                    </div>
-                ) : viewMode === 'grid' ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {filteredSubjects.map((sub) => (
-                            <div key={sub.id} className="group p-6 rounded-[2.5rem] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-indigo-500/30 transition-all hover:shadow-2xl hover:shadow-indigo-500/5 flex flex-col">
-                                <div className="flex justify-between items-start mb-6">
-                                    <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center">
-                                        <BookOpen className="w-6 h-6 text-indigo-600" />
+            <div className="flex flex-col lg:flex-row gap-8 min-h-[600px] items-start">
+                {/* Left Panel: Subjects */}
+                <div className={cn(
+                    "w-full lg:w-1/2 space-y-6 transition-all duration-500",
+                    loading ? "opacity-50 pointer-events-none" : "opacity-100"
+                )}>
+                    {loading ? (
+                        <div className="flex flex-col items-center justify-center py-32 gap-4 text-zinc-500 bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                            <Loader2 className="w-12 h-12 text-indigo-500 animate-spin" />
+                            <p className="font-bold text-sm tracking-widest uppercase opacity-70">Loading subjects...</p>
+                        </div>
+                    ) : filteredSubjects.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-20 gap-4 bg-zinc-50 dark:bg-zinc-900/30 rounded-3xl border border-dashed border-zinc-200 dark:border-zinc-800 text-center">
+                            <BookOpen className="w-12 h-12 text-zinc-300" />
+                            <h3 className="text-lg font-bold text-zinc-900 dark:text-white">No subjects found</h3>
+                            <p className="text-zinc-500 text-sm max-w-xs">Create subjects to start assigning them to teachers.</p>
+                        </div>
+                    ) : viewMode === 'grid' ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            {filteredSubjects.map((sub) => (
+                                <button
+                                    key={sub.id}
+                                    onClick={() => setSelectedSubject(sub)}
+                                    className={cn(
+                                        "group p-6 rounded-[2.5rem] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 transition-all text-left relative overflow-hidden",
+                                        selectedSubject?.id === sub.id ? "ring-2 ring-indigo-500 border-transparent shadow-2xl shadow-indigo-500/10" : "hover:border-indigo-500/30 hover:shadow-xl"
+                                    )}
+                                >
+                                    <div className="flex justify-between items-start mb-6">
+                                        <div className={cn(
+                                            "w-12 h-12 rounded-2xl flex items-center justify-center transition-colors",
+                                            selectedSubject?.id === sub.id ? "bg-indigo-500 text-white" : "bg-indigo-500/10 text-indigo-600"
+                                        )}>
+                                            <BookOpen className="w-6 h-6" />
+                                        </div>
+                                        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                                            <button onClick={() => openEdit(sub)} className="p-2 text-zinc-400 hover:text-indigo-500 transition-colors"><Edit2 className="w-4 h-4" /></button>
+                                            <button onClick={() => { setIdToDelete(sub.id); setDeleteConfirmOpen(true); }} className="p-2 text-zinc-400 hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                        <button onClick={() => openEdit(sub)} className="p-2 text-zinc-400 hover:text-indigo-500 transition-colors"><Edit2 className="w-4 h-4" /></button>
-                                        <button onClick={() => { setIdToDelete(sub.id); setDeleteConfirmOpen(true); }} className="p-2 text-zinc-400 hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
-                                    </div>
-                                </div>
-                                <h3 className="text-xl font-black text-zinc-900 dark:text-white tracking-tight italic mb-6">{sub.name}</h3>
+                                    <h3 className="text-xl font-black text-zinc-900 dark:text-white tracking-tight italic">{sub.name}</h3>
+                                    {selectedSubject?.id === sub.id && (
+                                        <div className="absolute right-6 bottom-6 animate-in slide-in-from-right-2 fade-in">
+                                            <ArrowRight className="w-5 h-5 text-indigo-500" />
+                                        </div>
+                                    )}
+                                </button>
+                            ))}
+                        </div>
+                    ) : (
+                        <Table
+                            columns={columns}
+                            data={filteredSubjects}
+                            loading={loading}
+                            emptyMessage="No subjects found matching your search."
+                        />
+                    )}
+                </div>
 
-                                <div className="mt-auto pt-6 border-t border-zinc-100 dark:border-zinc-800/50">
-                                    <Link
-                                        href={`/subjects/assign?subjectId=${sub.id}`}
-                                        className="flex items-center gap-2 text-indigo-500 hover:text-indigo-600 text-xs font-black uppercase tracking-widest transition-colors"
+                {/* Right Panel: Assigned Teachers */}
+                <div className="w-full lg:w-1/2 animate-in slide-in-from-right-4 duration-500 sticky top-8">
+                    {selectedSubject ? (
+                        <div className="bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-xl overflow-hidden flex flex-col min-h-[500px]">
+                            {/* Panel Header */}
+                            <div className="p-8 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                    <div className="space-y-1">
+                                        <div className="px-3 py-1 bg-indigo-500/10 text-indigo-500 rounded-full text-[10px] font-black uppercase tracking-widest inline-block mb-1">
+                                            Assigned Teachers
+                                        </div>
+                                        <h2 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight italic flex items-center gap-3">
+                                            {selectedSubject.name}
+                                        </h2>
+                                    </div>
+                                    <button
+                                        onClick={() => setIsAssignModalOpen(true)}
+                                        className="px-4 py-2 bg-indigo-500 text-white rounded-xl text-xs font-bold hover:bg-indigo-600 shadow-lg shadow-indigo-500/20 active:scale-95 transition-all flex items-center justify-center gap-2 whitespace-nowrap"
                                     >
-                                        <UserPlus className="w-4 h-4" />
-                                        Assign Teachers
-                                    </Link>
+                                        <Plus className="w-4 h-4" />
+                                        Assign New
+                                    </button>
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                ) : (
-                    <div className="bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-sm">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="bg-zinc-50/50 dark:bg-zinc-900/50">
-                                    <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest border-b border-zinc-100 dark:border-zinc-800">Subject Name</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest border-b border-zinc-100 dark:border-zinc-800 text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/50">
-                                {filteredSubjects.map((sub) => (
-                                    <tr key={sub.id} className="group hover:bg-zinc-50/[0.5] dark:hover:bg-zinc-800/30 transition-colors">
-                                        <td className="px-8 py-5 text-sm font-bold text-zinc-900 dark:text-white uppercase tracking-tight">{sub.name}</td>
-                                        <td className="px-8 py-5 text-right">
-                                            <div className="flex items-center justify-end gap-3">
-                                                <Link
-                                                    href={`/subjects/assign?subjectId=${sub.id}`}
-                                                    className="p-2 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-xl hover:bg-indigo-100 transition-all"
-                                                    title="Assign Teachers"
+
+                            {/* Panel Content */}
+                            <div className="flex-1 p-8">
+                                {loadingAssignments ? (
+                                    <div className="flex flex-col items-center justify-center py-20 gap-4 text-zinc-400">
+                                        <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+                                        <p className="font-bold text-[10px] uppercase tracking-widest">Loading assignments...</p>
+                                    </div>
+                                ) : assignments.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center py-20 gap-4 text-center">
+                                        <div className="w-16 h-16 rounded-3xl bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center">
+                                            <UserPlus className="w-8 h-8 text-zinc-300" />
+                                        </div>
+                                        <h3 className="font-bold text-zinc-900 dark:text-white text-lg">No teachers assigned</h3>
+                                        <p className="text-zinc-500 text-sm max-w-[240px]">Start by assigning a teacher to this subject.</p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        {assignments.map((as) => (
+                                            <div key={as.id} className="group flex items-center justify-between p-4 rounded-2xl border border-zinc-100 dark:border-zinc-800 hover:border-indigo-500/20 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-all">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-500 font-bold uppercase">
+                                                        {as.teacher?.name.charAt(0)}
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="font-black text-zinc-900 dark:text-white italic tracking-tight">{as.teacher?.name}</h4>
+                                                        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{as.teacher?.department || 'Teacher'}</p>
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    onClick={() => handleUnassign(as.id)}
+                                                    className="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                                                    title="Unassign"
                                                 >
-                                                    <UserPlus className="w-4 h-4" />
-                                                </Link>
-                                                <button onClick={() => openEdit(sub)} className="p-2 bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded-xl hover:bg-zinc-100 transition-all"><Edit2 className="w-4 h-4" /></button>
-                                                <button onClick={() => { setIdToDelete(sub.id); setDeleteConfirmOpen(true); }} className="p-2 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-100 transition-all"><Trash2 className="w-4 h-4" /></button>
+                                                    <UserMinus className="w-4 h-4" />
+                                                </button>
                                             </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Panel Footer */}
+                            <div className="p-6 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-900/30">
+                                <div className="flex items-center justify-between text-[10px] font-black text-zinc-400 uppercase tracking-widest">
+                                    <span>Total Assigned</span>
+                                    <span className="bg-white dark:bg-zinc-800 px-3 py-1 rounded-full border border-zinc-200 dark:border-zinc-700 text-indigo-500">
+                                        {assignments.length} Teachers
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="h-full bg-zinc-50/50 dark:bg-zinc-900/30 rounded-[2.5rem] border border-dashed border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center p-12 text-center text-zinc-400">
+                            <BookOpen className="w-12 h-12 mb-4 opacity-20" />
+                            <p className="font-bold text-sm tracking-widest uppercase opacity-50">Select a subject to view assignments</p>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Dialog */}
@@ -296,6 +486,54 @@ export default function SubjectsPage() {
                 variant="danger"
                 confirmText="Delete"
             />
+
+            {/* Assign Teacher Dialog */}
+            {isAssignModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+                    <div className="bg-white dark:bg-zinc-950 w-full max-w-md rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+                        <div className="p-8 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+                            <h2 className="text-xl font-black text-zinc-900 dark:text-white flex items-center gap-3">
+                                <UserPlus className="w-5 h-5 text-indigo-500" />
+                                Assign Teacher
+                            </h2>
+                            <button onClick={() => setIsAssignModalOpen(false)} className="p-2 hover:bg-zinc-100 rounded-xl transition-colors font-bold"><X className="w-5 h-5 font-bold" /></button>
+                        </div>
+                        <div className="p-8 space-y-6">
+                            <div>
+                                <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2 block font-bold">Select Teacher</label>
+                                <div className="relative">
+                                    <select
+                                        value={assigningTeacherId}
+                                        onChange={(e) => setAssigningTeacherId(e.target.value)}
+                                        className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-3.5 px-4 text-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-bold appearance-none cursor-pointer"
+                                    >
+                                        <option value="">Choose a staff member...</option>
+                                        {allStaff
+                                            .filter(s => !assignments.some(a => a.teacher_id === s.id))
+                                            .map((s) => (
+                                                <option key={s.id} value={s.id}>{s.name} ({s.department || 'No Dept'})</option>
+                                            ))
+                                        }
+                                    </select>
+                                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-400">
+                                        <LayoutGrid className="w-4 h-4" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex gap-4">
+                                <button type="button" onClick={() => setIsAssignModalOpen(false)} className="flex-1 py-3 px-4 rounded-2xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-black uppercase tracking-widest font-bold grayscale hover:grayscale-0 transition-all">Cancel</button>
+                                <button
+                                    onClick={handleAssign}
+                                    disabled={submitting || !assigningTeacherId}
+                                    className="flex-1 py-3 px-4 rounded-2xl bg-indigo-500 text-white text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20 active:scale-95 disabled:grayscale disabled:opacity-50 transition-all font-bold"
+                                >
+                                    {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Assign Now'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

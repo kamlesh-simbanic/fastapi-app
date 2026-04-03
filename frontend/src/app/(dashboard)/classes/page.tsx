@@ -18,6 +18,7 @@ import {
     LayoutGrid,
     List
 } from 'lucide-react';
+import Table, { Column } from '@/components/Table';
 import { cn } from '@/lib/utils';
 import { ConfirmBox } from '@/components/ConfirmBox';
 
@@ -152,6 +153,58 @@ export default function ClassesPage() {
         setIsAddOpen(true);
     };
 
+    const columns: Column<SchoolClass>[] = [
+        {
+            key: 'standard',
+            label: 'Standard / Level',
+            className: 'text-sm font-black text-zinc-900 dark:text-white tracking-tight italic uppercase'
+        },
+        {
+            key: 'division',
+            label: 'Division',
+            render: (cls) => (
+                <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-500 font-black text-[10px]">
+                    {cls.division}
+                </div>
+            )
+        },
+        {
+            key: 'class_teacher',
+            label: 'Class Teacher',
+            render: (cls) => (
+                <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+                        <User className="w-4 h-4 text-zinc-400" />
+                    </div>
+                    <span className="text-sm font-bold text-zinc-700 dark:text-zinc-300">
+                        {cls.class_teacher?.name || 'Not assigned'}
+                    </span>
+                </div>
+            )
+        },
+        {
+            key: 'actions',
+            label: 'Actions',
+            className: 'text-right',
+            render: (cls) => (
+                <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                        onClick={() => openEdit(cls)}
+                        className="p-2 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-xl hover:bg-indigo-100 transition-all active:scale-95 font-bold"
+                    >
+                        <Edit2 className="w-4 h-4" />
+                    </button>
+                    <button
+                        onClick={() => triggerDelete(cls.id)}
+                        className="p-2 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-100 transition-all active:scale-95 font-bold"
+                    >
+                        <Trash2 className="w-4 h-4" />
+                    </button>
+                </div>
+            )
+        }
+    ];
+
     if (!user) return null;
 
     return (
@@ -276,62 +329,17 @@ export default function ClassesPage() {
                         ))}
                     </div>
                 ) : (
-                    <div className="bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-sm animate-in fade-in duration-500">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="bg-zinc-50/50 dark:bg-zinc-900/50">
-                                    <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest border-b border-zinc-100 dark:border-zinc-800">Standard / Level</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest border-b border-zinc-100 dark:border-zinc-800">Division</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest border-b border-zinc-100 dark:border-zinc-800">Class Teacher</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest border-b border-zinc-100 dark:border-zinc-800 text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/50">
-                                {classes.map((cls) => (
-                                    <tr key={cls.id} className="group hover:bg-zinc-50/[0.5] dark:hover:bg-zinc-800/30 transition-colors">
-                                        <td className="px-8 py-5">
-                                            <span className="text-sm font-black text-zinc-900 dark:text-white tracking-tight italic uppercase">
-                                                Standard {cls.standard}
-                                            </span>
-                                        </td>
-                                        <td className="px-8 py-5">
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-500 font-black text-[10px]">
-                                                    {cls.division}
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-8 py-5">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
-                                                    <User className="w-4 h-4 text-zinc-400" />
-                                                </div>
-                                                <span className="text-sm font-bold text-zinc-700 dark:text-zinc-300">
-                                                    {cls.class_teacher?.name || 'Not assigned'}
-                                                </span>
-                                            </div>
-                                        </td>
-                                        <td className="px-8 py-5 text-right">
-                                            <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button
-                                                    onClick={() => openEdit(cls)}
-                                                    className="p-2 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-xl hover:bg-indigo-100 transition-all active:scale-95"
-                                                >
-                                                    <Edit2 className="w-4 h-4" />
-                                                </button>
-                                                <button
-                                                    onClick={() => triggerDelete(cls.id)}
-                                                    className="p-2 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-100 transition-all active:scale-95"
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                    <Table
+                        columns={columns}
+                        data={classes}
+                        loading={loading}
+                        totalCount={total}
+                        page={page}
+                        pageSize={pageSize}
+                        onPageChange={setPage}
+                        onPageSizeChange={setPageSize}
+                        emptyMessage="No classes found matching your search."
+                    />
                 )}
             </div>
 
@@ -414,83 +422,6 @@ export default function ClassesPage() {
                 </div>
             )}
 
-            {/* Pagination Footer */}
-            {!loading && total > 0 && (
-                <div className="mt-8 bg-white dark:bg-zinc-900 p-6 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
-                    <div className="flex items-center gap-4 order-2 md:order-1">
-                        <div className="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl">
-                            {[5, 10, 20, 50].map((size) => (
-                                <button
-                                    key={size}
-                                    onClick={() => {
-                                        setPageSize(size);
-                                        setPage(1);
-                                    }}
-                                    className={cn(
-                                        "px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
-                                        pageSize === size
-                                            ? "bg-white dark:bg-zinc-700 shadow-sm text-indigo-500"
-                                            : "text-zinc-400 hover:text-zinc-500"
-                                    )}
-                                >
-                                    {size}
-                                </button>
-                            ))}
-                        </div>
-                        <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Rows per page</span>
-                    </div>
-
-                    <div className="flex items-center gap-2 order-1 md:order-2">
-                        {(() => {
-                            const totalPages = Math.ceil(total / pageSize);
-                            let startPage = Math.max(1, page - 2);
-                            const endPage = Math.min(totalPages, startPage + 5);
-                            if (endPage - startPage < 5) {
-                                startPage = Math.max(1, endPage - 5);
-                            }
-
-                            return (
-                                <>
-                                    <button
-                                        disabled={page === 1}
-                                        onClick={() => setPage(p => p - 1)}
-                                        className="p-2 rounded-xl border border-zinc-200 dark:border-zinc-800 disabled:opacity-30 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all font-bold"
-                                    >
-                                        &larr;
-                                    </button>
-                                    <div className="flex items-center gap-1">
-                                        {Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map((p) => (
-                                            <button
-                                                key={p}
-                                                onClick={() => setPage(p)}
-                                                className={cn(
-                                                    "w-10 h-10 rounded-xl text-sm font-bold transition-all",
-                                                    page === p
-                                                        ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/20"
-                                                        : "hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500"
-                                                )}
-                                            >
-                                                {p}
-                                            </button>
-                                        ))}
-                                    </div>
-                                    <button
-                                        disabled={page === totalPages}
-                                        onClick={() => setPage(p => p + 1)}
-                                        className="p-2 rounded-xl border border-zinc-200 dark:border-zinc-800 disabled:opacity-30 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all font-bold"
-                                    >
-                                        &rarr;
-                                    </button>
-                                </>
-                            );
-                        })()}
-                    </div>
-
-                    <div className="text-[10px] font-black text-zinc-400 uppercase tracking-widest order-3">
-                        Showing {(page - 1) * pageSize + 1} to {Math.min(page * pageSize, total)} of {total} Results
-                    </div>
-                </div>
-            )}
             {/* Confirm Box */}
             <ConfirmBox
                 isOpen={deleteConfirmOpen}
