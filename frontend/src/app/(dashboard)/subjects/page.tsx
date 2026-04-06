@@ -26,11 +26,12 @@ import { Staff } from '../staff/types';
 import { getSubjectColumns } from './utils';
 
 
+import { useGlobalData } from '@/context/GlobalContext';
+
 export default function SubjectsPage() {
     const { user } = useAuth();
+    const { subjects: allSubjects, loading: globalLoading, refreshSubjects } = useGlobalData();
 
-    const [subjects, setSubjects] = useState<Subject[]>([]);
-    const [loading, setLoading] = useState(true);
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [search, setSearch] = useState('');
     const [isAddOpen, setIsAddOpen] = useState(false);
@@ -48,22 +49,12 @@ export default function SubjectsPage() {
     const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
     const [assigningTeacherId, setAssigningTeacherId] = useState<string>('');
 
-    const fetchSubjects = useCallback(async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            const data = await api.getSubjects();
-            setSubjects(data);
-            if (data.length > 0 && !selectedSubject) {
-                setSelectedSubject(data[0]);
-            }
-        } catch (err: unknown) {
-            console.error('Failed to fetch subjects:', err);
-            setError('Failed to load subjects.');
-        } finally {
-            setLoading(false);
+    // Set initial selected subject once data is loaded
+    useEffect(() => {
+        if (allSubjects.length > 0 && !selectedSubject) {
+            setSelectedSubject(allSubjects[0]);
         }
-    }, [selectedSubject]);
+    }, [allSubjects, selectedSubject]);
 
     const fetchAssignments = useCallback(async (subjectId: number) => {
         setLoadingAssignments(true);
@@ -88,10 +79,9 @@ export default function SubjectsPage() {
 
     useEffect(() => {
         if (user) {
-            fetchSubjects();
             fetchStaff();
         }
-    }, [user]);
+    }, [user, fetchStaff]);
 
     useEffect(() => {
         if (selectedSubject) {
@@ -112,7 +102,7 @@ export default function SubjectsPage() {
             setIsAddOpen(false);
             setEditingSubject(null);
             setFormData({ name: '' });
-            fetchSubjects();
+            refreshSubjects();
         } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : 'Failed to save subject.';
             setError(msg);
@@ -126,7 +116,7 @@ export default function SubjectsPage() {
         setIsDeleting(true);
         try {
             await api.deleteSubject(idToDelete);
-            fetchSubjects();
+            refreshSubjects();
             setDeleteConfirmOpen(false);
         } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : 'Failed to delete subject.';
@@ -143,7 +133,7 @@ export default function SubjectsPage() {
         setIsAddOpen(true);
     };
 
-    const filteredSubjects = subjects.filter(s =>
+    const filteredSubjects = allSubjects.filter((s: Subject) =>
         s.name.toLowerCase().includes(search.toLowerCase())
     );
 
@@ -252,9 +242,9 @@ export default function SubjectsPage() {
                 {/* Left Panel: Subjects */}
                 <div className={cn(
                     "w-full lg:w-1/2 space-y-6 transition-all duration-500 max-h-[600px] overflow-y-auto pr-4 custom-scrollbar",
-                    loading ? "opacity-50 pointer-events-none" : "opacity-100"
+                    globalLoading.subjects ? "opacity-50 pointer-events-none" : "opacity-100"
                 )}>
-                    {loading ? (
+                    {globalLoading.subjects ? (
                         <div className="flex flex-col items-center justify-center py-32 gap-4 text-zinc-500 bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-sm">
                             <Loader2 className="w-12 h-12 text-indigo-500 animate-spin" />
                             <p className="font-bold text-sm tracking-widest uppercase opacity-70">Loading subjects...</p>
@@ -267,7 +257,7 @@ export default function SubjectsPage() {
                         </div>
                     ) : viewMode === 'grid' ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            {filteredSubjects.map((sub) => (
+                            {filteredSubjects.map((sub: Subject) => (
                                 <button
                                     key={sub.id}
                                     onClick={() => setSelectedSubject(sub)}
@@ -306,7 +296,7 @@ export default function SubjectsPage() {
                                 onDelete: (id) => { setIdToDelete(id); setDeleteConfirmOpen(true); }
                             })}
                             data={filteredSubjects}
-                            loading={loading}
+                            loading={globalLoading.subjects}
                             emptyMessage="No subjects found matching your search."
                         />
                     )}

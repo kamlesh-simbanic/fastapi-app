@@ -8,68 +8,25 @@ import {
     Search,
     Download
 } from 'lucide-react';
-import { api } from '@/lib/api';
-
-interface TimetableRecord {
-    id: number;
-    day_of_week: string;
-    period_number: number;
-    subject: { id: number; name: string };
-    teacher: { id: number; name: string };
-}
-
-interface ClassData {
-    id: number;
-    standard: string;
-    division: string;
-}
+import { useGlobalData } from '@/context/GlobalContext';
 
 export default function TimetablePage() {
-    const [classes, setClasses] = useState<ClassData[]>([]);
+    const { classes, timetables, loading: globalLoading, refreshTimetable } = useGlobalData();
     const [selectedClassId, setSelectedClassId] = useState<number | null>(null);
-    const [timetable, setTimetable] = useState<TimetableRecord[]>([]);
-    const [loading, setLoading] = useState(false);
+
+    const activeClassId = selectedClassId || (classes.length > 0 ? classes[0].id : null);
 
     const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const PERIODS = [1, 2, 3, 4, 5, 6];
 
     useEffect(() => {
-        fetchClasses();
-    }, []);
-
-    useEffect(() => {
-        if (selectedClassId) {
-            fetchTimetable(selectedClassId);
+        if (activeClassId && !timetables[activeClassId]) {
+            refreshTimetable(activeClassId);
         }
-    }, [selectedClassId]);
+    }, [activeClassId, timetables, refreshTimetable]);
 
-    const fetchClasses = async () => {
-        try {
-            const data = await api.getClasses({ limit: 100 });
-
-
-            setClasses(data.items || []);
-            if (data.items?.length > 0) {
-                setSelectedClassId(data.items[0].id);
-            }
-        } catch (error) {
-            console.log("error", error);
-
-            console.error('Failed to fetch classes', error);
-        }
-    };
-
-    const fetchTimetable = async (classId: number) => {
-        setLoading(true);
-        try {
-            const data = await api.getTimetable(classId);
-            setTimetable(data.schedule || []);
-        } catch (error) {
-            console.error('Failed to fetch timetable', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    const timetable = activeClassId ? timetables[activeClassId] || [] : [];
+    const loading = globalLoading.timetables;
 
     const getSlotData = (day: string, period: number) => {
         return timetable.find(t => t.day_of_week === day && t.period_number === period);
@@ -99,7 +56,7 @@ export default function TimetablePage() {
                     </label>
                     <div className="relative">
                         <select
-                            value={selectedClassId || ''}
+                            value={activeClassId || ''}
                             onChange={(e) => setSelectedClassId(Number(e.target.value))}
                             className="w-full h-12 pl-12 pr-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all appearance-none cursor-pointer"
                         >

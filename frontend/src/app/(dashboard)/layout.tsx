@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import { useAuth } from '@/components/AuthContext';
 import { useRouter, usePathname } from 'next/navigation';
 import { DashboardLayout } from '@/components/DashboardLayout';
+import { GlobalDataProvider } from '@/context/GlobalContext';
 import { Layers } from 'lucide-react';
 import { hasPermission } from '@/lib/permissions';
 
@@ -39,5 +40,9 @@ export default function AuthenticatedLayout({
         );
     }
 
-    return <DashboardLayout>{children}</DashboardLayout>;
+    return (
+        <GlobalDataProvider>
+            <DashboardLayout>{children}</DashboardLayout>
+        </GlobalDataProvider>
+    );
 }

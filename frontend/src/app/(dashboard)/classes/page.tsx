@@ -18,7 +18,7 @@ import {
     LayoutGrid,
     List
 } from 'lucide-react';
-import Table, { Column } from '@/components/Table';
+import Table from '@/components/Table';
 import { cn } from '@/lib/utils';
 import { ConfirmBox } from '@/components/ConfirmBox';
 import { SchoolClass } from './types';
@@ -26,17 +26,18 @@ import { Staff } from '../staff/types';
 import { getClassColumns } from './utils';
 
 
+import { useGlobalData } from '@/context/GlobalContext';
+
 export default function ClassesPage() {
     const { user } = useAuth();
+    const { classes: allClasses, loading: globalLoading, refreshClasses } = useGlobalData();
 
-    const [classes, setClasses] = useState<SchoolClass[]>([]);
     const [staff, setStaff] = useState<Staff[]>([]);
     const [loading, setLoading] = useState(true);
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
-    const [total, setTotal] = useState(0);
     const [isAddOpen, setIsAddOpen] = useState(false);
     const [editingClass, setEditingClass] = useState<SchoolClass | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -52,32 +53,35 @@ export default function ClassesPage() {
     const [idToDelete, setIdToDelete] = useState<number | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
 
+    // Filter classes locally based on search
+    const filteredClasses = allClasses.filter(cls =>
+        cls.standard.toLowerCase().includes(search.toLowerCase()) ||
+        cls.division.toLowerCase().includes(search.toLowerCase())
+    );
+
+    const paginatedClasses = filteredClasses.slice((page - 1) * pageSize, page * pageSize);
+
     const fetchData = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
-            const [classesData, staffData] = await Promise.all([
-                api.getClasses({ search, skip: (page - 1) * pageSize, limit: pageSize }),
-                api.getStaff({ limit: 200 })
-            ]);
-
-            setClasses(classesData.items);
-            setTotal(classesData.total);
+            // We still fetch staff here as it's not in global context yet (per user request)
+            // But we can add it if needed. For now just use api.getStaff.
+            const staffData = await api.getStaff({ limit: 200 });
             setStaff(staffData.items);
+
+            // Classes are already coming from context
         } catch (err: unknown) {
             console.error('Failed to fetch data:', err);
-            setError('Failed to load classes or staff information.');
+            setError('Failed to load staff information.');
         } finally {
             setLoading(false);
         }
-    }, [search, page, pageSize]);
+    }, []);
 
     useEffect(() => {
         if (user) {
-            const timer = setTimeout(() => {
-                fetchData();
-            }, 300);
-            return () => clearTimeout(timer);
+            fetchData();
         }
     }, [fetchData, user]);
 
@@ -101,7 +105,7 @@ export default function ClassesPage() {
             setIsAddOpen(false);
             setEditingClass(null);
             setFormData({ standard: '', division: '', class_teacher_id: '' });
-            fetchData();
+            refreshClasses();
         } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : 'Failed to save class.';
             setError(msg);
@@ -115,7 +119,7 @@ export default function ClassesPage() {
         setIsDeleting(true);
         try {
             await api.deleteClass(idToDelete);
-            fetchData();
+            refreshClasses();
             setDeleteConfirmOpen(false);
         } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : 'Failed to delete class.';
@@ -221,7 +225,7 @@ export default function ClassesPage() {
                         <Loader2 className="w-12 h-12 text-indigo-500 animate-spin" />
                         <p className="font-bold text-sm tracking-widest uppercase opacity-70">Fetching classes...</p>
                     </div>
-                ) : classes.length === 0 ? (
+                ) : filteredClasses.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 gap-4 bg-zinc-50 dark:bg-zinc-900/30 rounded-3xl border border-dashed border-zinc-200 dark:border-zinc-800 text-center">
                         <Layers className="w-12 h-12 text-zinc-300" />
                         <h3 className="text-lg font-bold text-zinc-900 dark:text-white">No classes found</h3>
@@ -229,7 +233,7 @@ export default function ClassesPage() {
                     </div>
                 ) : viewMode === 'grid' ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-in slide-in-from-bottom-4 duration-500">
-                        {classes.map((cls) => (
+                        {filteredClasses.map((cls: SchoolClass) => (
                             <div key={cls.id} className="group p-6 rounded-[2.5rem] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-indigo-500/30 transition-all hover:shadow-2xl hover:shadow-indigo-500/5 relative overflow-hidden flex flex-col">
                                 <div className="flex justify-between items-start mb-6">
                                     <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center">
@@ -271,9 +275,9 @@ export default function ClassesPage() {
                             onEdit: openEdit,
                             onDelete: triggerDelete
                         })}
-                        data={classes}
-                        loading={loading}
-                        totalCount={total}
+                        data={paginatedClasses}
+                        loading={loading || globalLoading.classes}
+                        totalCount={filteredClasses.length}
                         page={page}
                         pageSize={pageSize}
                         onPageChange={setPage}

@@ -32,14 +32,10 @@ export default function FeeStructurePage() {
         fee_amount: ''
     });
 
-    const fetchStructures = useCallback(async () => {
+    const fetchClasses = useCallback(async () => {
         setLoading(true);
         try {
-            const [structureData, classData] = await Promise.all([
-                api.getFeeStructures(),
-                api.getClasses()
-            ]);
-            setStructures(structureData);
+            const classData = await api.getClasses();
             setClasses(classData.items);
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : 'Failed to fetch data');
@@ -48,9 +44,21 @@ export default function FeeStructurePage() {
         }
     }, []);
 
+    const fetchStructures = useCallback(async () => {
+        setLoading(true);
+        try {
+            const structureData = await api.getFeeStructures();
+            setStructures(structureData);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Failed to fetch data');
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
     useEffect(() => {
-        if (user) fetchStructures();
-    }, [user, fetchStructures]);
+        if (user) { fetchStructures(); fetchClasses(); }
+    }, [user]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
