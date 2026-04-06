@@ -13,13 +13,13 @@ class StaffBase(BaseModel):
     name: str
     mobile: str
     email: EmailStr
-    dob: date
-    department: Department
-    qualification: str
-    address: str
-    city: str
-    zip_code: str
-    leave_balance: int = 1
+    dob: Optional[date] = None
+    department: Optional[Department] = None
+    qualification: Optional[str] = None
+    address: Optional[str] = None
+    city: Optional[str] = None
+    zip_code: Optional[str] = None
+    leave_balance: Optional[int] = 20
 
 class StaffCreate(StaffBase):
     pass

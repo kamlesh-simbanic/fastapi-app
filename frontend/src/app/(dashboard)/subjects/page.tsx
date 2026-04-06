@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ConfirmBox } from '@/components/ConfirmBox';
-import Table, { Column } from '@/components/Table';
+import Table from '@/components/Table';
 import { Subject, Assignment } from './types';
 import { Staff } from '../staff/types';
 import { getSubjectColumns } from './utils';
@@ -251,7 +251,7 @@ export default function SubjectsPage() {
             <div className="flex flex-col lg:flex-row gap-8 min-h-[600px] items-start">
                 {/* Left Panel: Subjects */}
                 <div className={cn(
-                    "w-full lg:w-1/2 space-y-6 transition-all duration-500",
+                    "w-full lg:w-1/2 space-y-6 transition-all duration-500 max-h-[600px] overflow-y-auto pr-4 custom-scrollbar",
                     loading ? "opacity-50 pointer-events-none" : "opacity-100"
                 )}>
                     {loading ? (
@@ -353,7 +353,7 @@ export default function SubjectsPage() {
                                         <p className="text-zinc-500 text-sm max-w-[240px]">Start by assigning a teacher to this subject.</p>
                                     </div>
                                 ) : (
-                                    <div className="space-y-4">
+                                    <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                                         {assignments.map((as) => (
                                             <div key={as.id} className="group flex items-center justify-between p-4 rounded-2xl border border-zinc-100 dark:border-zinc-800 hover:border-indigo-500/20 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-all">
                                                 <div className="flex items-center gap-4">

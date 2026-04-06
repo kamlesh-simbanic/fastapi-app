@@ -29,8 +29,8 @@ class FeePaymentOut(FeePaymentBase):
     id: int
     created_at: datetime
     updated_at: datetime
-    created_by_id: int
-    updated_by_id: int
+    created_by_id: Optional[int] = None
+    updated_by_id: Optional[int] = None
     student: Optional[StudentMinimal] = None
 
     class Config:

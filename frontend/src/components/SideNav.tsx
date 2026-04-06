@@ -31,6 +31,7 @@ const navItems = [
     { icon: CreditCard, label: 'Fee Structure', href: '/fee-structure' },
     { icon: Briefcase, label: 'Staff', href: '/staff' },
     { icon: BookOpen, label: 'Subjects', href: '/subjects' },
+    { icon: CalendarDays, label: 'Timetable', href: '/timetable' },
     { icon: Calendar, label: 'Leave Management', href: '/leave' },
 ];
 

@@ -20,3 +20,6 @@ from .leave_request import (
     LeaveRequestBase, LeaveRequestCreate, LeaveRequestUpdate, 
     LeaveRequestResponse, LeaveType, LeaveStatus
 )
+from .timetable import (
+    TimetableBase, TimetableCreate, Timetable, ClassTimetableResponse
+)

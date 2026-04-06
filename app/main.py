@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 from . import models
 from .database import engine, get_db
-from .routers import auth, tasks, students, fees, staff, attendance, dashboard, school_class, class_student, holiday, public, fee_structure, subjects, leave_request
+from .routers import auth, tasks, students, fees, staff, attendance, dashboard, school_class, class_student, holiday, public, fee_structure, subjects, leave_request, timetable
 from .scheduler import start_scheduler, shutdown_scheduler
 
 load_dotenv()
@@ -56,6 +56,7 @@ app.include_router(class_student.router, prefix="/api")
 app.include_router(fee_structure.router, prefix="/api")
 app.include_router(subjects.router, prefix="/api")
 app.include_router(leave_request.router, prefix="/api")
+app.include_router(timetable.router, prefix="/api")
 
 
 # Root redirect to frontend

@@ -223,7 +223,7 @@ function AssignContent() {
                                 </div>
                             </div>
                         ) : (
-                            <div className="divide-y divide-zinc-100 dark:divide-zinc-800/50">
+                            <div className="divide-y divide-zinc-100 dark:divide-zinc-800/50 max-h-[500px] overflow-y-auto custom-scrollbar">
                                 {assignments.map((a) => (
                                     <div key={a.id} className="p-6 hover:bg-zinc-50 flex items-center justify-between transition-colors group">
                                         <div className="flex items-center gap-4">

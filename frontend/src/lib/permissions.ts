@@ -10,6 +10,7 @@ export const PERMISSIONS: Record<string, string[]> = {
     '/subjects': ['admin', 'management', 'teaching'],
     '/leave': ['admin', 'teaching', 'management', 'other'],
     '/leave/approvals': ['admin', 'management'],
+    '/timetable': ['admin', 'teaching', 'management', 'other'],
 };
 
 export function hasPermission(path: string, department: string | undefined): boolean {

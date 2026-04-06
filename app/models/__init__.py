@@ -11,3 +11,4 @@ from .class_student import ClassStudent
 from .fee_structure import FeeStructure
 from .subject import Subject, TeacherSubject
 from .leave_request import LeaveRequest, LeaveType, LeaveStatus
+from .timetable import Timetable

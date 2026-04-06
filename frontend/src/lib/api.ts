@@ -225,4 +225,7 @@ export const api = {
         method: 'PATCH',
         body: JSON.stringify(data),
     }),
+
+    // Timetable
+    getTimetable: (classId: string | number) => fetchApi(`/api/timetable/${classId}`),
 };
