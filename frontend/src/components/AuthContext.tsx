@@ -61,6 +61,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const login = async (credentials: Record<string, string>) => {
         setLoading(true);
         try {
+            console.log("credentials", credentials);
+
             const response = await api.login(credentials);
 
             api.setToken(response.token.access_token);
