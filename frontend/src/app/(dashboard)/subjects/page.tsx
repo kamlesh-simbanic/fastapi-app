@@ -24,7 +24,8 @@ import {
     AlertCircle,
     UserPlus,
     UserMinus,
-    ArrowRight
+    ArrowRight,
+    ChevronDown
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ConfirmBox } from '@/components/ConfirmBox';
