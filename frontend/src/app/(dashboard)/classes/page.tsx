@@ -2,8 +2,7 @@
 
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { addClass, updateClass, deleteClass } from './actions';
-import { getStaff } from '../staff/actions';
+import { api } from '@/lib/api';
 import { useAuth } from '@/components/AuthContext';
 import {
     Layers,
@@ -52,10 +51,9 @@ export default function ClassesPage() {
         setLoading(true);
         setError(null);
         try {
-            const { getClasses } = await import('./actions');
             const [classesData, staffData] = await Promise.all([
-                getClasses({ limit: 100 }),
-                getStaff({ limit: 200 })
+                api.getClasses({ limit: 100 }),
+                api.getStaff({ limit: 200 })
             ]);
             setAllClasses(classesData.items);
             setStaff(staffData.items);
@@ -93,9 +91,9 @@ export default function ClassesPage() {
             };
 
             if (editingClass) {
-                await updateClass(editingClass.id, payload);
+                await api.updateClass(editingClass.id, payload);
             } else {
-                await addClass(payload);
+                await api.addClass(payload);
             }
 
             setIsAddOpen(false);
@@ -113,7 +111,7 @@ export default function ClassesPage() {
         if (!deleteConfirmId) return;
         setIsDeleting(true);
         try {
-            await deleteClass(deleteConfirmId);
+            await api.deleteClass(deleteConfirmId);
             fetchData();
             setDeleteConfirmId(null);
         } catch {

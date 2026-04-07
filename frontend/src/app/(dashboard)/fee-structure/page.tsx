@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { getClasses } from '../classes/actions';
-import { getFeeStructures, addFeeStructure, updateFeeStructure, deleteFeeStructure } from './actions';
+import { api } from '@/lib/api';
 import { FeeStructure } from './types';
 import { SchoolClass } from '../classes/types';
 import { getFeeStructureColumns } from './utils';
@@ -39,7 +38,7 @@ export default function FeeStructurePage() {
 
     const fetchClasses = useCallback(async () => {
         try {
-            const classData = await getClasses();
+            const classData = await api.getClasses();
             setClasses(classData.items);
         } catch {
             console.error('Failed to fetch classes');
@@ -49,7 +48,7 @@ export default function FeeStructurePage() {
     const fetchStructures = useCallback(async () => {
         setLoading(true);
         try {
-            const structureData = await getFeeStructures();
+            const structureData = await api.getFeeStructures();
             setStructures(structureData);
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : 'Failed to fetch data');
@@ -73,9 +72,9 @@ export default function FeeStructurePage() {
             };
 
             if (isEditing && selectedId) {
-                await updateFeeStructure(selectedId, data);
+                await api.updateFeeStructure(selectedId, data);
             } else {
-                await addFeeStructure(data);
+                await api.addFeeStructure(data);
             }
             setShowModal(false);
             fetchStructures();
@@ -99,7 +98,7 @@ export default function FeeStructurePage() {
     const triggerDelete = async (id: number) => {
         if (!confirm('Are you sure you want to delete this fee structure?')) return;
         try {
-            await deleteFeeStructure(id);
+            await api.deleteFeeStructure(id);
             fetchStructures();
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : 'Failed to delete');

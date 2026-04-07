@@ -2,8 +2,7 @@
 
 import React, { useEffect, useState, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { getSubjects, getSubjectAssignments, assignTeacher, unassignTeacher } from '../actions';
-import { getStaff } from '../../staff/actions';
+import { api } from '@/lib/api';
 import { useAuth } from '@/components/AuthContext';
 import {
     UserPlus,
@@ -58,8 +57,8 @@ function AssignContent() {
         setError(null);
         try {
             const [subjectsData, allStaffData] = await Promise.all([
-                getSubjects(),
-                getStaff({ limit: 1000 })
+                api.getSubjects(),
+                api.getStaff({ limit: 1000 })
             ]);
 
             const currentSubject = subjectsData.find((s: Subject) => s.id.toString() === subjectId);
@@ -70,7 +69,7 @@ function AssignContent() {
             setSubject(currentSubject);
             setStaff(allStaffData.items.filter((s: Staff) => s.department === 'teaching'));
 
-            const assignmentsData = await getSubjectAssignments(subjectId);
+            const assignmentsData = await api.getSubjectAssignments(subjectId);
             setAssignments(assignmentsData);
         } catch (err: unknown) {
             console.error('Failed to fetch assignment data:', err);
@@ -93,7 +92,7 @@ function AssignContent() {
         setSubmitting(true);
         setError(null);
         try {
-            await assignTeacher({
+            await api.assignTeacher({
                 subject_id: parseInt(subjectId),
                 teacher_id: parseInt(selectedTeacher)
             });
@@ -111,7 +110,7 @@ function AssignContent() {
         if (!idToDelete) return;
         setIsDeleting(true);
         try {
-            await unassignTeacher(idToDelete);
+            await api.unassignTeacher(idToDelete);
             fetchData();
             setDeleteConfirmOpen(false);
         } catch (err: unknown) {

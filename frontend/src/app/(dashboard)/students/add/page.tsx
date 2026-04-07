@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { addStudent } from '../actions';
+import { api } from '@/lib/api';
 import { useAuth } from '@/components/AuthContext';
 import {
     Users,
@@ -104,7 +104,7 @@ export default function AddStudentPage() {
         setError(null);
 
         try {
-            await addStudent(form);
+            await api.addStudent(form);
             setSuccess(true);
             setTimeout(() => {
                 router.push('/students');

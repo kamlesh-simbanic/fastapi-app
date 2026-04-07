@@ -30,7 +30,7 @@ export const getFeeStructureColumns = ({
             key: 'fee_amount',
             label: 'Fee Amount',
             sortable: true,
-            className: 'font-black text-emerald-600 dark:text-emerald-400 text-lg',
+            className: 'font-black text-zinc-600 dark:text-zinc-400',
             render: (fee) => `$${fee.fee_amount.toLocaleString()}`
         },
         {

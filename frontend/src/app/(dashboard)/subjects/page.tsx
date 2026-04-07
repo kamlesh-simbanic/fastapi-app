@@ -1,15 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import {
-    addSubject,
-    updateSubject,
-    deleteSubject,
-    getSubjectAssignments,
-    assignTeacher,
-    unassignTeacher
-} from './actions';
-import { getStaff } from '../staff/actions';
+import { api } from '@/lib/api';
 import { useAuth } from '@/components/AuthContext';
 import {
     BookOpen,
@@ -62,7 +54,7 @@ export default function SubjectsPage() {
     const fetchAssignments = useCallback(async (subjectId: number) => {
         setLoadingAssignments(true);
         try {
-            const data = await getSubjectAssignments(subjectId);
+            const data = await api.getSubjectAssignments(subjectId);
             setAssignments(data);
         } catch (err: unknown) {
             console.error('Failed to fetch assignments:', err);
@@ -73,7 +65,7 @@ export default function SubjectsPage() {
 
     const fetchStaff = useCallback(async () => {
         try {
-            const data = await getStaff({ limit: 100 });
+            const data = await api.getStaff({ limit: 100 });
             setAllStaff(data.items);
         } catch (err: unknown) {
             console.error('Failed to fetch staff:', err);
@@ -98,9 +90,9 @@ export default function SubjectsPage() {
         setError(null);
         try {
             if (editingSubject) {
-                await updateSubject(editingSubject.id, formData);
+                await api.updateSubject(editingSubject.id, formData);
             } else {
-                await addSubject(formData);
+                await api.addSubject(formData);
             }
             setIsAddOpen(false);
             setEditingSubject(null);
@@ -118,7 +110,7 @@ export default function SubjectsPage() {
         if (!idToDelete) return;
         setIsDeleting(true);
         try {
-            await deleteSubject(idToDelete);
+            await api.deleteSubject(idToDelete);
             refreshSubjects();
             setDeleteConfirmOpen(false);
         } catch (err: unknown) {
@@ -144,7 +136,7 @@ export default function SubjectsPage() {
         if (!selectedSubject || !assigningTeacherId) return;
         setSubmitting(true);
         try {
-            await assignTeacher({
+            await api.assignTeacher({
                 subject_id: selectedSubject.id,
                 teacher_id: parseInt(assigningTeacherId)
             });
@@ -161,7 +153,7 @@ export default function SubjectsPage() {
     const handleUnassign = async (assignmentId: number) => {
         if (!selectedSubject) return;
         try {
-            await unassignTeacher(assignmentId);
+            await api.unassignTeacher(assignmentId);
             fetchAssignments(selectedSubject.id);
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : 'Failed to unassign teacher');

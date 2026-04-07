@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { addStaff } from '../actions';
+import { api } from '@/lib/api';
 import { useAuth } from '@/components/AuthContext';
 import {
     ChevronLeft,
@@ -109,7 +109,7 @@ export default function AddStaffPage() {
         setError(null);
 
         try {
-            await addStaff(formData);
+            await api.addStaff(formData);
             setSuccess(true);
             setTimeout(() => {
                 router.push('/staff');

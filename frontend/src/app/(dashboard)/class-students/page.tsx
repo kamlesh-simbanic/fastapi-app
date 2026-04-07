@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { getClassStudents, addClassStudent, updateClassStudent, deleteClassStudent } from './actions';
-import { getClasses } from '../classes/actions';
+import { api } from '@/lib/api';
 import { ClassStudent } from './types';
 import { SchoolClass } from '../classes/types';
 import { useAuth } from '@/components/AuthContext';
@@ -52,8 +51,8 @@ export default function ClassStudentsPage() {
         setError(null);
         try {
             const [mappingData, classList] = await Promise.all([
-                getClassStudents({ academic_year: academicYear, skip: (page - 1) * pageSize, limit: pageSize }),
-                getClasses({ limit: 100 })
+                api.getClassStudents({ academic_year: academicYear, skip: (page - 1) * pageSize, limit: pageSize }),
+                api.getClasses({ limit: 100 })
             ]);
 
             setMappings(mappingData.items || []);
@@ -88,9 +87,9 @@ export default function ClassStudentsPage() {
             };
 
             if (editingMapping) {
-                await updateClassStudent(editingMapping.id, payload);
+                await api.updateClassStudent(editingMapping.id, payload);
             } else {
-                await addClassStudent(payload);
+                await api.addClassStudent(payload);
             }
 
             setIsAddOpen(false);
@@ -108,7 +107,7 @@ export default function ClassStudentsPage() {
         if (!idToDelete) return;
         setIsDeleting(true);
         try {
-            await deleteClassStudent(idToDelete);
+            await api.deleteClassStudent(idToDelete);
             fetchData();
             setDeleteConfirmOpen(false);
         } catch {

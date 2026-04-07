@@ -1,10 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { getClasses } from '@/app/(dashboard)/classes/actions';
-import { getSubjects } from '@/app/(dashboard)/subjects/actions';
-import { getHolidays } from '@/app/(dashboard)/holidays/actions';
-import { getTimetable } from '@/app/(dashboard)/timetable/actions';
+import { api } from '@/lib/api';
 import { SchoolClass } from '@/app/(dashboard)/classes/types';
 import { Subject } from '@/app/(dashboard)/subjects/types';
 import { Holiday } from '@/app/(dashboard)/holidays/types';
@@ -55,7 +52,7 @@ export function GlobalDataProvider({ children }: { children: React.ReactNode }) 
     const refreshClasses = useCallback(async () => {
         setLoading(prev => ({ ...prev, classes: true }));
         try {
-            const data = await getClasses({ limit: 100 }); // Fetch all
+            const data = await api.getClasses({ limit: 100 }); // Fetch all
             setClasses(data.items || []);
         } catch (err) {
             console.error('Failed to fetch classes:', err);
@@ -68,7 +65,7 @@ export function GlobalDataProvider({ children }: { children: React.ReactNode }) 
     const refreshSubjects = useCallback(async () => {
         setLoading(prev => ({ ...prev, subjects: true }));
         try {
-            const data = await getSubjects({ limit: 100 });
+            const data = await api.getSubjects({ limit: 100 });
             setSubjects(data.items || data); // handle both paginated and list response
         } catch (err) {
             console.error('Failed to fetch subjects:', err);
@@ -81,7 +78,7 @@ export function GlobalDataProvider({ children }: { children: React.ReactNode }) 
     const refreshHolidays = useCallback(async () => {
         setLoading(prev => ({ ...prev, holidays: true }));
         try {
-            const data = await getHolidays({ sort_by: 'date', order: 'asc' });
+            const data = await api.getHolidays({ sort_by: 'date', order: 'asc' });
             setHolidays(data || []);
         } catch (err) {
             console.error('Failed to fetch holidays:', err);
@@ -99,7 +96,7 @@ export function GlobalDataProvider({ children }: { children: React.ReactNode }) 
 
         setLoading(prev => ({ ...prev, timetables: true }));
         try {
-            const data = await getTimetable(classId);
+            const data = await api.getTimetable(classId);
             const schedule = data.schedule || [];
             setTimetables(prev => ({
                 ...prev,
@@ -118,7 +115,7 @@ export function GlobalDataProvider({ children }: { children: React.ReactNode }) 
         setLoading(prev => ({ ...prev, timetables: true }));
         try {
             const timetablePromises = classList.map(cls =>
-                getTimetable(cls.id)
+                api.getTimetable(cls.id)
                     .then(data => ({ classId: cls.id, schedule: data.schedule || [] }))
                     .catch(err => {
                         console.error(`Failed to fetch timetable for class ${cls.id}:`, err);
@@ -142,9 +139,9 @@ export function GlobalDataProvider({ children }: { children: React.ReactNode }) 
         setLoading(prev => ({ ...prev, classes: true, subjects: true, holidays: true }));
         try {
             const [classesData, subjectsData, holidaysData] = await Promise.all([
-                getClasses({ limit: 100 }),
-                getSubjects({ limit: 100 }),
-                getHolidays({ sort_by: 'date', order: 'asc' })
+                api.getClasses({ limit: 100 }),
+                api.getSubjects({ limit: 100 }),
+                api.getHolidays({ sort_by: 'date', order: 'asc' })
             ]);
 
             const classList = classesData.items || [];

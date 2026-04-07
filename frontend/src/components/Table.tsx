@@ -138,7 +138,7 @@ const Table = <T extends { id: string | number }>({
                                         onChange={(e) => onPageSizeChange(Number(e.target.value))}
                                         className="appearance-none bg-surface-paper dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-radius-medium px-4 py-2 pr-10 text-[10px] font-bold text-zinc-600 dark:text-zinc-300 uppercase tracking-widest focus:outline-none focus:ring-4 focus:ring-primary-main/5 cursor-pointer shadow-sm"
                                     >
-                                        {pageSizeOptions.map(opt => <option key={opt} value={opt}>{opt} Records</option>)}
+                                        {pageSizeOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                     </select>
                                     <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400 pointer-events-none" />
                                 </div>
@@ -183,7 +183,7 @@ const Table = <T extends { id: string | number }>({
                                             className={cn(
                                                 "w-10 h-10 rounded-radius-medium text-[10px] font-bold uppercase transition-all shadow-sm",
                                                 page === p
-                                                    ? "bg-primary-main text-white shadow-xl shadow-primary-main/20 ring-4 ring-primary-main/5 active:scale-95"
+                                                    ? "bg-primary-main shadow-xl shadow-primary-main/20 ring-4 ring-primary-main/5 active:scale-95"
                                                     : "bg-surface-paper dark:bg-zinc-900 text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 border border-zinc-100 dark:border-zinc-800"
                                             )}
                                         >

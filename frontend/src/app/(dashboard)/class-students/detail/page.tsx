@@ -2,8 +2,7 @@
 
 import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { getClassStudentById, getClassStudents } from '../actions';
-import { getStudents } from '../../students/actions';
+import { api } from '@/lib/api';
 import { ClassStudent } from '../types';
 import { Student } from '../../students/types';
 import { STUDENT_COLUMNS } from '../../students/utils';
@@ -44,7 +43,7 @@ function DetailContent() {
 
             // First, try to fetch as a direct Mapping ID
             try {
-                const data = await getClassStudentById(parseInt(targetId));
+                const data = await api.getClassStudentById(parseInt(targetId));
                 if (data && data.class_id.toString() === targetId) {
                     currentMapping = data;
                 }
@@ -54,7 +53,7 @@ function DetailContent() {
 
             if (!currentMapping) {
                 // Try to fetch by Class ID and Year
-                const classData = await getClassStudents({
+                const classData = await api.getClassStudents({
                     class_id: parseInt(targetId),
                     academic_year: targetYear
                 });
@@ -70,7 +69,7 @@ function DetailContent() {
                 if (currentMapping.students && currentMapping.students.length > 0) {
                     setLoadingStudents(true);
                     try {
-                        const studentsData = await getStudents({ id: currentMapping.students, limit: 1000 });
+                        const studentsData = await api.getStudents({ id: currentMapping.students, limit: 1000 });
                         setStudents(studentsData.items || []);
                     } catch (studentErr) {
                         console.error('Failed to fetch students:', studentErr);

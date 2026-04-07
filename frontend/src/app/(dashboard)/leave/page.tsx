@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { getLeaveRequests, addLeaveRequest } from './actions';
+import { api } from '@/lib/api';
 import CalendarPicker from '@/components/CalendarPicker';
 import {
     Loader2,
@@ -36,12 +36,12 @@ export default function LeaveManagementPage() {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const personal = await getLeaveRequests({ view: 'personal' });
+            const personal = await api.getLeaveRequests({ view: 'personal' });
             setLeaveRequests(personal);
 
             // Fetch approvals to see if we should show the "Manage Approvals" button
             try {
-                const pendingApprovals = await getLeaveRequests({ view: 'approvals' });
+                const pendingApprovals = await api.getLeaveRequests({ view: 'approvals' });
                 setApprovals(pendingApprovals);
             } catch {
                 setApprovals([]);
@@ -68,7 +68,7 @@ export default function LeaveManagementPage() {
             setSubmitting(true);
             setError(null);
             setSuccess(null);
-            await addLeaveRequest(formData);
+            await api.addLeaveRequest(formData);
             setSuccess("Leave request submitted successfully!");
             setShowForm(false);
             setFormData({ leave_type: 'casual', start_date: '', end_date: '', reason: '' });

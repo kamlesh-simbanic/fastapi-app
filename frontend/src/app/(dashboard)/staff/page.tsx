@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { getStaff } from './actions';
+import { api } from '@/lib/api';
 import { useAuth } from '@/components/AuthContext';
 import Link from 'next/link';
 import {
@@ -48,7 +48,7 @@ export default function StaffPage() {
         setError(null);
         try {
             const skip = (page - 1) * pageSize;
-            const data = await getStaff({
+            const data = await api.getStaff({
                 search,
                 department: selectedDepartments,
                 skip,

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { addHoliday, deleteHoliday } from './actions';
+import { api } from '@/lib/api';
 import { useAuth } from '@/components/AuthContext';
 import {
     Calendar,
@@ -45,7 +45,7 @@ export default function HolidaysPage() {
         setIsSubmitting(true);
         setError(null);
         try {
-            await addHoliday(formData);
+            await api.addHoliday(formData);
             setSuccess('Holiday added successfully!');
             setIsAddModalOpen(false);
             setFormData({
@@ -68,7 +68,7 @@ export default function HolidaysPage() {
         setIsDeleting(true);
         setError(null);
         try {
-            await deleteHoliday(idToDelete);
+            await api.deleteHoliday(idToDelete);
             setSuccess('Holiday deleted successfully!');
             refreshHolidays();
             setTimeout(() => setSuccess(null), 3000);

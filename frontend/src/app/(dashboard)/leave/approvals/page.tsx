@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { getLeaveRequests, updateLeaveRequestStatus } from '../actions';
+import { api } from '@/lib/api';
 import {
     Loader2,
     CheckCircle2,
@@ -31,7 +31,7 @@ export default function ApprovalsPage() {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const data = await getLeaveRequests({ view: 'approvals' });
+            const data = await api.getLeaveRequests({ view: 'approvals' });
             setRequests(data);
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : 'An error occurred');
@@ -48,7 +48,7 @@ export default function ApprovalsPage() {
         try {
             setActionLoading(id);
             setError(null);
-            await updateLeaveRequestStatus(id, { status });
+            await api.updateLeaveRequestStatus(id, { status });
             setSuccess(`Request ${status} successfully!`);
             fetchData();
             setTimeout(() => setSuccess(null), 3000);

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { getPayments } from './actions';
+import { api } from '@/lib/api';
 import { useAuth } from '@/components/AuthContext';
 import Link from 'next/link';
 import {
@@ -41,7 +41,7 @@ export default function FeesPage() {
         setError(null);
         try {
             const skip = (page - 1) * pageSize;
-            const data = await getPayments({
+            const data = await api.getPayments({
                 search,
                 skip,
                 limit: pageSize,

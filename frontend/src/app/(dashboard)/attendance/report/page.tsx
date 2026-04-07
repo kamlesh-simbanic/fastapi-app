@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback, Suspense } from 'react';
-import { getMonthlyReport, getMonthlyReportPDF } from '../actions';
-import { getClasses } from '../../classes/actions';
+import { api } from '@/lib/api';
 import { useAuth } from '@/components/AuthContext';
 import {
     Calendar,
@@ -48,7 +47,7 @@ function AttendanceReportContent() {
     const fetchClasses = useCallback(async () => {
         setClassesLoading(true);
         try {
-            const data = await getClasses({ limit: 100 });
+            const data = await api.getClasses({ limit: 100 });
             setClasses(data.items);
         } catch {
             setError('Failed to load classes.');
@@ -62,7 +61,7 @@ function AttendanceReportContent() {
         setLoading(true);
         setError(null);
         try {
-            const data = await getMonthlyReport({
+            const data = await api.getMonthlyReport({
                 class_id: parseInt(selectedClass),
                 month,
                 year
@@ -180,7 +179,7 @@ function AttendanceReportContent() {
         if (!selectedClass) return;
         setLoading(true);
         try {
-            const blob = await getMonthlyReportPDF({
+            const blob = await api.getMonthlyReportPDF({
                 class_id: parseInt(selectedClass),
                 month,
                 year

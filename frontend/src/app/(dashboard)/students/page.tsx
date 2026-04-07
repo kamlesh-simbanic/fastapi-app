@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { getStudents } from './actions';
+import { api } from '@/lib/api';
 import { useAuth } from '@/components/AuthContext';
 import Link from 'next/link';
 import {
@@ -48,7 +48,7 @@ export default function StudentsPage() {
         setError(null);
         try {
             const skip = (page - 1) * pageSize;
-            const data = await getStudents({
+            const data = await api.getStudents({
                 search,
                 skip,
                 limit: pageSize,
