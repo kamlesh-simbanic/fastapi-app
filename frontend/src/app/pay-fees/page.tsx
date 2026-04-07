@@ -84,7 +84,7 @@ export default function PublicFeePaymentPage() {
         if (student) {
             fetchFeeAmount(student.gr_no, academicYear);
         }
-    }, [academicYear]);
+    }, [academicYear, student]);
 
     const handlePayUsingPG = async () => {
         if (!student) return;

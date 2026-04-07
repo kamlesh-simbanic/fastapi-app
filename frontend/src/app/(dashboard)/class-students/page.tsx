@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useCallback, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import React, { useEffect, useState, useCallback } from 'react';
 import { getClassStudents, addClassStudent, updateClassStudent, deleteClassStudent } from './actions';
 import { getClasses } from '../classes/actions';
 import { ClassStudent } from './types';
@@ -10,21 +9,15 @@ import { useAuth } from '@/components/AuthContext';
 import {
     Users,
     Plus,
-    Edit2,
-    Trash2,
-    Calendar,
     Loader2,
     X,
     Filter,
     ChevronDown,
-    UserCircle,
-    List,
     AlertCircle
 } from 'lucide-react';
 import { ConfirmBox } from '@/components/ConfirmBox';
 import Table from '@/components/Table';
 import { getClassStudentColumns } from './utils';
-import Link from 'next/link';
 
 export default function ClassStudentsPage() {
     const { user } = useAuth();
@@ -118,7 +111,7 @@ export default function ClassStudentsPage() {
             await deleteClassStudent(idToDelete);
             fetchData();
             setDeleteConfirmOpen(false);
-        } catch (err: unknown) {
+        } catch {
             setError('Failed to delete mapping');
         } finally {
             setIsDeleting(false);

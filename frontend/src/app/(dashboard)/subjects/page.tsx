@@ -15,16 +15,11 @@ import {
     BookOpen,
     Plus,
     Search,
-    Edit2,
-    Trash2,
     Loader2,
     X,
-    LayoutGrid,
-    List,
     AlertCircle,
     UserPlus,
     UserMinus,
-    ArrowRight,
     ChevronDown
 } from 'lucide-react';
 import { cn } from '@/lib/utils';

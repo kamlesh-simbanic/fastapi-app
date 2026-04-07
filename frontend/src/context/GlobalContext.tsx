@@ -160,12 +160,12 @@ export function GlobalDataProvider({ children }: { children: React.ReactNode }) 
         } finally {
             setLoading(prev => ({ ...prev, classes: false, subjects: false, holidays: false }));
         }
-    }, []);
+    }, [refreshAllTimetables]);
 
     // Load data on mount
     useEffect(() => {
         refreshAll();
-    }, []);
+    }, [refreshAll]);
 
     return (
         <GlobalDataContext.Provider value={{

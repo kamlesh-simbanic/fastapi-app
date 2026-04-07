@@ -10,11 +10,9 @@ import {
     Loader2,
     ChevronDown,
     X,
-    Eye,
     Plus
 } from 'lucide-react';
 import Table from '@/components/Table';
-import { cn } from '@/lib/utils';
 import { FeePayment } from './types';
 import { getFeeColumns } from './utils';
 

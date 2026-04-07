@@ -21,7 +21,6 @@ import {
     AlertCircle
 } from 'lucide-react';
 import Table from '@/components/Table';
-import { cn } from '@/lib/utils';
 
 function DetailContent() {
     const { user } = useAuth();
@@ -49,7 +48,7 @@ function DetailContent() {
                 if (data && data.class_id.toString() === targetId) {
                     currentMapping = data;
                 }
-            } catch (e) {
+            } catch {
                 // Ignore and try class lookup
             }
 
