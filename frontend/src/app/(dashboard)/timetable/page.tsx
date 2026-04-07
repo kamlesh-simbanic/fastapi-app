@@ -8,6 +8,8 @@ import {
     Search,
     Download
 } from 'lucide-react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { useGlobalData } from '@/context/GlobalContext';
 
 export default function TimetablePage() {
@@ -32,6 +34,57 @@ export default function TimetablePage() {
         return timetable.find(t => t.day_of_week === day && t.period_number === period);
     };
 
+    const exportToPDF = () => {
+        const doc = new jsPDF('landscape');
+        const activeClass = classes.find(c => c.id === activeClassId);
+        const className = activeClass ? `Standard ${activeClass.standard} - ${activeClass.division}` : 'Class';
+
+        // Add title
+        doc.setFontSize(22);
+        doc.setTextColor(30, 30, 30);
+        doc.text(`School Timetable - ${className}`, 14, 20);
+
+        // Prepare table data
+        const head = [['Slot', ...DAYS]];
+        const body = PERIODS.map(period => [
+            `#${period}`,
+            ...DAYS.map(day => {
+                const slot = getSlotData(day, period);
+                if (!slot) return '-';
+                return `${slot.subject?.name}\n(${slot.teacher?.name || 'TBA'})`;
+            })
+        ]);
+
+        autoTable(doc, {
+            startY: 30,
+            head,
+            body,
+            theme: 'grid',
+            styles: {
+                fontSize: 9,
+                cellPadding: 4,
+                halign: 'center',
+                valign: 'middle',
+                fontStyle: 'normal'
+            },
+            headStyles: {
+                fillColor: [79, 70, 229],
+                textColor: [255, 255, 255],
+                fontStyle: 'bold',
+                fontSize: 10
+            },
+            columnStyles: {
+                0: { fontStyle: 'bold', fillColor: [243, 244, 246] }
+            },
+            alternateRowStyles: {
+                fillColor: [252, 253, 255]
+            },
+            margin: { top: 30 }
+        });
+
+        doc.save(`Timetable_${className.replace(/\s+/g, '_')}.pdf`);
+    };
+
     return (
         <div className="p-4 lg:p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500">
             {/* Header */}
@@ -41,7 +94,11 @@ export default function TimetablePage() {
                     <p className="text-zinc-500 dark:text-zinc-400">View and manage periodic schedules for all classes.</p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all text-sm font-medium">
+                    <button
+                        onClick={exportToPDF}
+                        disabled={loading || timetable.length === 0}
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all text-sm font-medium disabled:opacity-50"
+                    >
                         <Download className="w-4 h-4" />
                         Export PDF
                     </button>
@@ -143,22 +200,6 @@ export default function TimetablePage() {
                             ))}
                         </tbody>
                     </table>
-                </div>
-            </div>
-
-            {/* Bottom Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="p-6 rounded-3xl bg-indigo-500/10 border border-indigo-500/20">
-                    <p className="text-xs font-bold text-indigo-500 uppercase tracking-widest mb-1">Total periods</p>
-                    <p className="text-4xl font-black text-indigo-600 dark:text-indigo-400">36</p>
-                </div>
-                <div className="p-6 rounded-3xl bg-zinc-500/5 border border-zinc-200 dark:border-zinc-800">
-                    <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Working Days</p>
-                    <p className="text-4xl font-black text-zinc-900 dark:text-white">6</p>
-                </div>
-                <div className="p-6 rounded-3xl bg-zinc-500/5 border border-zinc-200 dark:border-zinc-800">
-                    <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Max capacity</p>
-                    <p className="text-4xl font-black text-zinc-900 dark:text-white">100%</p>
                 </div>
             </div>
 
