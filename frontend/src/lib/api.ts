@@ -1,9 +1,45 @@
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-const getAuthToken = () => {
+const getCookie = (name: string) => {
+    if (typeof document === 'undefined') return null;
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+    return null;
+};
+
+const setCookie = (name: string, value: string, days = 7) => {
+    if (typeof document === 'undefined') return;
+    const date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    const expires = `; expires=${date.toUTCString()}`;
+    document.cookie = `${name}=${value || ""}${expires}; path=/; SameSite=Lax`;
+};
+
+const getAuthToken = async () => {
+    // Client-side cookie check
+    if (typeof document !== 'undefined') {
+        const cookieToken = getCookie('token');
+        if (cookieToken) return cookieToken;
+    }
+
+    // Try server-side cookies if we are in a server environment
+    if (typeof window === 'undefined') {
+        try {
+            // Dynamic import to avoid client-side bundling issues
+            const { cookies } = await import('next/headers');
+            const cookieStore = await cookies();
+            return cookieStore.get('token')?.value || null;
+        } catch {
+            return null;
+        }
+    }
+
+    // Fallback to localStorage on client
     if (typeof window !== 'undefined') {
         return localStorage.getItem('token');
     }
+
     return null;
 };
 
@@ -19,7 +55,7 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
     }
 
     const performRequest = async () => {
-        const token = getAuthToken();
+        const token = await getAuthToken();
         const headers = new Headers(options.headers);
 
         headers.set('Content-Type', 'application/json');
@@ -49,6 +85,29 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
     return performRequest();
 }
 
+export async function fetchApiBlob(endpoint: string, options: RequestInit = {}) {
+    const token = await getAuthToken();
+    const headers = new Headers(options.headers);
+
+    if (token) {
+        headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    const response = await fetch(`${API_URL}${endpoint}`, {
+        ...options,
+        headers,
+    });
+
+    if (!response.ok) {
+        const error = await response.json().catch(() => ({ detail: 'An error occurred' }));
+        throw new Error(error.detail || response.statusText);
+    }
+
+    return response.blob();
+}
+
+export const fetchApiWithCookies = fetchApi;
+
 const buildQuery = (params: Record<string, unknown>) => {
     const query = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {
@@ -65,6 +124,19 @@ const buildQuery = (params: Record<string, unknown>) => {
 };
 
 export const api = {
+    // Auth Helpers
+    setToken: (token: string) => {
+        setCookie('token', token);
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('token', token);
+        }
+    },
+    clearToken: () => {
+        setCookie('token', '', -1);
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('token');
+        }
+    },
     getHealth: () => fetchApi('/api/health'),
     getDbStatus: () => fetchApi('/api/db-test'),
     login: (credentials: Record<string, string>) => fetchApi('/api/auth/login', {
@@ -133,6 +205,7 @@ export const api = {
     deleteClass: (id: string | number) => fetchApi(`/api/classes/${id}`, {
         method: 'DELETE',
     }),
+    getClassById: (id: string | number) => fetchApi(`/api/classes/${id}`),
 
     // Class Students
     getClassStudents: (params: Record<string, unknown> = {}) => fetchApi(`/api/class-students/${buildQuery(params)}`),
@@ -157,15 +230,7 @@ export const api = {
         body: JSON.stringify(data),
     }),
     getMonthlyReport: (params: Record<string, unknown>) => fetchApi(`/api/attendance/report/monthly${buildQuery(params)}`),
-    getMonthlyReportPDF: async (params: Record<string, unknown>) => {
-        const response = await fetch(`${API_URL}/api/attendance/report/monthly/pdf${buildQuery(params)}`, {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-        });
-        if (!response.ok) throw new Error('Failed to download PDF');
-        return response.blob();
-    },
+    getMonthlyReportPDF: (params: Record<string, unknown>) => fetchApiBlob(`/api/attendance/report/monthly/pdf${buildQuery(params)}`),
 
     // Holidays
     getHolidays: (params: Record<string, unknown> = {}) => fetchApi(`/api/holidays/${buildQuery(params)}`),

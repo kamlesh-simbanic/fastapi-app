@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { api } from '@/lib/api';
+import { getAttendance, submitAttendance } from './actions';
+import { getClasses } from '../classes/actions';
+import { getStudentsByClass } from '../students/actions';
 import { useAuth } from '@/components/AuthContext';
 import {
     Save,
@@ -40,7 +42,7 @@ export default function AttendancePage() {
     const fetchClasses = useCallback(async () => {
         setClassesLoading(true);
         try {
-            const data = await api.getClasses({ limit: 100 });
+            const data = await getClasses({ limit: 100 });
             setClasses(data.items);
         } catch {
             setError('Failed to load classes.');
@@ -63,7 +65,7 @@ export default function AttendancePage() {
         setLoading(true);
         setError(null);
         try {
-            const data = await api.getStudentsByClass(classId);
+            const data = await getStudentsByClass(classId);
             setStudents(data);
 
             // Initialize attendance (default all Present)
@@ -83,7 +85,7 @@ export default function AttendancePage() {
         if (!classId || !attendanceDate) return;
 
         try {
-            const data = await api.getAttendance({ class_id: classId, day: attendanceDate });
+            const data = await getAttendance({ class_id: classId, day: attendanceDate });
             if (data && data.length > 0) {
                 const existing = data[0]; // Should be only one record per class/date
                 const attendanceMap: Record<number, string> = {};
@@ -160,7 +162,7 @@ export default function AttendancePage() {
                 status
             }));
 
-            await api.submitAttendance({
+            await submitAttendance({
                 date,
                 class_id: parseInt(selectedClass),
                 records: recordsArray

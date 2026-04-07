@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { api } from '@/lib/api';
+import { getStudents } from './actions';
 import { useAuth } from '@/components/AuthContext';
 import Link from 'next/link';
 import {
@@ -21,7 +21,7 @@ import {
     X,
     Pencil
 } from 'lucide-react';
-import Table, { Column } from '@/components/Table';
+import Table from '@/components/Table';
 import { cn } from '@/lib/utils';
 import { Student } from './types';
 import { STUDENT_COLUMNS } from './utils';
@@ -57,7 +57,7 @@ export default function StudentsPage() {
         setError(null);
         try {
             const skip = (page - 1) * pageSize;
-            const data = await api.getStudents({
+            const data = await getStudents({
                 search,
                 skip,
                 limit: pageSize,

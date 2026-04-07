@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { api } from '@/lib/api';
+import { getStaff } from './actions';
 import { useAuth } from '@/components/AuthContext';
 import Link from 'next/link';
 import {
@@ -56,7 +56,7 @@ export default function StaffPage() {
         setError(null);
         try {
             const skip = (page - 1) * pageSize;
-            const data = await api.getStaff({
+            const data = await getStaff({
                 search,
                 department: selectedDepartments,
                 skip,
@@ -95,7 +95,7 @@ export default function StaffPage() {
 
     useEffect(() => {
         // Set view mode based on screen size on mount
-        if (window.innerWidth < 1024) {
+        if (typeof window !== 'undefined' && window.innerWidth < 1024) {
             setViewMode('grid');
         } else {
             setViewMode('grid'); // Staff defaults to grid anyway
@@ -119,7 +119,6 @@ export default function StaffPage() {
     };
 
     if (!user) return null;
-
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500 pb-10">

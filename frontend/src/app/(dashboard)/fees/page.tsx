@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { api } from '@/lib/api';
+import { getPayments } from './actions';
 import { useAuth } from '@/components/AuthContext';
 import Link from 'next/link';
 import {
@@ -15,7 +15,7 @@ import {
     Eye,
     Plus
 } from 'lucide-react';
-import Table, { Column } from '@/components/Table';
+import Table from '@/components/Table';
 import { cn } from '@/lib/utils';
 import { FeePayment } from './types';
 import { getFeeColumns } from './utils';
@@ -46,7 +46,7 @@ export default function FeesPage() {
         setError(null);
         try {
             const skip = (page - 1) * pageSize;
-            const data = await api.getPayments({
+            const data = await getPayments({
                 search,
                 skip,
                 limit: pageSize,

@@ -27,7 +27,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const router = useRouter();
 
     const loadUser = async () => {
-        const token = localStorage.getItem('token');
+        // Try to get token from cookie or localStorage
+        let token = null;
+        if (typeof document !== 'undefined') {
+            const match = document.cookie.match(new RegExp('(^| )token=([^;]+)'));
+            if (match) token = match[2];
+        }
+        if (!token && typeof window !== 'undefined') {
+            token = localStorage.getItem('token');
+        }
+
         if (!token) {
             setLoading(false);
             return;
@@ -38,7 +47,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setUser(userData);
         } catch (error) {
             console.error('Failed to load user:', error);
-            localStorage.removeItem('token');
+            api.clearToken();
             setUser(null);
         } finally {
             setLoading(false);
@@ -54,12 +63,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
             const response = await api.login(credentials);
 
-            localStorage.setItem('token', response.token.access_token);
+            api.setToken(response.token.access_token);
             setUser(response.user);
             router.push('/');
         } catch (error) {
-
-
             throw error;
         } finally {
             setLoading(false);
@@ -67,7 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     const logout = () => {
-        localStorage.removeItem('token');
+        api.clearToken();
         setUser(null);
         router.push('/login');
     };

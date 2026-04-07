@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { api, API_URL } from '@/lib/api';
+import { getDbStatus, getDashboardStats } from './actions';
+import { API_URL } from '@/lib/api';
 import { useAuth } from '@/components/AuthContext';
 import {
   Activity,
@@ -42,8 +43,8 @@ export default function Home() {
       setStatus(prev => ({ ...prev, backend: 'loading', db: 'loading' }));
 
       try {
-        const dbData = await api.getDbStatus();
-        const statsData = await api.getDashboardStats();
+        const dbData = await getDbStatus();
+        const statsData = await getDashboardStats();
 
         setStats(statsData);
         setStatus({

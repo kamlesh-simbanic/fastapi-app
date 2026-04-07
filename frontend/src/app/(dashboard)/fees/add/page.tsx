@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { api } from '@/lib/api';
+import { addPayment, getSuggestedFee } from '../actions';
+import { getStudents } from '../../students/actions';
 import { useAuth } from '@/components/AuthContext';
 import {
     CreditCard,
@@ -60,7 +61,7 @@ export default function RecordPaymentPage() {
             if (studentSearch.length >= 2) {
                 setSearchingStudent(true);
                 try {
-                    const data = await api.getStudents({ search: studentSearch, limit: 5 });
+                    const data = await getStudents({ search: studentSearch, limit: 5 });
                     setSuggestions(data.items);
                 } catch (err) {
                     console.error('Search failed:', err);
@@ -76,10 +77,10 @@ export default function RecordPaymentPage() {
 
     // Fetch suggested fee
     useEffect(() => {
-        const fetchSuggestedFee = async () => {
+        const fetchSuggestedFeeData = async () => {
             if (selectedStudent && formData.year) {
                 try {
-                    const data = await api.getSuggestedFee(selectedStudent.gr_no, formData.year);
+                    const data = await getSuggestedFee(selectedStudent.gr_no, formData.year);
                     if (data && data.fee_amount) {
                         setFormData(prev => ({ ...prev, amount: data.fee_amount.toString() }));
                     }
@@ -88,7 +89,7 @@ export default function RecordPaymentPage() {
                 }
             }
         };
-        fetchSuggestedFee();
+        fetchSuggestedFeeData();
     }, [selectedStudent, formData.year]);
 
     const validateForm = () => {
@@ -123,7 +124,7 @@ export default function RecordPaymentPage() {
         setError(null);
 
         try {
-            await api.addPayment({
+            await addPayment({
                 ...formData,
                 amount: parseFloat(formData.amount),
                 gr_no: selectedStudent!.gr_no,

@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useEffect, useState, useCallback, Suspense } from 'react';
-import { api } from '@/lib/api';
+import { getMonthlyReport, getMonthlyReportPDF } from '../actions';
+import { getClasses } from '../../classes/actions';
 import { useAuth } from '@/components/AuthContext';
 import {
     Calendar,
@@ -29,8 +30,6 @@ interface SchoolClass {
     division: string;
 }
 
-// Use AttendanceSummary from ../utils
-
 function AttendanceReportContent() {
     const { user } = useAuth();
     const router = useRouter();
@@ -49,7 +48,7 @@ function AttendanceReportContent() {
     const fetchClasses = useCallback(async () => {
         setClassesLoading(true);
         try {
-            const data = await api.getClasses({ limit: 100 });
+            const data = await getClasses({ limit: 100 });
             setClasses(data.items);
         } catch {
             setError('Failed to load classes.');
@@ -63,13 +62,11 @@ function AttendanceReportContent() {
         setLoading(true);
         setError(null);
         try {
-            const data = await api.getMonthlyReport({
+            const data = await getMonthlyReport({
                 class_id: parseInt(selectedClass),
                 month,
                 year
             });
-            console.log("data", data);
-
             setReport(data);
         } catch {
             setError('Failed to load attendance report.');
@@ -183,11 +180,10 @@ function AttendanceReportContent() {
         if (!selectedClass) return;
         setLoading(true);
         try {
-            const blob = await api.getMonthlyReportPDF({
-                classId: parseInt(selectedClass),
+            const blob = await getMonthlyReportPDF({
+                class_id: parseInt(selectedClass),
                 month,
-                year,
-                class_id: parseInt(selectedClass) // backend expects class_id
+                year
             });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');

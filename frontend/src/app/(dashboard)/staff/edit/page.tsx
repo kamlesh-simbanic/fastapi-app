@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, Suspense, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { api } from '@/lib/api';
+import { getStaffById, updateStaff, deleteStaff } from '../actions';
 import { useAuth } from '@/components/AuthContext';
 import {
     ChevronLeft,
@@ -53,7 +53,7 @@ function EditStaffForm() {
     const fetchStaffDetails = useCallback(async () => {
         try {
             setFetching(true);
-            const data = await api.getStaffById(Number(staffId));
+            const data = await getStaffById(Number(staffId));
             setFormData({
                 name: data.name || '',
                 email: data.email || '',
@@ -145,7 +145,7 @@ function EditStaffForm() {
         setError(null);
 
         try {
-            await api.updateStaff(Number(staffId), formData);
+            await updateStaff(Number(staffId), formData);
             setSuccess(true);
             setTimeout(() => {
                 router.push('/staff');
@@ -166,7 +166,7 @@ function EditStaffForm() {
         setError(null);
 
         try {
-            await api.deleteStaff(Number(staffId));
+            await deleteStaff(Number(staffId));
             router.push('/staff');
         } catch (err) {
             console.error('Failed to delete staff:', err);

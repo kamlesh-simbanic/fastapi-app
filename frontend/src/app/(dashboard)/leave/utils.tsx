@@ -70,11 +70,15 @@ export const getPersonalLeaveColumns = (): Column<LeaveRequest>[] => [
 
 // Columns for Leave Approvals (Admin/Manager view)
 interface ApprovalActionProps {
-    onUpdateStatus: (id: number, status: 'approved' | 'rejected') => void;
+    onApprove: (id: number) => void;
+    onReject: (id: number) => void;
+    loadingId: number | null;
 }
 
-export const getLeaveApprovalColumns = ({
-    onUpdateStatus
+export const getApprovalLeaveColumns = ({
+    onApprove,
+    onReject,
+    loadingId
 }: ApprovalActionProps): Column<LeaveRequest>[] => [
         {
             key: 'staff',
@@ -115,16 +119,18 @@ export const getLeaveApprovalColumns = ({
                 req.status === 'pending' ? (
                     <div className="flex items-center justify-end gap-2">
                         <button
-                            onClick={() => onUpdateStatus(req.id, 'approved')}
-                            className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest active:scale-95 transition-all shadow-lg shadow-emerald-500/20"
+                            disabled={loadingId === req.id}
+                            onClick={() => onApprove(req.id)}
+                            className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest active:scale-95 transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-50"
                         >
-                            Approve
+                            {loadingId === req.id ? '...' : 'Approve'}
                         </button>
                         <button
-                            onClick={() => onUpdateStatus(req.id, 'rejected')}
-                            className="bg-white dark:bg-zinc-900 border-2 border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white px-4 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest active:scale-95 transition-all"
+                            disabled={loadingId === req.id}
+                            onClick={() => onReject(req.id)}
+                            className="bg-white dark:bg-zinc-900 border-2 border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white px-4 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest active:scale-95 transition-all disabled:opacity-50"
                         >
-                            Reject
+                            {loadingId === req.id ? '...' : 'Reject'}
                         </button>
                     </div>
                 ) : (

@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { api } from '@/lib/api';
+import { addClass, updateClass, deleteClass } from './actions';
+import { getStaff } from '../staff/actions';
 import { useAuth } from '@/components/AuthContext';
 import {
     Layers,
@@ -65,12 +66,8 @@ export default function ClassesPage() {
         setLoading(true);
         setError(null);
         try {
-            // We still fetch staff here as it's not in global context yet (per user request)
-            // But we can add it if needed. For now just use api.getStaff.
-            const staffData = await api.getStaff({ limit: 200 });
+            const staffData = await getStaff({ limit: 200 });
             setStaff(staffData.items);
-
-            // Classes are already coming from context
         } catch (err: unknown) {
             console.error('Failed to fetch data:', err);
             setError('Failed to load staff information.');
@@ -97,9 +94,9 @@ export default function ClassesPage() {
             };
 
             if (editingClass) {
-                await api.updateClass(editingClass.id, payload);
+                await updateClass(editingClass.id, payload);
             } else {
-                await api.addClass(payload);
+                await addClass(payload);
             }
 
             setIsAddOpen(false);
@@ -118,7 +115,7 @@ export default function ClassesPage() {
         if (!idToDelete) return;
         setIsDeleting(true);
         try {
-            await api.deleteClass(idToDelete);
+            await deleteClass(idToDelete);
             refreshClasses();
             setDeleteConfirmOpen(false);
         } catch (err: unknown) {

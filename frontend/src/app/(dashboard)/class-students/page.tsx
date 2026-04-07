@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
-import { api } from '@/lib/api';
+import React, { useEffect, useState, useCallback, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { getClassStudents, addClassStudent, updateClassStudent, deleteClassStudent } from './actions';
+import { getClasses } from '../classes/actions';
 import { ClassStudent } from './types';
 import { SchoolClass } from '../classes/types';
-import { getClassStudentColumns } from './utils';
 import { useAuth } from '@/components/AuthContext';
 import {
     Users,
@@ -16,13 +17,14 @@ import {
     X,
     Filter,
     ChevronDown,
-    AlertCircle,
     UserCircle,
     LayoutGrid,
-    List
+    List,
+    AlertCircle
 } from 'lucide-react';
-import Table, { Column } from '@/components/Table';
 import { ConfirmBox } from '@/components/ConfirmBox';
+import Table from '@/components/Table';
+import { getClassStudentColumns } from './utils';
 import Link from 'next/link';
 
 export default function ClassStudentsPage() {
@@ -31,51 +33,51 @@ export default function ClassStudentsPage() {
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [mappings, setMappings] = useState<ClassStudent[]>([]);
     const [classes, setClasses] = useState<SchoolClass[]>([]);
+    const [total, setTotal] = useState(0);
+    const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(true);
-    const [academicYear, setAcademicYear] = useState('2025-26');
-    const [classFilter, setClassFilter] = useState('');
+    const [pageSize, setPageSize] = useState(12);
+    const [error, setError] = useState<string | null>(null);
+
     const [isAddOpen, setIsAddOpen] = useState(false);
     const [editingMapping, setEditingMapping] = useState<ClassStudent | null>(null);
-    const [error, setError] = useState<string | null>(null);
+    const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+    const [idToDelete, setIdToDelete] = useState<number | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    const [academicYear, setAcademicYear] = useState('2025-26');
+    const [classFilter, setClassFilter] = useState('');
 
     const [formData, setFormData] = useState({
         academic_year: '2025-26',
         class_id: '',
-        students_raw: '' // Comma separated IDs for simplicity in this demo
+        students_raw: ''
     });
 
     const [submitting, setSubmitting] = useState(false);
-    const [page, setPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
-    const [total, setTotal] = useState(0);
-    const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-    const [idToDelete, setIdToDelete] = useState<number | null>(null);
-    const [isDeleting, setIsDeleting] = useState(false);
 
     const fetchData = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
-            const [mappingsData, classesData] = await Promise.all([
-                api.getClassStudents({ academic_year: academicYear, skip: (page - 1) * pageSize, limit: pageSize }),
-                api.getClasses({ limit: 100 })
+            const [mappingData, classList] = await Promise.all([
+                getClassStudents({ academic_year: academicYear, skip: (page - 1) * pageSize, limit: pageSize }),
+                getClasses({ limit: 100 })
             ]);
 
-            setMappings(mappingsData.items);
-            setTotal(mappingsData.total);
-            setClasses(classesData.items);
+            setMappings(mappingData.items || []);
+            setTotal(mappingData.total || 0);
+            setClasses(classList.items || []);
+
         } catch (err: unknown) {
-            console.error('Failed to fetch data:', err);
-            setError('Failed to load class assignments.');
+            setError(err instanceof Error ? err.message : 'An error occurred');
         } finally {
             setLoading(false);
         }
-    }, [academicYear, page, pageSize]);
+    }, [page, pageSize, academicYear]);
 
     useEffect(() => {
-        if (user) {
-            fetchData();
-        }
+        if (user) fetchData();
     }, [fetchData, user]);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -95,18 +97,17 @@ export default function ClassStudentsPage() {
             };
 
             if (editingMapping) {
-                await api.updateClassStudent(editingMapping.id, payload);
+                await updateClassStudent(editingMapping.id, payload);
             } else {
-                await api.addClassStudent(payload);
+                await addClassStudent(payload);
             }
 
             setIsAddOpen(false);
             setEditingMapping(null);
-            setFormData({ academic_year: '2025-26', class_id: '', students_raw: '' });
+            setFormData({ academic_year: academicYear, class_id: '', students_raw: '' });
             fetchData();
         } catch (err: unknown) {
-            const msg = err instanceof Error ? err.message : 'Failed to save assignment.';
-            setError(msg);
+            setError(err instanceof Error ? err.message : 'Failed to save assignment.');
         } finally {
             setSubmitting(false);
         }
@@ -116,12 +117,11 @@ export default function ClassStudentsPage() {
         if (!idToDelete) return;
         setIsDeleting(true);
         try {
-            await api.deleteClassStudent(idToDelete);
+            await deleteClassStudent(idToDelete);
             fetchData();
             setDeleteConfirmOpen(false);
         } catch (err: unknown) {
-            const msg = err instanceof Error ? err.message : 'Failed to delete assignment.';
-            setError(msg);
+            setError('Failed to delete mapping');
         } finally {
             setIsDeleting(false);
             setIdToDelete(null);
@@ -143,11 +143,10 @@ export default function ClassStudentsPage() {
         setIsAddOpen(true);
     };
 
-
     if (!user) return null;
 
     const filteredMappings = classFilter
-        ? mappings.filter(m => m.class_id.toString() === classFilter)
+        ? mappings.filter((m: ClassStudent) => m.class_id.toString() === classFilter)
         : mappings;
 
     return (
@@ -269,17 +268,17 @@ export default function ClassStudentsPage() {
                                 <div className="bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl p-4 mb-6">
                                     <div className="flex items-center justify-between mb-2">
                                         <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Student Count</span>
-                                        <span className="text-lg font-black text-indigo-500">{m.students.length}</span>
+                                        <span className="text-lg font-black text-indigo-500">{m.students?.length || 0}</span>
                                     </div>
                                     <div className="flex -space-x-2 overflow-hidden">
-                                        {[...Array(Math.min(5, m.students.length))].map((_, i) => (
+                                        {[...Array(Math.min(5, m.students?.length || 0))].map((_, i) => (
                                             <div key={i} className="inline-block h-8 w-8 rounded-full ring-2 ring-white dark:ring-zinc-900 bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center">
                                                 <UserCircle className="w-5 h-5 text-zinc-400" />
                                             </div>
                                         ))}
-                                        {m.students.length > 5 && (
+                                        {(m.students?.length || 0) > 5 && (
                                             <div className="flex items-center justify-center h-8 w-8 rounded-full ring-2 ring-white dark:ring-zinc-900 bg-indigo-500 text-[10px] font-bold text-white">
-                                                +{m.students.length - 5}
+                                                +{(m.students?.length || 0) - 5}
                                             </div>
                                         )}
                                     </div>

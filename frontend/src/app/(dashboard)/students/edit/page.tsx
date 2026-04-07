@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { api } from '@/lib/api';
+import { getStudentById, updateStudent } from '../actions';
 import { useAuth } from '@/components/AuthContext';
 import {
     ArrowLeft,
@@ -53,7 +53,7 @@ function EditStudentForm() {
             const fetchStudent = async () => {
                 setFetching(true);
                 try {
-                    const data = await api.getStudentById(id as string);
+                    const data = await getStudentById(id as string);
                     setGrNo(data.gr_no);
                     setForm({
                         name: data.name,
@@ -130,7 +130,7 @@ function EditStudentForm() {
         setError(null);
 
         try {
-            await api.updateStudent(id as string, form);
+            await updateStudent(id as string, form);
             setSuccess(true);
             setTimeout(() => {
                 router.push('/students');

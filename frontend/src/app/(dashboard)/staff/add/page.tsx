@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { api } from '@/lib/api';
+import { addStaff } from '../actions';
 import { useAuth } from '@/components/AuthContext';
 import {
     ChevronLeft,
@@ -109,7 +109,7 @@ export default function AddStaffPage() {
         setError(null);
 
         try {
-            await api.addStaff(formData);
+            await addStaff(formData);
             setSuccess(true);
             setTimeout(() => {
                 router.push('/staff');
@@ -178,7 +178,6 @@ export default function AddStaffPage() {
                                 <div className="relative group">
                                     <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" />
                                     <input
-                                        // required
                                         name="name"
                                         value={formData.name}
                                         onChange={handleChange}
@@ -199,7 +198,6 @@ export default function AddStaffPage() {
                                 <div className="relative group">
                                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" />
                                     <input
-                                        // required
                                         type="text"
                                         name="email"
                                         value={formData.email}
@@ -221,7 +219,6 @@ export default function AddStaffPage() {
                                 <div className="relative group">
                                     <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" />
                                     <input
-                                        // required
                                         name="mobile"
                                         value={formData.mobile}
                                         onChange={handleChange}
@@ -276,7 +273,6 @@ export default function AddStaffPage() {
                                 <div className="relative group">
                                     <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-indigo-500 transition-colors pointer-events-none" />
                                     <select
-                                        // required
                                         name="department"
                                         value={formData.department}
                                         onChange={handleChange}
@@ -294,7 +290,6 @@ export default function AddStaffPage() {
                                 <div className="relative group">
                                     <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-indigo-500 transition-colors pointer-events-none" />
                                     <select
-                                        // required
                                         name="qualification"
                                         value={formData.qualification}
                                         onChange={handleChange}
@@ -324,7 +319,6 @@ export default function AddStaffPage() {
                                 <div className="relative group">
                                     <MapPin className="absolute left-4 top-4 w-4 h-4 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" />
                                     <textarea
-                                        // required
                                         name="address"
                                         value={formData.address}
                                         onChange={handleChange}
@@ -345,7 +339,6 @@ export default function AddStaffPage() {
                                 <div className="space-y-2">
                                     <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 ml-1">City</label>
                                     <input
-                                        // required
                                         name="city"
                                         value={formData.city}
                                         onChange={handleChange}
@@ -363,7 +356,6 @@ export default function AddStaffPage() {
                             <div className="space-y-2">
                                 <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 ml-1">Zip Code</label>
                                 <input
-                                    // required
                                     name="zip_code"
                                     value={formData.zip_code}
                                     onChange={handleChange}

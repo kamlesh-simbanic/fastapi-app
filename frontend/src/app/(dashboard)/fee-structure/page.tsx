@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { api } from '@/lib/api';
+import { getClasses } from '../classes/actions';
+import { getFeeStructures, addFeeStructure, updateFeeStructure, deleteFeeStructure } from './actions';
 import { FeeStructure } from './types';
 import { SchoolClass } from '../classes/types';
 import { getFeeStructureColumns } from './utils';
@@ -35,7 +36,7 @@ export default function FeeStructurePage() {
     const fetchClasses = useCallback(async () => {
         setLoading(true);
         try {
-            const classData = await api.getClasses();
+            const classData = await getClasses();
             setClasses(classData.items);
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : 'Failed to fetch data');
@@ -47,7 +48,7 @@ export default function FeeStructurePage() {
     const fetchStructures = useCallback(async () => {
         setLoading(true);
         try {
-            const structureData = await api.getFeeStructures();
+            const structureData = await getFeeStructures();
             setStructures(structureData);
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : 'Failed to fetch data');
@@ -58,7 +59,7 @@ export default function FeeStructurePage() {
 
     useEffect(() => {
         if (user) { fetchStructures(); fetchClasses(); }
-    }, [user]);
+    }, [user, fetchStructures, fetchClasses]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -71,9 +72,9 @@ export default function FeeStructurePage() {
             };
 
             if (isEditing && selectedId) {
-                await api.updateFeeStructure(selectedId, data);
+                await updateFeeStructure(selectedId, data);
             } else {
-                await api.addFeeStructure(data);
+                await addFeeStructure(data);
             }
             setShowModal(false);
             fetchStructures();
@@ -97,7 +98,7 @@ export default function FeeStructurePage() {
     const triggerDelete = async (id: number) => {
         if (!confirm('Are you sure you want to delete this fee structure?')) return;
         try {
-            await api.deleteFeeStructure(id);
+            await deleteFeeStructure(id);
             fetchStructures();
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : 'Failed to delete');
