@@ -18,7 +18,6 @@ import {
     Filter,
     ChevronDown,
     UserCircle,
-    LayoutGrid,
     List,
     AlertCircle
 } from 'lucide-react';
@@ -30,7 +29,6 @@ import Link from 'next/link';
 export default function ClassStudentsPage() {
     const { user } = useAuth();
 
-    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [mappings, setMappings] = useState<ClassStudent[]>([]);
     const [classes, setClasses] = useState<SchoolClass[]>([]);
     const [total, setTotal] = useState(0);
@@ -176,7 +174,7 @@ export default function ClassStudentsPage() {
                 </button>
             </section>
 
-            {/* Filters & Toggle */}
+            {/* Filters */}
             <section className="flex flex-col sm:flex-row items-center gap-4 bg-white dark:bg-zinc-900 p-4 rounded-[2rem] border border-zinc-200 dark:border-zinc-800 shadow-sm">
                 <div className="flex items-center gap-3 flex-1 w-full">
                     <Filter className="w-5 h-5 text-indigo-500 ml-2" />
@@ -209,21 +207,6 @@ export default function ClassStudentsPage() {
                         </div>
                     </div>
                 </div>
-
-                <div className="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl">
-                    <button
-                        onClick={() => setViewMode('grid')}
-                        className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-white dark:bg-zinc-700 shadow-sm text-indigo-500' : 'text-zinc-400 hover:text-zinc-500'}`}
-                    >
-                        <LayoutGrid className="w-4 h-4" />
-                    </button>
-                    <button
-                        onClick={() => setViewMode('list')}
-                        className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-white dark:bg-zinc-700 shadow-sm text-indigo-500' : 'text-zinc-400 hover:text-zinc-500'}`}
-                    >
-                        <List className="w-4 h-4" />
-                    </button>
-                </div>
             </section>
 
             {error && (
@@ -245,59 +228,6 @@ export default function ClassStudentsPage() {
                         <Users className="w-12 h-12 text-zinc-300" />
                         <h3 className="text-lg font-bold text-zinc-900 dark:text-white">No assignments found</h3>
                         <p className="text-zinc-500 text-sm max-w-xs">No students have been assigned to classes for this year yet.</p>
-                    </div>
-                ) : viewMode === 'grid' ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in slide-in-from-bottom-4 duration-500">
-                        {filteredMappings.map((m) => (
-                            <div key={m.id} className="group p-8 rounded-[2.5rem] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-indigo-500/30 transition-all hover:shadow-2xl hover:shadow-indigo-500/5 relative overflow-hidden flex flex-col">
-                                <div className="flex justify-between items-start mb-6">
-                                    <div className="space-y-1">
-                                        <div className="px-3 py-1 bg-indigo-500/10 text-indigo-500 rounded-full text-[10px] font-black uppercase tracking-widest inline-block mb-2">
-                                            {m.academic_year}
-                                        </div>
-                                        <h3 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tighter italic">
-                                            {m.school_class ? `${m.school_class.standard} - ${m.school_class.division}` : `Class ID: ${m.class_id}`}
-                                        </h3>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <button onClick={() => openEdit(m)} className="p-2 text-zinc-400 hover:text-indigo-500 transition-colors"><Edit2 className="w-4 h-4" /></button>
-                                        <button onClick={() => triggerDelete(m.id)} className="p-2 text-zinc-400 hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
-                                    </div>
-                                </div>
-
-                                <div className="bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl p-4 mb-6">
-                                    <div className="flex items-center justify-between mb-2">
-                                        <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Student Count</span>
-                                        <span className="text-lg font-black text-indigo-500">{m.students?.length || 0}</span>
-                                    </div>
-                                    <div className="flex -space-x-2 overflow-hidden">
-                                        {[...Array(Math.min(5, m.students?.length || 0))].map((_, i) => (
-                                            <div key={i} className="inline-block h-8 w-8 rounded-full ring-2 ring-white dark:ring-zinc-900 bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center">
-                                                <UserCircle className="w-5 h-5 text-zinc-400" />
-                                            </div>
-                                        ))}
-                                        {(m.students?.length || 0) > 5 && (
-                                            <div className="flex items-center justify-center h-8 w-8 rounded-full ring-2 ring-white dark:ring-zinc-900 bg-indigo-500 text-[10px] font-bold text-white">
-                                                +{(m.students?.length || 0) - 5}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="mt-auto pt-6 border-t border-zinc-100 dark:border-zinc-800/50 flex items-center justify-between">
-                                    <div className="flex items-center gap-2 text-zinc-500 text-[10px] font-bold uppercase tracking-widest">
-                                        <Calendar className="w-3 h-3 text-indigo-500" />
-                                        Active Mapping
-                                    </div>
-                                    <Link
-                                        href={`/class-students/detail?id=${m.id}`}
-                                        className="text-xs font-black text-indigo-500 uppercase tracking-widest hover:underline transition-all"
-                                    >
-                                        View List
-                                    </Link>
-                                </div>
-                            </div>
-                        ))}
                     </div>
                 ) : (
                     <Table

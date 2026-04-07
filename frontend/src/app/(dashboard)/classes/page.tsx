@@ -15,9 +15,7 @@ import {
     X,
     BadgeCheck,
     ChevronDown,
-    AlertCircle,
-    LayoutGrid,
-    List
+    AlertCircle
 } from 'lucide-react';
 import Table from '@/components/Table';
 import { cn } from '@/lib/utils';
@@ -35,7 +33,6 @@ export default function ClassesPage() {
 
     const [staff, setStaff] = useState<Staff[]>([]);
     const [loading, setLoading] = useState(true);
-    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
@@ -172,7 +169,7 @@ export default function ClassesPage() {
                 </button>
             </section>
 
-            {/* Filters & Toggle */}
+            {/* Filters */}
             <section className="flex flex-col sm:flex-row items-center gap-4">
                 <div className="relative group flex-1 w-full">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" />
@@ -184,27 +181,6 @@ export default function ClassesPage() {
                         className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-3.5 pl-12 pr-12 text-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-sm"
                     />
                     {search && <button onClick={() => setSearch('')} className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 hover:bg-zinc-100 rounded-xl text-zinc-400"><X className="w-4 h-4" /></button>}
-                </div>
-
-                <div className="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl self-end sm:self-center">
-                    <button
-                        onClick={() => setViewMode('grid')}
-                        className={cn(
-                            "p-2 rounded-lg transition-all",
-                            viewMode === 'grid' ? "bg-white dark:bg-zinc-700 shadow-sm text-indigo-500" : "text-zinc-400 hover:text-zinc-500"
-                        )}
-                    >
-                        <LayoutGrid className="w-4 h-4" />
-                    </button>
-                    <button
-                        onClick={() => setViewMode('list')}
-                        className={cn(
-                            "p-2 rounded-lg transition-all",
-                            viewMode === 'list' ? "bg-white dark:bg-zinc-700 shadow-sm text-indigo-500" : "text-zinc-400 hover:text-zinc-500"
-                        )}
-                    >
-                        <List className="w-4 h-4" />
-                    </button>
                 </div>
             </section>
 
@@ -227,44 +203,6 @@ export default function ClassesPage() {
                         <Layers className="w-12 h-12 text-zinc-300" />
                         <h3 className="text-lg font-bold text-zinc-900 dark:text-white">No classes found</h3>
                         <p className="text-zinc-500 text-sm max-w-xs">Create your first class to start managing student groups.</p>
-                    </div>
-                ) : viewMode === 'grid' ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-in slide-in-from-bottom-4 duration-500">
-                        {filteredClasses.map((cls: SchoolClass) => (
-                            <div key={cls.id} className="group p-6 rounded-[2.5rem] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-indigo-500/30 transition-all hover:shadow-2xl hover:shadow-indigo-500/5 relative overflow-hidden flex flex-col">
-                                <div className="flex justify-between items-start mb-6">
-                                    <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center">
-                                        <span className="text-indigo-600 font-black text-lg">{cls.division}</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <button onClick={() => openEdit(cls)} className="p-2 text-zinc-400 hover:text-indigo-500 transition-colors"><Edit2 className="w-4 h-4" /></button>
-                                        <button onClick={() => triggerDelete(cls.id)} className="p-2 text-zinc-400 hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-1 mb-6">
-                                    <h3 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tighter italic">Standard {cls.standard}</h3>
-                                    <div className="flex items-center gap-2 text-zinc-500 text-xs font-bold uppercase tracking-widest">
-                                        <BadgeCheck className="w-3 h-3 text-emerald-500" />
-                                        Division {cls.division}
-                                    </div>
-                                </div>
-
-                                <div className="mt-auto pt-6 border-t border-zinc-100 dark:border-zinc-800/50">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
-                                            <User className="w-4 h-4 text-zinc-400" />
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Class Teacher</span>
-                                            <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
-                                                {cls.class_teacher?.name || 'Not assigned'}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
                     </div>
                 ) : (
                     <Table

@@ -7,8 +7,6 @@ import Link from 'next/link';
 import {
     Users,
     Search,
-    LayoutGrid,
-    List,
     Calendar,
     MapPin,
     Phone,
@@ -48,7 +46,6 @@ export default function StudentsPage() {
     const [pageSize, setPageSize] = useState(12);
     const [sortBy, setSortBy] = useState('name');
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-    const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
     const [error, setError] = useState<string | null>(null);
 
 
@@ -94,12 +91,6 @@ export default function StudentsPage() {
         }
     }, [fetchStudents, user]);
 
-    useEffect(() => {
-        // Switch to grid view on small screens by default
-        if (window.innerWidth < 1024) {
-            setViewMode('grid');
-        }
-    }, []);
 
     useEffect(() => {
         setPage(1);
@@ -124,15 +115,6 @@ export default function StudentsPage() {
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <div className="flex bg-zinc-100 dark:bg-zinc-900 p-1 rounded-xl border border-zinc-200 dark:border-zinc-800">
-                        <button onClick={() => setViewMode('grid')} className={cn("p-2 rounded-lg transition-all", viewMode === 'grid' ? "bg-white dark:bg-zinc-800 text-indigo-500 shadow-sm" : "text-zinc-400 hover:text-zinc-600")}>
-                            <LayoutGrid className="w-4 h-4" />
-                        </button>
-                        <button onClick={() => setViewMode('list')} className={cn("p-2 rounded-lg transition-all", viewMode === 'list' ? "bg-white dark:bg-zinc-800 text-indigo-500 shadow-sm" : "text-zinc-400 hover:text-zinc-600")}>
-                            <List className="w-4 h-4" />
-                        </button>
-                    </div>
-
                     <Link href="/students/add" className="px-4 py-2 bg-indigo-500 text-white rounded-xl text-sm font-bold hover:bg-indigo-600 shadow-lg shadow-indigo-500/20 active:scale-95 transition-all flex items-center gap-2">
                         <Users className="w-4 h-4" />
                         Add Student
@@ -195,66 +177,6 @@ export default function StudentsPage() {
                         <Users className="w-12 h-12 text-zinc-300" />
                         <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Empty Directory</h3>
                         <button onClick={() => { setSearch(''); }} className="text-indigo-500 text-sm font-bold hover:underline">Clear search filter</button>
-                    </div>
-                ) : viewMode === 'grid' ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-in slide-in-from-bottom-4 duration-500">
-                        {students.map((member) => (
-                            <div key={member.id} className="group p-6 rounded-[2.5rem] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-indigo-500/30 transition-all hover:shadow-2xl hover:shadow-indigo-500/5 relative overflow-hidden flex flex-col">
-                                <div className="absolute -top-4 -right-4 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl group-hover:bg-indigo-500/10 transition-colors" />
-
-                                <div className="flex justify-between items-start mb-6">
-                                    <div className="w-14 h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-800 flex items-center justify-center flex-shrink-0 shadow-sm transition-transform group-hover:scale-110">
-                                        <UserCircle className="w-8 h-8 text-zinc-400 group-hover:text-indigo-500 transition-colors" />
-                                    </div>
-                                    <div className="bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 px-3 py-1.5 rounded-xl flex flex-col items-center justify-center shadow-lg">
-                                        <span className="text-[10px] font-black uppercase tracking-tighter opacity-70">GR NO</span>
-                                        <span className="text-xs font-black font-mono leading-none">{member.gr_no}</span>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-1 mb-6">
-                                    <h3 className="text-lg font-extrabold text-zinc-900 dark:text-white tracking-tight leading-tight group-hover:text-indigo-600 transition-colors">
-                                        {member.name} {member.surname}
-                                    </h3>
-                                    <p className="text-zinc-500 dark:text-zinc-400 text-xs font-medium flex items-center gap-1.5 uppercase tracking-wide">
-                                        S/O {member.father_name}
-                                    </p>
-                                </div>
-
-                                <div className="space-y-4 pt-6 border-t border-zinc-100 dark:border-zinc-800/50 flex-1">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-1">
-                                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Born</span>
-                                            <div className="flex items-center gap-2 text-xs font-bold text-zinc-700 dark:text-zinc-300">
-                                                <Calendar className="w-3.5 h-3.5 text-indigo-500" />
-                                                {new Date(member.dob).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
-                                            </div>
-                                        </div>
-                                        <div className="space-y-1">
-                                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Region</span>
-                                            <div className="flex items-center gap-2 text-xs font-bold text-zinc-700 dark:text-zinc-300">
-                                                <MapPin className="w-3.5 h-3.5 text-emerald-500" />
-                                                {member.city}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="space-y-1">
-                                        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Contact</span>
-                                        <div className="flex items-center gap-2 text-xs font-bold text-zinc-700 dark:text-zinc-300">
-                                            <Phone className="w-3.5 h-3.5 text-indigo-500" />
-                                            {member.mobile}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-2 mt-6">
-                                    <Link href={`/students/edit?id=${member.id}`} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 hover:bg-indigo-500 hover:text-white transition-all text-xs font-bold border border-zinc-100 dark:border-zinc-800">
-                                        <Pencil className="w-3.5 h-3.5" />
-                                        Update Profile
-                                    </Link>
-                                </div>
-                            </div>
-                        ))}
                     </div>
                 ) : (
                     <Table

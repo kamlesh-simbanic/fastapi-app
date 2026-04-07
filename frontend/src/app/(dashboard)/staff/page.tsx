@@ -8,15 +8,8 @@ import {
     Users,
     Search,
     Filter,
-    Mail,
-    Phone,
-    MapPin,
-    Briefcase,
     Loader2,
     X,
-    LayoutGrid,
-    List,
-    Pencil,
     ChevronDown,
     ArrowUp,
     ArrowDown
@@ -45,10 +38,9 @@ export default function StaffPage() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
-    const [pageSize, setPageSize] = useState(6);
+    const [pageSize, setPageSize] = useState(12);
     const [sortBy, setSortBy] = useState('created_at');
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [error, setError] = useState<string | null>(null);
 
     const fetchStaff = useCallback(async () => {
@@ -93,14 +85,6 @@ export default function StaffPage() {
         }
     }, [fetchStaff, user]);
 
-    useEffect(() => {
-        // Set view mode based on screen size on mount
-        if (typeof window !== 'undefined' && window.innerWidth < 1024) {
-            setViewMode('grid');
-        } else {
-            setViewMode('grid'); // Staff defaults to grid anyway
-        }
-    }, []);
 
     useEffect(() => {
         setPage(1);
@@ -130,7 +114,7 @@ export default function StaffPage() {
                 </div>
 
                 <div className="flex items-center gap-3">
-                    {/* Sort Dropdown for Grid/Mobile */}
+                    {/* Sort Dropdown  */}
                     <div className="flex items-center gap-2">
                         <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider hidden sm:inline">Sort by:</span>
                         <div className="relative group">
@@ -154,15 +138,6 @@ export default function StaffPage() {
                     </div>
 
                     <div className="w-px h-8 bg-zinc-200 dark:bg-zinc-800 mx-1" />
-
-                    <div className="flex bg-zinc-100 dark:bg-zinc-900 p-1 rounded-xl border border-zinc-200 dark:border-zinc-800">
-                        <button onClick={() => setViewMode('grid')} className={cn("p-2 rounded-lg transition-all", viewMode === 'grid' ? "bg-white dark:bg-zinc-800 text-indigo-500 shadow-sm" : "text-zinc-400 hover:text-zinc-600")}>
-                            <LayoutGrid className="w-4 h-4" />
-                        </button>
-                        <button onClick={() => setViewMode('list')} className={cn("p-2 rounded-lg transition-all", viewMode === 'list' ? "bg-white dark:bg-zinc-800 text-indigo-500 shadow-sm" : "text-zinc-400 hover:text-zinc-600")}>
-                            <List className="w-4 h-4" />
-                        </button>
-                    </div>
 
                     <Link href="/staff/add" className="px-4 py-2 bg-indigo-500 text-white rounded-xl text-sm font-bold hover:bg-indigo-600 shadow-lg shadow-indigo-500/20 active:scale-95 transition-all flex items-center gap-2">
                         <Users className="w-4 h-4" />
@@ -227,39 +202,6 @@ export default function StaffPage() {
                         <Users className="w-12 h-12 text-zinc-300" />
                         <h3 className="text-lg font-bold text-zinc-900 dark:text-white">No personnel found</h3>
                         <button onClick={() => { setSearch(''); setSelectedDepartments([]); }} className="text-indigo-500 text-sm font-bold hover:underline">Clear all filters</button>
-                    </div>
-                ) : viewMode === 'grid' ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in slide-in-from-bottom-4 duration-500">
-                        {staff.map((member) => (
-                            <div key={member.id} className="group p-6 rounded-[2rem] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-indigo-500/30 transition-all hover:shadow-xl hover:shadow-indigo-500/5 relative overflow-hidden flex flex-col">
-                                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity"><Briefcase className="w-20 h-20 text-indigo-500" /></div>
-                                <div className="absolute top-4 right-4 flex gap-2">
-                                    <Link href={`/staff/edit?id=${member.id}`} className="p-2 bg-white/90 dark:bg-zinc-800/90 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-400 hover:text-indigo-500 transition-all shadow-sm"><Pencil className="w-4 h-4" /></Link>
-                                </div>
-
-                                <div className="flex justify-between items-start mb-6">
-                                    <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center"><Users className="w-6 h-6 text-indigo-500" /></div>
-                                    <span className={cn("px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border", getDepartmentColor(member.department))}>{member.department}</span>
-                                </div>
-
-                                <div className="space-y-1 mb-6">
-                                    <h3 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight">{member.name}</h3>
-                                    <p className="text-indigo-500 dark:text-indigo-400 text-xs font-semibold uppercase tracking-wider">{member.qualification}</p>
-                                </div>
-
-                                <div className="space-y-3 pt-6 border-t border-zinc-100 dark:border-zinc-800/50 flex-1">
-                                    <div className="flex items-center gap-3 text-sm text-zinc-500 dark:text-zinc-400"><Mail className="w-4 h-4 text-zinc-400" /><span className="truncate">{member.email}</span></div>
-                                    <div className="flex items-center gap-3 text-sm text-zinc-500 dark:text-zinc-400"><Phone className="w-4 h-4 text-zinc-400" /><span>{member.mobile}</span></div>
-                                    <div className="flex items-center gap-3 text-sm text-zinc-500 dark:text-zinc-400"><MapPin className="w-4 h-4 text-zinc-400" /><span>{member.city}</span></div>
-                                    <div className="flex items-center gap-2 text-zinc-400 dark:text-zinc-500 mt-1">
-                                        <span className="text-[10px] font-bold uppercase tracking-wider">Joined:</span>
-                                        <span className="text-[10px]">{new Date(member.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
-                                    </div>
-                                </div>
-
-                                <button className="mt-6 w-full py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-white text-sm font-bold border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-zinc-900 transition-all">View Full Profile</button>
-                            </div>
-                        ))}
                     </div>
                 ) : (
                     <Table

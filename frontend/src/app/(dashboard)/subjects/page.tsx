@@ -40,7 +40,6 @@ export default function SubjectsPage() {
     const { user } = useAuth();
     const { subjects: allSubjects, loading: globalLoading, refreshSubjects } = useGlobalData();
 
-    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [search, setSearch] = useState('');
     const [isAddOpen, setIsAddOpen] = useState(false);
     const [editingSubject, setEditingSubject] = useState<Subject | null>(null);
@@ -215,27 +214,6 @@ export default function SubjectsPage() {
                     />
                     {search && <button onClick={() => setSearch('')} className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 hover:bg-zinc-100 rounded-xl text-zinc-400"><X className="w-4 h-4" /></button>}
                 </div>
-
-                <div className="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl">
-                    <button
-                        onClick={() => setViewMode('grid')}
-                        className={cn(
-                            "p-2 rounded-lg transition-all",
-                            viewMode === 'grid' ? "bg-white dark:bg-zinc-700 shadow-sm text-indigo-500" : "text-zinc-400 hover:text-zinc-500"
-                        )}
-                    >
-                        <LayoutGrid className="w-4 h-4" />
-                    </button>
-                    <button
-                        onClick={() => setViewMode('list')}
-                        className={cn(
-                            "p-2 rounded-lg transition-all",
-                            viewMode === 'list' ? "bg-white dark:bg-zinc-700 shadow-sm text-indigo-500" : "text-zinc-400 hover:text-zinc-500"
-                        )}
-                    >
-                        <List className="w-4 h-4" />
-                    </button>
-                </div>
             </section>
 
             {error && (
@@ -262,38 +240,6 @@ export default function SubjectsPage() {
                             <BookOpen className="w-12 h-12 text-zinc-300" />
                             <h3 className="text-lg font-bold text-zinc-900 dark:text-white">No subjects found</h3>
                             <p className="text-zinc-500 text-sm max-w-xs">Create subjects to start assigning them to teachers.</p>
-                        </div>
-                    ) : viewMode === 'grid' ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            {filteredSubjects.map((sub: Subject) => (
-                                <button
-                                    key={sub.id}
-                                    onClick={() => setSelectedSubject(sub)}
-                                    className={cn(
-                                        "group p-6 rounded-[2.5rem] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 transition-all text-left relative overflow-hidden",
-                                        selectedSubject?.id === sub.id ? "ring-2 ring-indigo-500 border-transparent shadow-2xl shadow-indigo-500/10" : "hover:border-indigo-500/30 hover:shadow-xl"
-                                    )}
-                                >
-                                    <div className="flex justify-between items-start mb-6">
-                                        <div className={cn(
-                                            "w-12 h-12 rounded-2xl flex items-center justify-center transition-colors",
-                                            selectedSubject?.id === sub.id ? "bg-indigo-500 text-white" : "bg-indigo-500/10 text-indigo-600"
-                                        )}>
-                                            <BookOpen className="w-6 h-6" />
-                                        </div>
-                                        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                                            <button onClick={() => openEdit(sub)} className="p-2 text-zinc-400 hover:text-indigo-500 transition-colors"><Edit2 className="w-4 h-4" /></button>
-                                            <button onClick={() => { setIdToDelete(sub.id); setDeleteConfirmOpen(true); }} className="p-2 text-zinc-400 hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
-                                        </div>
-                                    </div>
-                                    <h3 className="text-xl font-black text-zinc-900 dark:text-white tracking-tight italic">{sub.name}</h3>
-                                    {selectedSubject?.id === sub.id && (
-                                        <div className="absolute right-6 bottom-6 animate-in slide-in-from-right-2 fade-in">
-                                            <ArrowRight className="w-5 h-5 text-indigo-500" />
-                                        </div>
-                                    )}
-                                </button>
-                            ))}
                         </div>
                     ) : (
                         <Table
@@ -466,7 +412,7 @@ export default function SubjectsPage() {
                                         }
                                     </select>
                                     <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-400">
-                                        <LayoutGrid className="w-4 h-4" />
+                                        <ChevronDown className="w-4 h-4" />
                                     </div>
                                 </div>
                             </div>

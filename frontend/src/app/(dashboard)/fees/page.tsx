@@ -7,8 +7,6 @@ import Link from 'next/link';
 import {
     CreditCard,
     Search,
-    LayoutGrid,
-    List,
     Loader2,
     ChevronDown,
     X,
@@ -35,7 +33,6 @@ export default function FeesPage() {
     const [pageSize, setPageSize] = useState(12);
     const [term, setTerm] = useState<string>('');
     const [year, setYear] = useState<string>('');
-    const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
     const [error, setError] = useState<string | null>(null);
     const [selectedPayment, setSelectedPayment] = useState<FeePayment | null>(null);
     const [sortBy, setSortBy] = useState<string>('created_at');
@@ -107,15 +104,6 @@ export default function FeesPage() {
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <div className="flex bg-zinc-100 dark:bg-zinc-900 p-1 rounded-xl border border-zinc-200 dark:border-zinc-800">
-                        <button onClick={() => setViewMode('grid')} className={cn("p-2 rounded-lg transition-all", viewMode === 'grid' ? "bg-white dark:bg-zinc-800 text-emerald-500 shadow-sm" : "text-zinc-400 hover:text-zinc-600")}>
-                            <LayoutGrid className="w-4 h-4" />
-                        </button>
-                        <button onClick={() => setViewMode('list')} className={cn("p-2 rounded-lg transition-all", viewMode === 'list' ? "bg-white dark:bg-zinc-800 text-emerald-500 shadow-sm" : "text-zinc-400 hover:text-zinc-600")}>
-                            <List className="w-4 h-4" />
-                        </button>
-                    </div>
-
                     <Link href="/fees/add" className="px-4 py-2 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 shadow-lg shadow-emerald-500/20 active:scale-95 transition-all flex items-center gap-2">
                         <Plus className="w-4 h-4" />
                         Record Payment
@@ -207,49 +195,6 @@ export default function FeesPage() {
                         <CreditCard className="w-12 h-12 text-zinc-300" />
                         <h3 className="text-lg font-bold text-zinc-900 dark:text-white">No payments recorded</h3>
                         <button onClick={() => { setSearch(''); setTerm(''); setYear(''); }} className="text-emerald-500 text-sm font-bold hover:underline">Clear all filters</button>
-                    </div>
-                ) : viewMode === 'grid' ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-in slide-in-from-bottom-4 duration-500">
-                        {payments.map((payment) => (
-                            <div key={payment.id} className="group p-6 rounded-[2.5rem] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-emerald-500/30 transition-all hover:shadow-2xl hover:shadow-emerald-500/5 relative overflow-hidden flex flex-col">
-                                <div className="flex justify-between items-start mb-6">
-                                    <div className="px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-[10px] font-black uppercase tracking-widest text-zinc-500">
-                                        {payment.term} {payment.year}
-                                    </div>
-                                    <div className="text-emerald-500 font-black text-lg">
-                                        ${payment.amount.toLocaleString()}
-                                    </div>
-                                </div>
-
-                                <div className="space-y-1 mb-6">
-                                    <h3 className="text-lg font-extrabold text-zinc-900 dark:text-white tracking-tight leading-tight">
-                                        {payment.student?.name} {payment.student?.surname}
-                                    </h3>
-                                    <p className="text-zinc-500 dark:text-zinc-400 text-[10px] font-bold uppercase tracking-widest">
-                                        GR: {payment.gr_no}
-                                    </p>
-                                </div>
-
-                                <div className="space-y-4 pt-6 border-t border-zinc-100 dark:border-zinc-800/50 flex-1">
-                                    <div className="flex items-center justify-between text-xs font-bold">
-                                        <span className="text-zinc-400 uppercase tracking-widest">Method</span>
-                                        <span className="text-zinc-700 dark:text-zinc-300 uppercase">{payment.payment_method}</span>
-                                    </div>
-                                    <div className="flex items-center justify-between text-xs font-bold">
-                                        <span className="text-zinc-400 uppercase tracking-widest">Date</span>
-                                        <span className="text-zinc-700 dark:text-zinc-300">{new Date(payment.created_at).toLocaleDateString()}</span>
-                                    </div>
-                                </div>
-
-                                <button
-                                    onClick={() => setSelectedPayment(payment)}
-                                    className="mt-6 w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 hover:bg-emerald-500 hover:text-white transition-all text-xs font-bold border border-zinc-100 dark:border-zinc-800"
-                                >
-                                    <Eye className="w-3.5 h-3.5" />
-                                    View Receipt
-                                </button>
-                            </div>
-                        ))}
                     </div>
                 ) : (
                     <Table
