@@ -1,0 +1,25 @@
+{
+  "name": "fastapi-app",
+  "version": "1.0.0",
+  "description": "A comprehensive, modular school management application built with a FastAPI backend and a Next.js frontend. This project features student management, class organization, fee payment portals, and more, all packaged for easy deployment with Docker.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kamlesh-simbanic/fastapi-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/kamlesh-simbanic/fastapi-app/issues"
+  },
+  "homepage": "https://github.com/kamlesh-simbanic/fastapi-app#readme",
+  "devDependencies": {
+    "husky": "^9.1.7"
+  }
+}
