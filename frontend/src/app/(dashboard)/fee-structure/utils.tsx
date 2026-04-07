@@ -15,18 +15,21 @@ export const getFeeStructureColumns = ({
         {
             key: 'class',
             label: 'Class',
+            sortable: true,
             className: 'font-black text-zinc-900 dark:text-white capitalize',
             render: (fee) => fee.school_class ? `${fee.school_class.standard} - ${fee.school_class.division}` : 'Unknown Class'
         },
         {
             key: 'year',
             label: 'Academic Year',
+            sortable: true,
             className: 'font-bold text-zinc-600 dark:text-zinc-400',
             render: (fee) => fee.year
         },
         {
             key: 'fee_amount',
             label: 'Fee Amount',
+            sortable: true,
             className: 'font-black text-emerald-600 dark:text-emerald-400 text-lg',
             render: (fee) => `$${fee.fee_amount.toLocaleString()}`
         },

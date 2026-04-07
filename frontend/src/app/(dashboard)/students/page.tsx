@@ -7,20 +7,14 @@ import Link from 'next/link';
 import {
     Users,
     Search,
-    Calendar,
-    MapPin,
-    Phone,
     GraduationCap,
     Loader2,
     ChevronDown,
-    UserCircle,
     ArrowUp,
     ArrowDown,
-    X,
-    Pencil
+    X
 } from 'lucide-react';
 import Table from '@/components/Table';
-import { cn } from '@/lib/utils';
 import { Student } from './types';
 import { STUDENT_COLUMNS } from './utils';
 

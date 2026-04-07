@@ -1,9 +1,12 @@
 'use client';
 
 import React, { useEffect, useState, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { getClassStudentById } from '../actions';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { getClassStudentById, getClassStudents } from '../actions';
+import { getStudents } from '../../students/actions';
 import { ClassStudent } from '../types';
+import { Student } from '../../students/types';
+import { STUDENT_COLUMNS } from '../../students/utils';
 import { useAuth } from '@/components/AuthContext';
 import {
     ArrowLeft,
@@ -11,53 +14,133 @@ import {
     Calendar,
     GraduationCap,
     Clock,
-    CheckCircle2,
     LayoutGrid,
-    BookOpen
+    BookOpen,
+    ChevronDown,
+    Plus,
+    AlertCircle
 } from 'lucide-react';
-import Link from 'next/link';
+import Table from '@/components/Table';
+import { cn } from '@/lib/utils';
 
 function DetailContent() {
     const { user } = useAuth();
+    const router = useRouter();
     const searchParams = useSearchParams();
-    const mappingId = searchParams.get('id');
+    const id = searchParams.get('id');
+    const yearParam = searchParams.get('year') || '2025-26';
+
     const [mapping, setMapping] = useState<ClassStudent | null>(null);
+    const [students, setStudents] = useState<Student[]>([]);
     const [loading, setLoading] = useState(true);
+    const [loadingStudents, setLoadingStudents] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [academicYear, setAcademicYear] = useState(yearParam);
+
+    const fetchDetail = async (targetId: string, targetYear: string) => {
+        setLoading(true);
+        setError(null);
+        try {
+            let currentMapping: ClassStudent | null = null;
+
+            // First, try to fetch as a direct Mapping ID
+            try {
+                const data = await getClassStudentById(parseInt(targetId));
+                if (data && data.class_id.toString() === targetId) {
+                    currentMapping = data;
+                }
+            } catch (e) {
+                // Ignore and try class lookup
+            }
+
+            if (!currentMapping) {
+                // Try to fetch by Class ID and Year
+                const classData = await getClassStudents({
+                    class_id: parseInt(targetId),
+                    academic_year: targetYear
+                });
+
+                if (classData.items && classData.items.length > 0) {
+                    currentMapping = classData.items[0];
+                }
+            }
+
+            if (currentMapping) {
+                setMapping(currentMapping);
+                // Fetch full student details
+                if (currentMapping.students && currentMapping.students.length > 0) {
+                    setLoadingStudents(true);
+                    try {
+                        const studentsData = await getStudents({ id: currentMapping.students, limit: 1000 });
+                        setStudents(studentsData.items || []);
+                    } catch (studentErr) {
+                        console.error('Failed to fetch students:', studentErr);
+                    } finally {
+                        setLoadingStudents(false);
+                    }
+                } else {
+                    setStudents([]);
+                }
+            } else {
+                setMapping(null);
+                setStudents([]);
+                setError('No student assignments found for this class and year.');
+            }
+        } catch (err: unknown) {
+            console.error('Failed to fetch detail:', err);
+            setError('Failed to load assignment details.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchDetail = async () => {
-            if (!mappingId) return;
-            try {
-                const data = await getClassStudentById(parseInt(mappingId));
-                setMapping(data);
-            } catch (err: unknown) {
-                console.error('Failed to fetch detail:', err);
-                setError('Failed to load details');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        if (user) fetchDetail();
-    }, [mappingId, user]);
+        if (user && id) {
+            fetchDetail(id, academicYear);
+        }
+    }, [id, academicYear, user]);
 
     if (loading) {
         return (
-            <div className="flex flex-col items-center justify-center py-32 gap-4 text-zinc-500">
+            <div className="flex flex-col items-center justify-center py-32 gap-4 text-zinc-500 animate-in fade-in">
                 <Loader2 className="w-12 h-12 text-indigo-500 animate-spin" />
-                <p className="font-bold text-sm tracking-widest uppercase opacity-70">Loading details...</p>
+                <p className="font-bold text-xs uppercase tracking-widest opacity-70 italic tracking-[0.2em]">Synchronizing roster...</p>
             </div>
         );
     }
 
     if (error || !mapping) {
         return (
-            <div className="p-8 text-center bg-white dark:bg-zinc-900 rounded-[3rem] border border-zinc-200 dark:border-zinc-800">
-                <p className="text-red-500 font-bold">{error || 'Assignment not found'}</p>
-                <Link href="/class-students" className="mt-4 inline-flex items-center gap-2 text-indigo-500 font-bold hover:underline">
-                    <ArrowLeft className="w-4 h-4" /> Back to List
-                </Link>
+            <div className="space-y-6 animate-in fade-in duration-500">
+                <div className="flex items-center justify-between">
+                    <button onClick={() => router.back()} className="inline-flex items-center gap-2 text-zinc-500 hover:text-indigo-500 transition-colors text-xs font-bold uppercase tracking-widest">
+                        <ArrowLeft className="w-3 h-3" /> Back
+                    </button>
+
+                    <div className="relative group">
+                        <select
+                            value={academicYear}
+                            onChange={(e) => setAcademicYear(e.target.value)}
+                            className="appearance-none bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-2 pr-10 text-[10px] font-black uppercase tracking-widest text-zinc-500 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all cursor-pointer shadow-sm"
+                        >
+                            <option value="2024-25">2024-25</option>
+                            <option value="2025-26">2025-26</option>
+                            <option value="2026-27">2026-27</option>
+                        </select>
+                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
+                    </div>
+                </div>
+
+                <div className="p-20 text-center bg-white dark:bg-zinc-900 rounded-[3rem] border border-zinc-200 dark:border-zinc-800 shadow-sm border-dashed">
+                    <div className="w-20 h-20 rounded-3xl bg-zinc-50 dark:bg-zinc-800/50 flex items-center justify-center mx-auto mb-6">
+                        <AlertCircle className="w-10 h-10 text-zinc-300" />
+                    </div>
+                    <h3 className="text-xl font-black text-zinc-900 dark:text-white uppercase tracking-tight mb-2">No Assignments Found</h3>
+                    <p className="text-zinc-500 text-sm font-medium max-w-xs mx-auto mb-8">{error || 'There are no students assigned to this class for the selected academic year.'}</p>
+                    <button className="px-8 py-3 bg-indigo-500 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-indigo-600 shadow-xl shadow-indigo-500/20 active:scale-95 transition-all flex items-center gap-2 mx-auto">
+                        <Plus className="w-4 h-4" /> Create Assignment
+                    </button>
+                </div>
             </div>
         );
     }
@@ -67,105 +150,93 @@ function DetailContent() {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="space-y-1">
-                    <Link href="/class-students" className="inline-flex items-center gap-2 text-zinc-500 hover:text-indigo-500 transition-colors text-xs font-bold uppercase tracking-widest mb-2">
-                        <ArrowLeft className="w-3 h-3" /> Back to assignments
-                    </Link>
-                    <h1 className="text-3xl font-black text-zinc-900 dark:text-white tracking-tight italic">
+                    <button onClick={() => router.push('/classes')} className="inline-flex items-center gap-2 text-zinc-500 hover:text-indigo-500 transition-colors text-xs font-bold uppercase tracking-widest mb-2 active:scale-95 transition-all">
+                        <ArrowLeft className="w-3 h-3" /> Back to classes
+                    </button>
+                    <h1 className="text-3xl font-black text-zinc-900 dark:text-white tracking-tight italic flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-2xl bg-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 text-white italic font-black">
+                            {mapping.school_class?.standard.charAt(0)}
+                        </div>
                         {mapping.school_class?.standard} - {mapping.school_class?.division}
                     </h1>
                     <div className="flex items-center gap-4">
-                        <div className="px-3 py-1 bg-indigo-500/10 text-indigo-500 rounded-full text-[10px] font-black uppercase tracking-widest ring-1 ring-indigo-500/20">
+                        <div className="px-3 py-1 bg-indigo-500/10 text-indigo-500 rounded-full text-[10px] font-black uppercase tracking-widest ring-1 ring-indigo-500/20 shadow-sm">
                             {mapping.academic_year}
                         </div>
                         <div className="flex items-center gap-1.5 text-zinc-500 text-[10px] font-bold uppercase tracking-widest">
-                            <BookOpen className="w-3 h-3 text-indigo-500" />
+                            <BookOpen className="w-4 h-4 text-indigo-500" />
                             {mapping.students?.length || 0} Students Assigned
                         </div>
                     </div>
+                </div>
+
+                <div className="relative group">
+                    <label className="absolute -top-3 left-3 bg-white dark:bg-zinc-950 px-2 text-[8px] font-black uppercase tracking-[0.2em] text-zinc-400 z-10">Switch Year</label>
+                    <select
+                        value={academicYear}
+                        onChange={(e) => setAcademicYear(e.target.value)}
+                        className="appearance-none bg-white dark:bg-zinc-950 border-2 border-zinc-100 dark:border-zinc-800 rounded-2xl px-6 py-3.5 pr-12 text-xs font-black uppercase tracking-widest text-zinc-600 dark:text-zinc-300 focus:outline-none focus:border-indigo-500 transition-all cursor-pointer shadow-xl shadow-zinc-200/20"
+                    >
+                        <option value="2024-25">Academic Year: 2024-25</option>
+                        <option value="2025-26">Academic Year: 2025-26</option>
+                        <option value="2026-27">Academic Year: 2026-27</option>
+                    </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
                 </div>
             </div>
 
             {/* Stats Overview */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div className="p-6 rounded-[2rem] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
-                    <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center mb-4 text-indigo-500">
-                        <GraduationCap className="w-5 h-5" />
+                <div className="p-8 rounded-[2.5rem] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm group hover:border-indigo-500/30 transition-all">
+                    <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center mb-6 text-indigo-500 group-hover:scale-110 transition-transform">
+                        <GraduationCap className="w-6 h-6" />
                     </div>
-                    <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1">Class</p>
-                    <h4 className="text-xl font-black text-zinc-900 dark:text-white">{mapping.school_class?.standard}</h4>
+                    <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-1">Standard</p>
+                    <h4 className="text-2xl font-black text-zinc-900 dark:text-white italic tracking-tight">{mapping.school_class?.standard}</h4>
                 </div>
-                <div className="p-6 rounded-[2rem] bg-indigo-500 text-white shadow-xl shadow-indigo-500/20">
-                    <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-4">
-                        <LayoutGrid className="w-5 h-5" />
+                <div className="p-8 rounded-[2.5rem] bg-indigo-500 text-white shadow-2xl shadow-indigo-500/20 border-4 border-indigo-400/20 group hover:scale-[1.02] transition-all">
+                    <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center mb-6 backdrop-blur-md">
+                        <LayoutGrid className="w-6 h-6" />
                     </div>
-                    <p className="text-[10px] font-black text-white/60 uppercase tracking-widest mb-1">Division</p>
-                    <h4 className="text-xl font-black">{mapping.school_class?.division}</h4>
+                    <p className="text-[10px] font-black text-white/60 uppercase tracking-[0.2em] mb-1">Division</p>
+                    <h4 className="text-2xl font-black italic tracking-tight">{mapping.school_class?.division}</h4>
                 </div>
-                <div className="p-6 rounded-[2rem] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center mb-4 text-emerald-500">
-                        <Calendar className="w-5 h-5" />
+                <div className="p-8 rounded-[2.5rem] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm group hover:border-emerald-500/30 transition-all">
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-6 text-emerald-500 group-hover:scale-110 transition-transform">
+                        <Calendar className="w-6 h-6" />
                     </div>
-                    <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1">Session</p>
-                    <h4 className="text-xl font-black text-zinc-900 dark:text-white">{mapping.academic_year}</h4>
+                    <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-1">Session</p>
+                    <h4 className="text-2xl font-black text-zinc-900 dark:text-white italic tracking-tight">{mapping.academic_year}</h4>
                 </div>
-                <div className="p-6 rounded-[2rem] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
-                    <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center mb-4 text-amber-500">
-                        <Clock className="w-5 h-5" />
+                <div className="p-8 rounded-[2.5rem] bg-zinc-900 dark:bg-black border border-zinc-800 shadow-2xl group overflow-hidden relative">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl -translate-y-16 translate-x-16" />
+                    <div className="relative z-10">
+                        <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-6 text-white group-hover:scale-110 transition-transform">
+                            <Clock className="w-6 h-6" />
+                        </div>
+                        <p className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-1">Registry</p>
+                        <h4 className="text-2xl font-black text-white italic tracking-tight flex items-center gap-3">
+                            Active <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse ring-4 ring-emerald-500/20" />
+                        </h4>
                     </div>
-                    <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1">Status</p>
-                    <h4 className="text-xl font-black text-zinc-900 dark:text-white flex items-center gap-2">
-                        Active <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse ring-4 ring-emerald-500/20" />
-                    </h4>
                 </div>
             </div>
 
-            {/* Students List */}
-            <div className="bg-white dark:bg-zinc-900 rounded-[3rem] border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-sm">
-                <div className="px-8 py-6 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
-                    <h3 className="text-lg font-black text-zinc-900 dark:text-white uppercase tracking-tight">Student Roster</h3>
+            {/* Students List Table */}
+            <div className="space-y-4">
+                <div className="flex items-center justify-between px-4">
+                    <h3 className="text-xl font-black text-zinc-900 dark:text-white uppercase tracking-tight italic">Class Roster</h3>
+                    <button className="p-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl text-zinc-400 hover:text-indigo-500 transition-all active:scale-95 shadow-sm">
+                        <Plus className="w-5 h-5" />
+                    </button>
                 </div>
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead>
-                            <tr className="bg-zinc-50/50 dark:bg-zinc-800/30">
-                                <th className="px-8 py-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">ID / Roll No</th>
-                                <th className="px-8 py-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Student Details</th>
-                                <th className="px-8 py-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Category</th>
-                                <th className="px-8 py-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/50">
-                            {mapping.students?.map((studentId: number) => (
-                                <tr key={studentId} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/20 transition-colors group">
-                                    <td className="px-8 py-6 font-mono text-xs font-black text-indigo-500">#{studentId}</td>
-                                    <td className="px-8 py-6">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-400 group-hover:scale-110 transition-transform">
-                                                <GraduationCap className="w-5 h-5" />
-                                            </div>
-                                            <div>
-                                                <p className="text-sm font-black text-zinc-900 dark:text-white tracking-tight">Student {studentId}</p>
-                                                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest underline decoration-indigo-500/30">Primary Enrollment</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-8 py-6">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
-                                            <span className="text-xs font-bold text-zinc-600 dark:text-zinc-400">Regular</span>
-                                        </div>
-                                    </td>
-                                    <td className="px-8 py-6">
-                                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <div className="px-3 py-1 bg-emerald-500/10 text-emerald-500 rounded-lg text-[10px] font-black uppercase tracking-widest">Verified</div>
-                                            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+
+                <Table
+                    columns={STUDENT_COLUMNS}
+                    data={students}
+                    loading={loadingStudents}
+                    emptyMessage="No students assigned for the selected year."
+                />
             </div>
         </div>
     );
