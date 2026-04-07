@@ -1,9 +1,11 @@
-from sqlalchemy import Column, Integer, String, Date, ForeignKey, DateTime, Enum
-from sqlalchemy.orm import relationship
-from datetime import datetime
 import enum
+from datetime import datetime
 
-from ..database import Base
+from sqlalchemy import Column, Date, DateTime, Enum, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
+
+from app.database import Base
+
 
 class LeaveType(enum.Enum):
     SICK = "sick"
@@ -11,10 +13,12 @@ class LeaveType(enum.Enum):
     PERSONAL = "personal"
     OTHER = "other"
 
+
 class LeaveStatus(enum.Enum):
     PENDING = "pending"
     APPROVED = "approved"
     REJECTED = "rejected"
+
 
 class LeaveRequest(Base):
     __tablename__ = "leave_requests"
@@ -26,7 +30,7 @@ class LeaveRequest(Base):
     end_date = Column(Date, nullable=False)
     reason = Column(String(255))
     status = Column(Enum(LeaveStatus), default=LeaveStatus.PENDING)
-    
+
     # Audit info
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

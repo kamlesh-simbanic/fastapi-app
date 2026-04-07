@@ -1,8 +1,10 @@
-from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey
-from sqlalchemy.orm import relationship
 from datetime import datetime
 
-from ..database import Base
+from sqlalchemy import Column, Date, DateTime, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
+
+from app.database import Base
+
 
 class Holiday(Base):
     __tablename__ = "holidays"
@@ -11,7 +13,7 @@ class Holiday(Base):
     name = Column(String(100), index=True)
     date = Column(Date, index=True)
     number_of_days = Column(Integer, default=1)
-    
+
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     created_by_id = Column(Integer, ForeignKey("users.id"))

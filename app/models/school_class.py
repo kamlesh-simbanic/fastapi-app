@@ -1,7 +1,10 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
-from sqlalchemy.orm import relationship
 from datetime import datetime
-from ..database import Base
+
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
+
+from app.database import Base
+
 
 class SchoolClass(Base):
     __tablename__ = "school_classes"
@@ -10,7 +13,7 @@ class SchoolClass(Base):
     standard = Column(String(50), index=True)
     division = Column(String(10), index=True)
     class_teacher_id = Column(Integer, ForeignKey("staff.id"), nullable=True)
-    
+
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     created_by_id = Column(Integer, ForeignKey("users.id"))

@@ -1,25 +1,70 @@
-from .user import UserBase, UserCreate, UserLogin, UserOut, Token, TokenData, AuthResponse
-from .task import TaskBase, TaskCreate, TaskUpdate, TaskOut, TaskStatus
-from .student import StudentBase, StudentCreate, StudentUpdate, StudentOut, StudentStatus, StudentList
-from .fee_payment import FeePaymentCreate, FeePaymentOut, FeeTerm
-from .staff import StaffCreate, StaffOut, Department, StaffList, StaffUpdate
 from .attendance import (
-    AttendanceCreate, AttendanceUpdate, AttendanceOut, 
-    AttendanceStatus, StudentAttendanceReport, AttendanceBulkCreateNew
+    AttendanceBulkCreateNew,
+    AttendanceCreate,
+    AttendanceOut,
+    AttendanceStatus,
+    AttendanceUpdate,
+    StudentAttendanceReport,
 )
-from .holiday import HolidayBase, HolidayCreate, HolidayUpdate, HolidayOut
-from .school_class import SchoolClassBase, SchoolClassCreate, SchoolClassUpdate, SchoolClass, StaffSimple, SchoolClassList
-from .class_student import ClassStudentBase, ClassStudentCreate, ClassStudentUpdate, ClassStudent, ClassStudentList
-from .fee_structure import FeeStructureBase, FeeStructureCreate, FeeStructureUpdate, FeeStructure, FeeStructureDetailed
-from .subject import (
-    SubjectBase, SubjectCreate, SubjectUpdate, Subject, 
-    TeacherSubjectBase, TeacherSubjectCreate, TeacherSubject,
-    SubjectWithTeachers
+from .class_student import (
+    ClassStudent,
+    ClassStudentBase,
+    ClassStudentCreate,
+    ClassStudentList,
+    ClassStudentUpdate,
 )
+from .fee_payment import FeePaymentCreate, FeePaymentOut, FeeTerm
+from .fee_structure import (
+    FeeStructure,
+    FeeStructureBase,
+    FeeStructureCreate,
+    FeeStructureDetailed,
+    FeeStructureUpdate,
+)
+from .holiday import HolidayBase, HolidayCreate, HolidayOut, HolidayUpdate
 from .leave_request import (
-    LeaveRequestBase, LeaveRequestCreate, LeaveRequestUpdate, 
-    LeaveRequestResponse, LeaveType, LeaveStatus
+    LeaveRequestBase,
+    LeaveRequestCreate,
+    LeaveRequestResponse,
+    LeaveRequestUpdate,
+    LeaveStatus,
+    LeaveType,
 )
-from .timetable import (
-    TimetableBase, TimetableCreate, Timetable, ClassTimetableResponse
+from .school_class import (
+    SchoolClass,
+    SchoolClassBase,
+    SchoolClassCreate,
+    SchoolClassList,
+    SchoolClassUpdate,
+    StaffSimple,
+)
+from .staff import Department, StaffCreate, StaffList, StaffOut, StaffUpdate
+from .student import (
+    StudentBase,
+    StudentCreate,
+    StudentList,
+    StudentOut,
+    StudentStatus,
+    StudentUpdate,
+)
+from .subject import (
+    Subject,
+    SubjectBase,
+    SubjectCreate,
+    SubjectUpdate,
+    SubjectWithTeachers,
+    TeacherSubject,
+    TeacherSubjectBase,
+    TeacherSubjectCreate,
+)
+from .task import TaskBase, TaskCreate, TaskOut, TaskStatus, TaskUpdate
+from .timetable import ClassTimetableResponse, Timetable, TimetableBase, TimetableCreate
+from .user import (
+    AuthResponse,
+    Token,
+    TokenData,
+    UserBase,
+    UserCreate,
+    UserLogin,
+    UserOut,
 )

@@ -1,2 +1,14 @@
 #!/usr/bin/env sh
-cd frontend && npx lint-staged
+# Frontend checks
+cd frontend && npx lint-staged && cd ..
+
+# Backend checks
+echo "Running backend linting..."
+# Using the venv if it exists, otherwise assuming ruff is in PATH
+if [ -f "venv/bin/ruff" ]; then
+  venv/bin/ruff check --fix app scripts
+  venv/bin/ruff format app scripts
+else
+  ruff check --fix app scripts
+  ruff format app scripts
+fi

@@ -1,1 +1,17 @@
-from . import auth, tasks, students, fees, staff, attendance, dashboard, school_class, class_student, holiday, public, fee_structure, subjects, leave_request, timetable
+from . import (
+    attendance,
+    auth,
+    class_student,
+    dashboard,
+    fee_structure,
+    fees,
+    holiday,
+    leave_request,
+    public,
+    school_class,
+    staff,
+    students,
+    subjects,
+    tasks,
+    timetable,
+)

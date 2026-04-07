@@ -1,10 +1,15 @@
-from sqlalchemy import Column, Integer, String, Date, Enum as SQLAlchemyEnum
 import enum
-from ..database import Base
+
+from sqlalchemy import Column, Date, Integer, String
+from sqlalchemy import Enum as SQLAlchemyEnum
+
+from app.database import Base
+
 
 class StudentStatus(enum.Enum):
     ACTIVE = "active"
     TERMINATED = "terminated"
+
 
 class Student(Base):
     __tablename__ = "students"
@@ -19,4 +24,6 @@ class Student(Base):
     address = Column(String(255))
     city = Column(String(100))
     zip_code = Column(String(20))
-    status = Column(SQLAlchemyEnum(StudentStatus), default=StudentStatus.ACTIVE, index=True)
+    status = Column(
+        SQLAlchemyEnum(StudentStatus), default=StudentStatus.ACTIVE, index=True
+    )

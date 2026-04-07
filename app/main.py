@@ -1,16 +1,31 @@
 import os
-from fastapi import FastAPI, Depends, HTTPException, Request
-from fastapi.responses import FileResponse
-from fastapi.middleware.cors import CORSMiddleware
 
-from fastapi.staticfiles import StaticFiles
-from sqlalchemy.orm import Session
 from dotenv import load_dotenv
+from fastapi import Depends, FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from sqlalchemy.orm import Session
 
 from . import models
 from .database import engine, get_db
-from .routers import auth, tasks, students, fees, staff, attendance, dashboard, school_class, class_student, holiday, public, fee_structure, subjects, leave_request, timetable
-from .scheduler import start_scheduler, shutdown_scheduler
+from .routers import (
+    attendance,
+    auth,
+    class_student,
+    dashboard,
+    fee_structure,
+    fees,
+    holiday,
+    leave_request,
+    public,
+    school_class,
+    staff,
+    students,
+    subjects,
+    tasks,
+    timetable,
+)
+from .scheduler import shutdown_scheduler, start_scheduler
 
 load_dotenv()
 
@@ -19,13 +34,16 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title=os.getenv("PROJECT_NAME", "FastAPI App Starter"))
 
+
 @app.on_event("startup")
 async def startup_event():
     start_scheduler()
 
+
 @app.on_event("shutdown")
 async def shutdown_event():
     shutdown_scheduler()
+
 
 # Configure CORS
 origins = [
@@ -65,37 +83,42 @@ app.include_router(timetable.router, prefix="/api")
 async def health_check():
     return {"status": "healthy Status"}
 
+
 @app.get("/api/db-test")
 async def db_test(db: Session = Depends(get_db)):
     try:
         from sqlalchemy import text
+
         db.execute(text("SELECT 1"))
         return {"status": "connected", "database": "MySQL"}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Database connection failed: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Database connection failed: {str(e)}"
+        )
+
 
 # Serve the frontend
 @app.get("/{full_path:path}")
 async def serve_frontend(full_path: str):
     base_dir = "frontend/out"
-    
+
     # 1. Handle root path
     if not full_path or full_path == "/":
         return FileResponse(os.path.join(base_dir, "index.html"))
-    
+
     # 2. Try serving the exact file (exists for _next/ assets, favicons, etc.)
     file_path = os.path.join(base_dir, full_path)
     if os.path.isfile(file_path):
         return FileResponse(file_path)
-    
+
     # 3. Try serving the path with .html (Next.js static export structure)
     html_file = file_path + ".html"
     if os.path.isfile(html_file):
         return FileResponse(html_file)
-    
+
     # 4. Fallback to index.html for client-side routing (SPA support)
     index_file = os.path.join(base_dir, "index.html")
     if os.path.isfile(index_file):
         return FileResponse(index_file)
-        
+
     raise HTTPException(status_code=404, detail="Not Found")

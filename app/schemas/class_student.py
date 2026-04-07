@@ -1,20 +1,25 @@
-from pydantic import BaseModel, ConfigDict
 from datetime import datetime
-from typing import List, Optional
+
+from pydantic import BaseModel, ConfigDict
+
 from .student import StudentOut
+
 
 class ClassStudentBase(BaseModel):
     academic_year: str
     class_id: int
-    students: List[int]
+    students: list[int]
+
 
 class ClassStudentCreate(ClassStudentBase):
     pass
 
+
 class ClassStudentUpdate(BaseModel):
-    academic_year: Optional[str] = None
-    class_id: Optional[int] = None
-    students: Optional[List[int]] = None
+    academic_year: str | None = None
+    class_id: int | None = None
+    students: list[int] | None = None
+
 
 class SchoolClassSimple(BaseModel):
     id: int
@@ -22,17 +27,19 @@ class SchoolClassSimple(BaseModel):
     division: str
     model_config = ConfigDict(from_attributes=True)
 
+
 class ClassStudent(ClassStudentBase):
     id: int
     created_at: datetime
     updated_at: datetime
-    created_by_id: Optional[int] = None
-    updated_by_id: Optional[int] = None
-    
-    school_class: Optional[SchoolClassSimple] = None
-    student_details: Optional[List[StudentOut]] = None
+    created_by_id: int | None = None
+    updated_by_id: int | None = None
+
+    school_class: SchoolClassSimple | None = None
+    student_details: list[StudentOut] | None = None
 
     model_config = ConfigDict(from_attributes=True)
+
 
 class ClassStudentList(BaseModel):
     items: list[ClassStudent]

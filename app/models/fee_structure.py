@@ -1,7 +1,10 @@
-from sqlalchemy import Column, Integer, Float, ForeignKey, DateTime
-from sqlalchemy.orm import relationship
 from datetime import datetime
-from ..database import Base
+
+from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer
+from sqlalchemy.orm import relationship
+
+from app.database import Base
+
 
 class FeeStructure(Base):
     __tablename__ = "fee_structures"
@@ -10,7 +13,7 @@ class FeeStructure(Base):
     class_id = Column(Integer, ForeignKey("school_classes.id"), index=True)
     year = Column(Integer, index=True)
     fee_amount = Column(Float)
-    
+
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     created_by_id = Column(Integer, ForeignKey("users.id"))

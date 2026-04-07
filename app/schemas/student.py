@@ -1,11 +1,13 @@
-from pydantic import BaseModel
-from typing import Optional
 from datetime import date
 from enum import Enum
+
+from pydantic import BaseModel
+
 
 class StudentStatus(str, Enum):
     ACTIVE = "active"
     TERMINATED = "terminated"
+
 
 class StudentBase(BaseModel):
     name: str
@@ -18,8 +20,10 @@ class StudentBase(BaseModel):
     zip_code: str
     status: StudentStatus = StudentStatus.ACTIVE
 
+
 class StudentCreate(StudentBase):
     pass
+
 
 class StudentMinimal(BaseModel):
     name: str
@@ -30,17 +34,19 @@ class StudentMinimal(BaseModel):
     class Config:
         from_attributes = True
 
+
 class StudentUpdate(BaseModel):
-    gr_no: Optional[str] = None
-    name: Optional[str] = None
-    father_name: Optional[str] = None
-    surname: Optional[str] = None
-    mobile: Optional[str] = None
-    dob: Optional[date] = None
-    address: Optional[str] = None
-    city: Optional[str] = None
-    zip_code: Optional[str] = None
-    status: Optional[StudentStatus] = None
+    gr_no: str | None = None
+    name: str | None = None
+    father_name: str | None = None
+    surname: str | None = None
+    mobile: str | None = None
+    dob: date | None = None
+    address: str | None = None
+    city: str | None = None
+    zip_code: str | None = None
+    status: StudentStatus | None = None
+
 
 class StudentOut(StudentBase):
     id: int
@@ -48,6 +54,7 @@ class StudentOut(StudentBase):
 
     class Config:
         from_attributes = True
+
 
 class StudentList(BaseModel):
     items: list[StudentOut]
