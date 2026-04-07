@@ -1,27 +1,32 @@
-from pydantic import BaseModel
-from datetime import datetime, date
-from typing import List, Optional, Dict
+from datetime import date, datetime
 from enum import Enum
-from .student import StudentMinimal
+
+from pydantic import BaseModel
+
 
 class AttendanceStatus(str, Enum):
     PRESENT = "present"
     ABSENT = "absent"
 
+
 class AttendanceRecord(BaseModel):
     student_id: int
-    status: str # "P" or "A"
+    status: str  # "P" or "A"
+
 
 class AttendanceBase(BaseModel):
     class_id: int
     date: date
-    records: List[AttendanceRecord]
+    records: list[AttendanceRecord]
+
 
 class AttendanceCreate(AttendanceBase):
     pass
 
+
 class AttendanceUpdate(AttendanceBase):
     pass
+
 
 class AttendanceOut(AttendanceBase):
     id: int
@@ -31,8 +36,10 @@ class AttendanceOut(AttendanceBase):
     class Config:
         from_attributes = True
 
+
 class AttendanceBulkCreateNew(AttendanceBase):
     pass
+
 
 class StudentAttendanceReport(BaseModel):
     student_id: int
@@ -43,4 +50,4 @@ class StudentAttendanceReport(BaseModel):
     present_days: int
     absent_days: int
     attendance_percentage: float
-    data: Dict[str, str] # Format { "1": "present", "2": "absent", ... }
+    data: dict[str, str]  # Format { "1": "present", "2": "absent", ... }

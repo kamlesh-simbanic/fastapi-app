@@ -1,34 +1,40 @@
-from pydantic import BaseModel, ConfigDict
 from datetime import datetime
-from typing import Optional
+
+from pydantic import BaseModel, ConfigDict
+
 
 class SchoolClassBase(BaseModel):
     standard: str
     division: str
-    class_teacher_id: Optional[int] = None
+    class_teacher_id: int | None = None
+
 
 class SchoolClassCreate(SchoolClassBase):
     pass
 
+
 class SchoolClassUpdate(BaseModel):
-    standard: Optional[str] = None
-    division: Optional[str] = None
-    class_teacher_id: Optional[int] = None
+    standard: str | None = None
+    division: str | None = None
+    class_teacher_id: int | None = None
+
 
 class StaffSimple(BaseModel):
     id: int
     name: str
     model_config = ConfigDict(from_attributes=True)
 
+
 class SchoolClass(SchoolClassBase):
     id: int
     created_at: datetime
     updated_at: datetime
-    created_by_id: Optional[int] = None
-    updated_by_id: Optional[int] = None
-    class_teacher: Optional[StaffSimple] = None
+    created_by_id: int | None = None
+    updated_by_id: int | None = None
+    class_teacher: StaffSimple | None = None
 
     model_config = ConfigDict(from_attributes=True)
+
 
 class SchoolClassList(BaseModel):
     items: list[SchoolClass]

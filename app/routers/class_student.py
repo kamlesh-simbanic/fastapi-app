@@ -1,24 +1,32 @@
-from fastapi import APIRouter, Depends, status, Query
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
-from typing import List, Optional
 
-from .. import models, schemas, utils, controllers
-from ..database import get_db
-from .auth import get_current_user, check_access
+from app import controllers, models, schemas
+from app.database import get_db
+
+from .auth import check_access, get_current_user
 
 router = APIRouter(
     prefix="/class-students",
     tags=["Class Students"],
-    dependencies=[Depends(check_access([models.Department.ADMIN, models.Department.MANAGEMENT]))]
+    dependencies=[
+        Depends(check_access([models.Department.ADMIN, models.Department.MANAGEMENT]))
+    ],
 )
 
-@router.post("/", response_model=schemas.ClassStudent, status_code=status.HTTP_201_CREATED)
+
+@router.post(
+    "/", response_model=schemas.ClassStudent, status_code=status.HTTP_201_CREATED
+)
 def create_class_student(
     student_schema: schemas.ClassStudentCreate,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_user)
+    current_user: models.User = Depends(get_current_user),
 ):
-    return controllers.class_student.add_class_student(db, student_schema, current_user.id)
+    return controllers.class_student.add_class_student(
+        db, student_schema, current_user.id
+    )
+
 
 @router.get("/", response_model=schemas.ClassStudentList)
 def read_class_students(
@@ -26,40 +34,49 @@ def read_class_students(
     limit: int = Query(100, ge=1),
     sort_by: str = "id",
     order: str = "asc",
-    academic_year: Optional[str] = None,
+    academic_year: str | None = None,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_user)
+    current_user: models.User = Depends(get_current_user),
 ):
-    return controllers.class_student.list_class_students(db, skip, limit, sort_by, order, academic_year)
+    return controllers.class_student.list_class_students(
+        db, skip, limit, sort_by, order, academic_year
+    )
+
 
 @router.get("/{id}", response_model=schemas.ClassStudent)
 def read_class_student(
     id: int,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_user)
+    current_user: models.User = Depends(get_current_user),
 ):
     return controllers.class_student.get_class_student(db, id)
+
 
 @router.put("/{id}", response_model=schemas.ClassStudent)
 def update_class_student(
     id: int,
     student_schema: schemas.ClassStudentUpdate,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_user)
+    current_user: models.User = Depends(get_current_user),
 ):
-    return controllers.class_student.update_class_student(db, id, student_schema, current_user.id)
+    return controllers.class_student.update_class_student(
+        db, id, student_schema, current_user.id
+    )
+
 
 @router.delete("/{id}", status_code=status.HTTP_200_OK)
 def delete_class_student(
     id: int,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_user)
+    current_user: models.User = Depends(get_current_user),
 ):
     return controllers.class_student.delete_class_student(db, id)
-@router.get("/class/{class_id}", response_model=List[schemas.StudentOut])
+
+
+@router.get("/class/{class_id}", response_model=list[schemas.StudentOut])
 def get_students_by_class(
     class_id: int,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_user)
+    current_user: models.User = Depends(get_current_user),
 ):
     return controllers.class_student.get_students_by_class(db, class_id)

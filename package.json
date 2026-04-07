@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/kamlesh-simbanic/fastapi-app#readme",
   "devDependencies": {
-    "husky": "^9.1.7"
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0"
   }
 }
