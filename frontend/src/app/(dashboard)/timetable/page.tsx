@@ -160,7 +160,6 @@ export default function TimetablePage() {
                                     </td>
                                     {DAYS.map(day => {
                                         const slot = getSlotData(day, period);
-                                        console.log("slot", slot);
 
                                         return (
                                             <td key={`${day}-${period}`} className="p-3 border-b border-r border-zinc-200 dark:border-zinc-800 group/cell overflow-hidden">
