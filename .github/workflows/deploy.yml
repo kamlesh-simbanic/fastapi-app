@@ -1,30 +1,21 @@
 name: Deploy to FastAPI Cloud
 on:
   push:
-    branches: [main, qa]
-
+    branches: [main]
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
-          
-      - name: Build Frontend
-        working-directory: frontend
+      - working-directory: frontend
         run: |
           npm install
           npm run build
-          
-      - name: Setup uv
-        uses: astral-sh/setup-uv@v7
-        
-      - name: Deploy
-        run: uv run fastapi deploy
+      - uses: astral-sh/setup-uv@v7
+      - run: uv run fastapi deploy
         env:
           FASTAPI_CLOUD_TOKEN: ${{ secrets.FASTAPI_CLOUD_TOKEN }}
-          FASTAPI_CLOUD_APP_ID: ${{ github.ref_name == 'qa' && secrets.FASTAPI_CLOUD_APP_ID_QA || secrets.FASTAPI_CLOUD_APP_ID }}
+          FASTAPI_CLOUD_APP_ID: ${{ secrets.FASTAPI_CLOUD_APP_ID }}

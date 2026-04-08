@@ -1,0 +1,4 @@
+{
+    "app_id": "${{ secrets.FASTAPI_CLOUD_APP_ID_QA }}",
+    "team_id": "13009012-bc9f-47c2-9e79-a391f7edce23"
+}
