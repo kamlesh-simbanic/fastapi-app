@@ -241,6 +241,7 @@ function AssignContent() {
                                         <button
                                             onClick={() => { setIdToDelete(a.id); setDeleteConfirmOpen(true); }}
                                             className="p-3 text-zinc-400 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all opacity-0 group-hover:opacity-100"
+                                            title="Unassign"
                                         >
                                             <Trash2 className="w-5 h-5" />
                                         </button>

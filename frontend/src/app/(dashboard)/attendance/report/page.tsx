@@ -256,11 +256,15 @@ function AttendanceReportContent() {
             {/* Selection Controls */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-white dark:bg-zinc-900 p-8 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all duration-300">
                 <div className="space-y-2">
-                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+                    <label
+                        htmlFor="month-select"
+                        className="text-[10px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2"
+                    >
                         <Calendar className="w-3 h-3" /> Select Month
                     </label>
                     <div className="relative">
                         <select
+                            id="month-select"
                             value={month}
                             onChange={(e) => setMonth(parseInt(e.target.value))}
                             className="w-full appearance-none bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-3 px-4 pr-10 text-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-bold text-zinc-700 dark:text-zinc-300 cursor-pointer"
@@ -276,11 +280,15 @@ function AttendanceReportContent() {
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+                    <label
+                        htmlFor="year-select"
+                        className="text-[10px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2"
+                    >
                         <Activity className="w-3 h-3" /> Select Year
                     </label>
                     <div className="relative">
                         <select
+                            id="year-select"
                             value={year}
                             onChange={(e) => setYear(parseInt(e.target.value))}
                             className="w-full appearance-none bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-3 px-4 pr-10 text-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-bold text-zinc-700 dark:text-zinc-300 cursor-pointer"
@@ -294,11 +302,15 @@ function AttendanceReportContent() {
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+                    <label
+                        htmlFor="class-report-select"
+                        className="text-[10px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2"
+                    >
                         <Users2 className="w-3 h-3" /> Select Class
                     </label>
                     <div className="relative">
                         <select
+                            id="class-report-select"
                             value={selectedClass}
                             onChange={(e) => setSelectedClass(e.target.value)}
                             disabled={classesLoading}
