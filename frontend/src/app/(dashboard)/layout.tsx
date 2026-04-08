@@ -19,7 +19,6 @@ export default function AuthenticatedLayout({
 
     useEffect(() => {
         if (!authLoading) {
-            console.log("user", user);
 
             if (!user) {
                 router.push('/login');
