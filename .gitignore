@@ -19,3 +19,6 @@ dist/
 # IDEs
 .vscode/
 .idea/
+
+# FastAPI Cloud
+.fastapicloud/
