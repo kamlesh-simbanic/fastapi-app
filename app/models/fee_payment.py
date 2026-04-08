@@ -7,12 +7,12 @@ from sqlalchemy.orm import relationship
 from app.database import Base
 
 
-class FeeTerm(enum.Enum):
+class FeeTerm(str, enum.Enum):
     SUMMER = "summer"
     WINTER = "winter"
 
 
-class PaymentMethod(enum.Enum):
+class PaymentMethod(str, enum.Enum):
     cash = "cash"
     upi = "upi"
     cheque = "cheque"

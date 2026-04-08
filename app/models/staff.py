@@ -7,7 +7,7 @@ from sqlalchemy.orm import relationship
 from app.database import Base
 
 
-class Department(enum.Enum):
+class Department(str, enum.Enum):
     TEACHING = "teaching"
     MANAGEMENT = "management"
     ADMIN = "admin"
