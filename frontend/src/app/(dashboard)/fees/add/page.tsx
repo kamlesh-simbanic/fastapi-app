@@ -84,7 +84,7 @@ export default function RecordPaymentPage() {
                         setFormData(prev => ({ ...prev, amount: data.fee_amount.toString() }));
                     }
                 } catch {
-                    console.log('No fee structure found for this student/year');
+                    alert('No fee structure found for this student/year');
                 }
             }
         };

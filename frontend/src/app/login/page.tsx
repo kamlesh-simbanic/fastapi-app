@@ -36,7 +36,6 @@ export default function LoginPage() {
         setError(null);
 
         try {
-            console.log("formData", formData);
 
             await login(formData);
         } catch (err: unknown) {
