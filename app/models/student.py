@@ -6,7 +6,7 @@ from sqlalchemy import Enum as SQLAlchemyEnum
 from app.database import Base
 
 
-class StudentStatus(enum.Enum):
+class StudentStatus(str, enum.Enum):
     ACTIVE = "active"
     TERMINATED = "terminated"
 
