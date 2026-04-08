@@ -232,11 +232,15 @@ export default function AttendancePage() {
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+                    <label
+                        htmlFor="class-select"
+                        className="text-[10px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2"
+                    >
                         <Users className="w-3 h-3" /> Select Class
                     </label>
                     <div className="relative">
                         <select
+                            id="class-select"
                             value={selectedClass}
                             onChange={(e) => setSelectedClass(e.target.value)}
                             disabled={classesLoading}
