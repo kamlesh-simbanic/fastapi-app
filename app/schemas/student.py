@@ -15,9 +15,9 @@ class StudentBase(BaseModel):
     surname: str
     mobile: str
     dob: date
-    address: str
-    city: str
-    zip_code: str
+    address: str | None = None
+    city: str | None = None
+    zip_code: str | None = None
     status: StudentStatus = StudentStatus.ACTIVE
 
 
