@@ -29,14 +29,13 @@ from .scheduler import shutdown_scheduler, start_scheduler
 
 load_dotenv()
 
-# Create database tables
-models.Base.metadata.create_all(bind=engine)
-
 app = FastAPI(title=os.getenv("PROJECT_NAME", "FastAPI App Starter"))
 
 
 @app.on_event("startup")
 async def startup_event():
+    # Create database tables
+    models.Base.metadata.create_all(bind=engine)
     start_scheduler()
 
 

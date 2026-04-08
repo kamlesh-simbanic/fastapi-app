@@ -79,7 +79,7 @@ export default function LoginPage() {
                         )}
 
                         <div className="space-y-2">
-                            <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider ml-1">
+                            <label htmlFor="email" className="text-xs font-semibold text-zinc-400 uppercase tracking-wider ml-1">
                                 Email Address
                             </label>
                             <div className="relative group">
@@ -87,6 +87,7 @@ export default function LoginPage() {
                                     <Mail className="w-5 h-5 text-zinc-500 group-focus-within:text-indigo-400 transition-colors" />
                                 </div>
                                 <input
+                                    id="email"
                                     type="text"
                                     name="email"
                                     required
@@ -100,7 +101,7 @@ export default function LoginPage() {
 
                         <div className="space-y-2">
                             <div className="flex justify-between items-center ml-1">
-                                <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                                <label htmlFor="password" className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
                                     Password
                                 </label>
                                 <Link href="#" className="text-xs font-medium text-indigo-400 hover:text-indigo-300 transition-colors">
@@ -112,6 +113,7 @@ export default function LoginPage() {
                                     <Lock className="w-5 h-5 text-zinc-500 group-focus-within:text-indigo-400 transition-colors" />
                                 </div>
                                 <input
+                                    id="password"
                                     type="password"
                                     name="password"
                                     required
