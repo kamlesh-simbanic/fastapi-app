@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app import controllers, database, schemas
@@ -8,7 +8,9 @@ from .auth import get_current_user
 router = APIRouter(prefix="/fee-structure", tags=["Fee Structure"])
 
 
-@router.post("/", response_model=schemas.FeeStructure)
+@router.post(
+    "/", response_model=schemas.FeeStructure, status_code=status.HTTP_201_CREATED
+)
 def create_fee_structure(
     fee_schema: schemas.FeeStructureCreate,
     db: Session = Depends(database.get_db),
