@@ -22,3 +22,8 @@ dist/
 
 # FastAPI Cloud
 .fastapicloud/
+# Coverage
+.coverage
+htmlcov/
+coverage.xml
+pytest-coverage.txt
