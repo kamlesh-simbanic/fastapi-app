@@ -6,7 +6,7 @@ import { useGlobalData } from '@/context/GlobalContext';
 import { api } from '@/lib/api';
 
 // Mock dependencies
-jest.mock('@/components/AuthContext');
+jest.mock('@/context/AuthContext');
 jest.mock('@/context/GlobalContext');
 jest.mock('@/lib/api', () => ({
     api: {

@@ -5,7 +5,7 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 
 // Mock dependencies
-jest.mock('@/components/AuthContext');
+jest.mock('@/context/AuthContext');
 jest.mock('@/lib/api', () => ({
     api: {
         getClasses: jest.fn(),

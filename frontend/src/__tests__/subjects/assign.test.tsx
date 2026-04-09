@@ -6,7 +6,7 @@ import { api } from '@/lib/api';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 // Mock dependencies
-jest.mock('@/components/AuthContext');
+jest.mock('@/context/AuthContext');
 jest.mock('next/navigation', () => ({
     useRouter: jest.fn(),
     useSearchParams: jest.fn(),

@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
 // Mock the dependencies
-jest.mock('@/components/AuthContext');
+jest.mock('@/context/AuthContext');
 jest.mock('next/navigation');
 
 describe('LoginPage', () => {
