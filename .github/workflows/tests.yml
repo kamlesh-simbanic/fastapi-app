@@ -35,6 +35,12 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           coverage-summary-path: frontend/coverage/coverage-summary.json
+          title: "Frontend Code Coverage"
+          summary-title: "Coverage Summary"
+          badge-title: "Coverage"
+          create-new-comment: true
+          # Add link to full report if it's a PR
+          coverage-title: ${{ github.event_name == 'pull_request' && format('[View Full HTML Report](https://kamlesh-simbanic.github.io/fastapi-app/pr-{0}/index.html)', github.event.number) || '[View Full HTML Report](https://kamlesh-simbanic.github.io/fastapi-app/index.html)' }}
 
       - name: Upload Coverage Artifact
         uses: actions/upload-artifact@v4
@@ -62,14 +68,11 @@ jobs:
 
   deploy-coverage:
     needs: frontend-tests
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/qa')
+    # Deploy on push to main/qa OR on pull_request (to support PR previews)
+    if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/qa')) || (github.event_name == 'pull_request')
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     permissions:
-      pages: write
-      id-token: write
+      contents: write
     steps:
       - name: Download Coverage Artifact
         uses: actions/download-artifact@v4
@@ -77,14 +80,13 @@ jobs:
           name: frontend-coverage-report
           path: coverage-report
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload Pages Artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: coverage-report
-
       - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./coverage-report
+          # Deploy to root for main/qa, or to a subfolder for PRs
+          destination_dir: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.number) || '.' }}
+          keep_files: true
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
