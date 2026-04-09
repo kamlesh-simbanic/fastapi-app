@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import AssignTeacherPage from '@/app/(dashboard)/subjects/assign/page';
-import { useAuth } from '@/components/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { api } from '@/lib/api';
 import { useRouter, useSearchParams } from 'next/navigation';
 

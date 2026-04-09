@@ -4,7 +4,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { api } from '@/lib/api';
 import { ClassStudent } from './types';
 import { SchoolClass } from '../classes/types';
-import { useAuth } from '@/components/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import {
     Users,
     Plus,

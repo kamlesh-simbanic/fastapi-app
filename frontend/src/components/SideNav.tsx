@@ -17,7 +17,7 @@ import {
     BookOpen
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useAuth } from './AuthContext';
+import { useAuth } from '../context/AuthContext';
 import { PERMISSIONS } from '@/lib/permissions';
 
 const navItems = [

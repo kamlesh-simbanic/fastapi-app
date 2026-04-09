@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, waitFor, fireEvent, within, act } from '@testing-library/react';
 import FeesPage from '@/app/(dashboard)/fees/page';
-import { useAuth } from '@/components/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { api } from '@/lib/api';
 
 // Mock dependencies

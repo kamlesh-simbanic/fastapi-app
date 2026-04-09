@@ -3,7 +3,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
-import { useAuth } from '@/components/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import {
     ArrowLeft,
     Check,
