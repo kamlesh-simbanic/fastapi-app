@@ -1,6 +1,8 @@
 name: Tests
 
 on:
+  push:
+    branches: [ main, qa ]
   pull_request:
     branches: [ main, qa ]
 
@@ -34,6 +36,12 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           coverage-summary-path: frontend/coverage/coverage-summary.json
 
+      - name: Upload Coverage Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage-report
+          path: frontend/coverage/lcov-report/
+
   backend-tests:
     runs-on: ubuntu-latest
     steps:
@@ -51,3 +59,32 @@ jobs:
 
       - name: Run Backend Tests
         run: pytest
+
+  deploy-coverage:
+    needs: frontend-tests
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/qa')
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Download Coverage Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-coverage-report
+          path: coverage-report
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: coverage-report
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
