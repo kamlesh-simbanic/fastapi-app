@@ -6,7 +6,7 @@ import { api } from '@/lib/api';
 import { ClassStudent } from '../types';
 import { Student } from '../../students/types';
 import { STUDENT_COLUMNS } from '../../students/utils';
-import { useAuth } from '@/components/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import {
     ArrowLeft,
     Loader2,

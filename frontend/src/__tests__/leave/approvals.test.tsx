@@ -12,7 +12,7 @@ jest.mock('@/lib/api', () => ({
 }));
 
 // Mock Auth - Use static mock to avoid undefined user
-jest.mock('@/components/AuthContext', () => ({
+jest.mock('@/context/AuthContext', () => ({
     useAuth: () => ({ user: { id: 1, name: 'Mgmt User' } })
 }));
 

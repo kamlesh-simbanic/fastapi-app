@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { getDbStatus, getDashboardStats } from './actions';
 import { API_URL } from '@/lib/api';
-import { useAuth } from '@/components/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import {
   Activity,
   Server,

@@ -5,7 +5,7 @@ import { api } from '@/lib/api';
 import { FeeStructure } from './types';
 import { SchoolClass } from '../classes/types';
 import { getFeeStructureColumns } from './utils';
-import { useAuth } from '@/components/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import {
     CreditCard,
     Plus,
