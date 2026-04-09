@@ -42,7 +42,6 @@ export async function getStudentsByClass(classId: string | number) {
     try {
         return await api.getStudentsByClass(classId);
     } catch (error) {
-        console.error('Action getStudentsByClass failed:', error);
         throw error;
     }
 }
