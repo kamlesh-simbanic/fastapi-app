@@ -32,7 +32,7 @@ jobs:
         uses: MishaKav/jest-coverage-comment@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          jest-summary-report: frontend/coverage/coverage-final.json
+          coverage-summary-path: frontend/coverage/coverage-summary.json
 
   backend-tests:
     runs-on: ubuntu-latest
