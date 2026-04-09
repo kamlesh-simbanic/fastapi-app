@@ -53,10 +53,21 @@ jobs:
           pip install -e ".[dev]"
 
       - name: Run Backend Tests
-        run: pytest
+        run: |
+          set -o pipefail
+          pytest --cov=app --cov-report=term-missing --cov-report=xml --cov-report=html | tee pytest-coverage.txt
+
+      - name: Upload Coverage Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage-report
+          path: |
+            htmlcov/
+            coverage.xml
+            pytest-coverage.txt
 
   deploy-coverage:
-    needs: frontend-tests
+    needs: [frontend-tests, backend-tests]
     # Deploy on push to main/qa OR on pull_request (to support PR previews)
     if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/qa')) || (github.event_name == 'pull_request')
     runs-on: ubuntu-latest
@@ -64,30 +75,56 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - name: Download Coverage Artifact
+      - name: Download Frontend Coverage Artifact
         uses: actions/download-artifact@v4
         with:
           name: frontend-coverage-report
-          path: coverage-report
+          path: frontend-coverage-report
 
-      - name: Deploy to GitHub Pages
+      - name: Download Backend Coverage Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-coverage-report
+          path: backend-coverage-report
+
+      - name: Deploy Frontend to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./coverage-report/lcov-report
+          publish_dir: ./frontend-coverage-report/lcov-report
           # Deploy to root for main/qa, or to a subfolder for PRs
           destination_dir: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.number) || '.' }}
           keep_files: true
           user_name: 'github-actions[bot]'
           user_email: 'github-actions[bot]@users.noreply.github.com'
 
-      - name: Add Coverage Comment
+      - name: Deploy Backend to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./backend-coverage-report/htmlcov
+          # Deploy to 'backend' subfolder
+          destination_dir: ${{ github.event_name == 'pull_request' && format('pr-{0}/backend', github.event.number) || 'backend' }}
+          keep_files: true
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Add Frontend Coverage Comment
         uses: MishaKav/jest-coverage-comment@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          coverage-summary-path: coverage-report/coverage-summary.json
-          # Use title for the prominent link
+          coverage-summary-path: frontend-coverage-report/coverage-summary.json
           title: ${{ github.event_name == 'pull_request' && format('Frontend Code Coverage - [View Full HTML Report](https://kamlesh-simbanic.github.io/fastapi-app/pr-{0}/index.html)', github.event.number) || 'Frontend Code Coverage - [View Full HTML Report](https://kamlesh-simbanic.github.io/fastapi-app/index.html)' }}
-          summary-title: "Coverage Details"
-          badge-title: "Coverage Status"
+          summary-title: "Frontend Coverage Details"
+          badge-title: "Frontend Coverage Status"
+          create-new-comment: true
+
+      - name: Add Backend Coverage Comment
+        uses: MishaKav/pytest-coverage-comment@main
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          pytest-coverage-path: backend-coverage-report/pytest-coverage.txt
+          junitxml-path: backend-coverage-report/coverage.xml
+          title: ${{ github.event_name == 'pull_request' && format('Backend Code Coverage - [View Full HTML Report](https://kamlesh-simbanic.github.io/fastapi-app/pr-{0}/backend/index.html)', github.event.number) || 'Backend Code Coverage - [View Full HTML Report](https://kamlesh-simbanic.github.io/fastapi-app/backend/index.html)' }}
+          badge-title: "Backend Coverage Status"
           create-new-comment: true

@@ -27,6 +27,7 @@ requires-python = ">=3.10"
 dev = [
     "pytest>=7.0",
     "pytest-asyncio>=0.20",
+    "pytest-cov>=4.1",
     "ruff>=0.3.0",
     "mypy>=1.0",
     "httpx>=0.24",
@@ -87,6 +88,7 @@ filterwarnings = [
     "ignore::PendingDeprecationWarning",
 ]
 asyncio_mode = "auto"
+addopts = "--cov=app --cov-report=term-missing --cov-report=html --cov-report=xml"
 
 [tool.fastapi]
 entrypoint = "app.main:app"
