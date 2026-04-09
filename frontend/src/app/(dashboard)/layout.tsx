@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { useAuth } from '@/components/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { useRouter, usePathname } from 'next/navigation';
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { GlobalDataProvider } from '@/context/GlobalContext';

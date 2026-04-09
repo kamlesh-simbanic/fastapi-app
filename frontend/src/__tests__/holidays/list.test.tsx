@@ -1,12 +1,12 @@
 import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import HolidaysPage from '@/app/(dashboard)/holidays/page';
-import { useAuth } from '@/components/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { useGlobalData } from '@/context/GlobalContext';
 import { api } from '@/lib/api';
 
 // Mock dependencies
-jest.mock('@/components/AuthContext');
+jest.mock('@/context/AuthContext');
 jest.mock('@/context/GlobalContext');
 jest.mock('@/lib/api', () => ({
     api: {

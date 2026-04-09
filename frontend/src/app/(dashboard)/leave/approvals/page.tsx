@@ -16,7 +16,7 @@ import { LeaveRequest } from '../types';
 import Table from '@/components/Table';
 import { getApprovalLeaveColumns } from '../utils';
 import { cn } from '@/lib/utils';
-import { useAuth } from '@/components/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 
 export default function ApprovalsPage() {
     const { user } = useAuth();

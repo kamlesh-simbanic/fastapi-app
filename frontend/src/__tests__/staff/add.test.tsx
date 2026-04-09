@@ -1,11 +1,11 @@
 import React from 'react';
 import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
 import AddStaffPage from '@/app/(dashboard)/staff/add/page';
-import { useAuth } from '@/components/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { api } from '@/lib/api';
 
 // Mock dependencies
-jest.mock('@/components/AuthContext');
+jest.mock('@/context/AuthContext');
 jest.mock('@/lib/api', () => ({
     api: {
         addStaff: jest.fn(),
