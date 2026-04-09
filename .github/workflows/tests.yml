@@ -7,6 +7,8 @@ on:
 jobs:
   frontend-tests:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
       
@@ -22,8 +24,14 @@ jobs:
         working-directory: frontend
 
       - name: Run Frontend Tests
-        run: npm run test
+        run: npm run test:coverage
         working-directory: frontend
+
+      - name: Add Coverage Comment
+        uses: MishaKav/jest-coverage-comment@main
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          jest-summary-report: frontend/coverage/coverage-final.json
 
   backend-tests:
     runs-on: ubuntu-latest
