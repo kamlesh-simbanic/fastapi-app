@@ -6,9 +6,14 @@ A comprehensive, modular school management application built with a FastAPI back
 
 - **Modular Backend**: Scalable FastAPI architecture with clear separation of routers, models, and controllers.
 - **Modern Frontend**: Responsive Next.js application with Tailwind CSS and static-export support.
-- **Authentication**: Secure JWT-based authentication for students, staff, and admins.
-- **Database Architecture**: Robust relational schema managed via SQLAlchemy with MySQL.
-- **Public Portal**: Unauthenticated access for GR number verification and UPI-based fee payments.
+- **Authentication**: Secure JWT-based authentication with role-based access control.
+- **Modules**:
+  - **Student & Staff Management**: Comprehensive profiles and records.
+  - **Leave Management**: Automated leave request and approval workflows.
+  - **Attendance & Holidays**: Track daily attendance and manage school calendars.
+  - **Timetable & Subjects**: Interactive schedule grid and subject assignment.
+  - **Fee Management**: Structure definition and UPI-integrated payment portals.
+- **Data Persistence**: Robust relational schema managed via SQLAlchemy with MySQL.
 - **PDF Generation**: Automated PDF generation for receipts and reports using ReportLab.
 - **Dockerized Deployment**: Multi-stage Dockerfile for optimized production builds.
 
@@ -23,89 +28,84 @@ A comprehensive, modular school management application built with a FastAPI back
 
 ### Frontend
 - **Framework**: [Next.js](https://nextjs.org/) (App Router)
+- **State Management**: React Context (Global & Auth)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 - **Language**: TypeScript
+
+### Developer Tools
+- **Git Hooks**: [Husky](https://typicode.github.io/husky/) & [lint-staged](https://github.com/lint-staged/lint-staged)
+- **CI/CD**: GitHub Actions (Linting, Testing, QA Deployment)
 
 ## 📁 Project Structure
 
 ```text
 .
+├── .github/workflows/  # CI/CD pipeline definitions
+├── .husky/             # Git hook configurations
 ├── app/                # FastAPI Backend application
 │   ├── controllers/    # Business logic
 │   ├── models/         # SQLAlchemy database models
 │   ├── routers/        # API route definitions
 │   ├── schemas/        # Pydantic models for validation
-│   ├── utils.py        # Shared utilities
 │   └── main.py         # Application entry point
 ├── frontend/           # Next.js Frontend application
 │   ├── src/            # Application source code
 │   └── public/         # Static assets
-├── Dockerfile          # Multi-stage Docker configuration
+├── package.json        # Root Node.js deps (Husky, lint-staged)
 ├── pyproject.toml      # Python project configuration
-└── requirements.txt    # Python dependencies
+├── requirements.txt    # Python dependencies
+└── Dockerfile          # Multi-stage Docker configuration
 ```
 
 ## ⚙️ Getting Started
 
 ### Prerequisites
 
-- **Python**: 3.10 or higher
-- **Node.js**: 18.x or higher
-- **MySQL Server**: A running MySQL instance
+- **Python**: 3.10+
+- **Node.js**: 18.x+
+- **MySQL Server**: Running instance
 
-### Backend Setup
+### 1. Root & Git Hooks Setup
+From the project root:
+```bash
+npm install
+```
+This installs Husky and registers the git hooks.
 
-1.  **Create a Virtual Environment**:
-    ```bash
-    python -m venv venv
-    source venv/bin/activate  # On Windows: venv\Scripts\activate
-    ```
-2.  **Install Dependencies**:
-    ```bash
-    pip install -r requirements.txt
-    ```
-3.  **Configure Environment Variables**:
-    Create a `.env` file in the root directory and add:
-    ```env
-    DATABASE_URL=mysql+pymysql://user:password@localhost/dbname
-    SECRET_KEY=your-secret-key-here
-    ```
-4.  **Run the Server**:
-    ```bash
-    uvicorn app.main:app --reload
-    ```
+### 2. Backend Setup
+1. **Create Virtual Environment**:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # Windows: venv\Scripts\activate
+   ```
+2. **Install Deps**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. **Env Configuration**:
+   Create `.env` with:
+   ```env
+   DATABASE_URL=mysql+pymysql://user:password@localhost/dbname
+   SECRET_KEY=your-secret-key
+   ```
+4. **Run Server**:
+   ```bash
+   uvicorn app.main:app --reload
+   ```
 
-### Frontend Setup
-
-1.  **Navigate to Frontend Directory**:
-    ```bash
-    cd frontend
-    ```
-2.  **Install Dependencies**:
-    ```bash
-    npm install
-    ```
-3.  **Run in Development Mode**:
-    ```bash
-    npm run dev
-    ```
+### 3. Frontend Setup
+1. **Navigate**: `cd frontend`
+2. **Install**: `npm install`
+3. **Run**: `npm run dev`
 
 ## 🐳 Docker Deployment
 
-To build and run the entire application using Docker:
+Note: Ensure Docker is installed on your system.
+1. **Build**: `docker build -t school-mgmt-app .`
+2. **Run**: `docker run -p 8000:8000 --env-file .env school-mgmt-app`
 
-1.  **Build the Image**:
-    ```bash
-    docker build -t school-mgmt-app .
-    ```
-2.  **Run the Container**:
-    ```bash
-    docker run -p 8000:8000 --env-file .env school-mgmt-app
-    ```
-    The application will be accessible at `http://localhost:8000`.
-
-## 🧪 Testing and Linting
-
-- **Run backend tests**: `pytest`
-- **Run linting (Ruff)**: `ruff check app`
-- **Type checking**: `mypy app`
+## 🧪 Testing and Quality
+- **Backend Tests**: `pytest`
+- **Linting**: `ruff check app`
+- **Frontend Lint**: `npm run lint` (inside frontend/)
+- **Git Hooks**: Pre-commit hooks will automatically run linting on staged files.
