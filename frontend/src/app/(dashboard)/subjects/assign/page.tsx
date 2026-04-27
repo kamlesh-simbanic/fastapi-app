@@ -123,14 +123,14 @@ function AssignContent() {
     };
 
     if (!subjectId) return (
-        <div className="p-8 text-center bg-red-50 text-red-500 rounded-2xl border border-red-100 font-bold">
+        <div className="p-8 text-center bg-destructive text-destructive rounded-2xl border border-destructive font-bold">
             Invalid Subject ID
         </div>
     );
 
     if (loading) return (
-        <div className="flex flex-col items-center justify-center py-32 gap-4 text-zinc-500">
-            <Loader2 className="w-12 h-12 text-indigo-500 animate-spin" />
+        <div className="flex flex-col items-center justify-center py-32 gap-4 text-muted-foreground">
+            <Loader2 className="w-12 h-12 text-primary animate-spin" />
             <p className="font-bold text-sm tracking-widest uppercase opacity-70">Loading assignment details...</p>
         </div>
     );
@@ -141,37 +141,37 @@ function AssignContent() {
             <section className="flex items-center gap-6">
                 <button
                     onClick={() => router.back()}
-                    className="p-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl hover:bg-zinc-50 transition-all shadow-sm"
+                    className="p-3 bg-card border border-border rounded-2xl hover:bg-zinc-50 transition-all shadow-sm"
                 >
-                    <ArrowLeft className="w-5 h-5 text-zinc-600" />
+                    <ArrowLeft className="w-5 h-5 text-muted-foreground" />
                 </button>
                 <div className="space-y-1">
-                    <h1 className="text-3xl font-black text-zinc-900 dark:text-white italic tracking-tight flex items-center gap-3">
+                    <h1 className="text-3xl font-black text-foreground italic tracking-tight flex items-center gap-3">
                         Assign Teachers to {subject?.name}
                     </h1>
-                    <p className="text-zinc-500 dark:text-zinc-400 text-sm font-medium">Link faculty members to this subject for scheduling and reports.</p>
+                    <p className="text-muted-foreground text-sm font-medium">Link faculty members to this subject for scheduling and reports.</p>
                 </div>
             </section>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Assignment Form */}
                 <div className="lg:col-span-1 space-y-6">
-                    <div className="p-8 bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-6">
+                    <div className="p-8 bg-card rounded-[2.5rem] border border-border shadow-sm space-y-6">
                         <div className="flex items-center gap-3 mb-2">
-                            <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-500">
+                            <div className="p-2 rounded-xl bg-primary/10 text-primary">
                                 <UserPlus className="w-5 h-5" />
                             </div>
-                            <h2 className="text-lg font-black text-zinc-900 dark:text-white uppercase tracking-tight">New Assignment</h2>
+                            <h2 className="text-lg font-black text-foreground uppercase tracking-tight">New Assignment</h2>
                         </div>
 
                         <form onSubmit={handleAssign} className="space-y-4">
                             <div>
-                                <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2 block">Teacher / Faculty</label>
+                                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2 block">Teacher / Faculty</label>
                                 <select
                                     required
                                     value={selectedTeacher}
                                     onChange={(e) => setSelectedTeacher(e.target.value)}
-                                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-3 px-4 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer"
+                                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-border rounded-2xl py-3 px-4 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all cursor-pointer"
                                 >
                                     <option value="">Select a teacher</option>
                                     {staff.map(s => (
@@ -182,14 +182,14 @@ function AssignContent() {
                             <button
                                 type="submit"
                                 disabled={submitting || !selectedTeacher}
-                                className="w-full py-4 bg-indigo-500 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-indigo-600 shadow-lg shadow-indigo-500/20 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:active:scale-100"
+                                className="w-full py-4 bg-primary text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-primary/90 shadow-lg shadow-primary/20 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:active:scale-100"
                             >
                                 {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Assign Teacher'}
                             </button>
                         </form>
 
                         {error && (
-                            <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center gap-3 text-red-500">
+                            <div className="p-4 rounded-xl bg-destructive/10 border border-destructive/20 flex items-center gap-3 text-destructive">
                                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
                                 <p className="text-[10px] font-bold">{error}</p>
                             </div>
@@ -199,15 +199,15 @@ function AssignContent() {
 
                 {/* Assigned Teachers List */}
                 <div className="lg:col-span-2 space-y-6">
-                    <div className="bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-sm">
-                        <div className="p-8 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
-                            <h2 className="text-lg font-black text-zinc-900 dark:text-white uppercase tracking-tight flex items-center gap-3">
-                                <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500">
+                    <div className="bg-card rounded-[2.5rem] border border-border overflow-hidden shadow-sm">
+                        <div className="p-8 border-b border-zinc-100 dark:border-border flex items-center justify-between">
+                            <h2 className="text-lg font-black text-foreground uppercase tracking-tight flex items-center gap-3">
+                                <div className="p-2 rounded-xl bg-success/10 text-success">
                                     <User className="w-5 h-5" />
                                 </div>
                                 Assigned Faculty
                             </h2>
-                            <span className="px-3 py-1 bg-zinc-100 dark:bg-zinc-800 rounded-full text-[10px] font-black text-zinc-500 uppercase tracking-widest tracking-widest">
+                            <span className="px-3 py-1 bg-secondary rounded-full text-[10px] font-black text-muted-foreground uppercase tracking-widest tracking-widest">
                                 {assignments.length} Assigned
                             </span>
                         </div>
@@ -218,8 +218,8 @@ function AssignContent() {
                                     <User className="w-8 h-8 text-zinc-300" />
                                 </div>
                                 <div className="space-y-1">
-                                    <h3 className="font-black text-zinc-900 dark:text-white">No teachers assigned</h3>
-                                    <p className="text-zinc-500 text-xs font-medium max-w-[200px]">Use the form on the left to add your first assignment.</p>
+                                    <h3 className="font-black text-foreground">No teachers assigned</h3>
+                                    <p className="text-muted-foreground text-xs font-medium max-w-[200px]">Use the form on the left to add your first assignment.</p>
                                 </div>
                             </div>
                         ) : (
@@ -227,12 +227,12 @@ function AssignContent() {
                                 {assignments.map((a) => (
                                     <div key={a.id} className="p-6 hover:bg-zinc-50 flex items-center justify-between transition-colors group">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 rounded-full bg-indigo-500/5 border border-indigo-500/10 flex items-center justify-center">
-                                                <User className="w-6 h-6 text-indigo-500" />
+                                            <div className="w-12 h-12 rounded-full bg-primary/5 border border-primary/10 flex items-center justify-center">
+                                                <User className="w-6 h-6 text-primary" />
                                             </div>
                                             <div>
-                                                <h4 className="font-black text-zinc-900 dark:text-white uppercase tracking-tight italic">{a.teacher?.name || 'Unknown Teacher'}</h4>
-                                                <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest flex items-center gap-1">
+                                                <h4 className="font-black text-foreground uppercase tracking-tight italic">{a.teacher?.name || 'Unknown Teacher'}</h4>
+                                                <p className="text-[10px] font-bold text-success uppercase tracking-widest flex items-center gap-1">
                                                     <CheckCircle2 className="w-3 h-3" />
                                                     Active Assignment
                                                 </p>
@@ -240,7 +240,7 @@ function AssignContent() {
                                         </div>
                                         <button
                                             onClick={() => { setIdToDelete(a.id); setDeleteConfirmOpen(true); }}
-                                            className="p-3 text-zinc-400 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all opacity-0 group-hover:opacity-100"
+                                            className="p-3 text-muted-foreground hover:text-destructive hover:bg-destructive rounded-2xl transition-all opacity-0 group-hover:opacity-100"
                                             title="Unassign"
                                         >
                                             <Trash2 className="w-5 h-5" />
@@ -269,8 +269,8 @@ function AssignContent() {
 export default function AssignTeacherPage() {
     return (
         <Suspense fallback={
-            <div className="flex flex-col items-center justify-center py-32 gap-4 text-zinc-500">
-                <Loader2 className="w-12 h-12 text-indigo-500 animate-spin" />
+            <div className="flex flex-col items-center justify-center py-32 gap-4 text-muted-foreground">
+                <Loader2 className="w-12 h-12 text-primary animate-spin" />
                 <p className="font-bold text-sm tracking-widest uppercase opacity-70">Initializing...</p>
             </div>
         }>

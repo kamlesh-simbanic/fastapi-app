@@ -31,7 +31,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
                 <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-10 relative print:p-0">
                     {/* Subtle Page Background Decoration */}
-                    <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-600/5 dark:bg-indigo-600/10 blur-[120px] rounded-full pointer-events-none -z-10 print:hidden" />
+                    <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 blur-[120px] rounded-full pointer-events-none -z-10 print:hidden" />
 
                     <div className="max-w-7xl mx-auto h-full print:max-w-none">
                         {children}
@@ -42,10 +42,11 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             {/* Mobile Sidebar Overlay */}
             {isSidebarOpen && (
                 <div
-                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 lg:hidden print:hidden"
+                    className="fixed inset-0 bg-background/80 backdrop-blur-sm z-30 lg:hidden print:hidden"
                     onClick={() => setIsSidebarOpen(false)}
                 />
             )}
         </div>
+
     );
 }

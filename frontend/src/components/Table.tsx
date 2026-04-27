@@ -62,18 +62,18 @@ const Table = <T extends { id: string | number }>({
 
     return (
         <div className={cn("space-y-6", className)}>
-            <div className="bg-surface-paper dark:bg-zinc-900 rounded-radius-large border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-sm">
+            <div className="bg-card rounded-xl border border-border overflow-hidden shadow-sm">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-separate border-spacing-0">
-                        <thead className="bg-surface-ground">
+                        <thead className="bg-muted/50">
                             <tr>
                                 {columns.map((col) => (
                                     <th
                                         key={col.key}
                                         onClick={() => col.sortable && onSort && onSort(col.key)}
                                         className={cn(
-                                            "px-8 py-6 text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] border-b border-zinc-100 dark:border-zinc-800",
-                                            col.sortable && "cursor-pointer hover:text-primary-main",
+                                            "px-8 py-6 text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] border-b border-border/50",
+                                            col.sortable && "cursor-pointer hover:text-primary",
                                             col.className
                                         )}
                                     >
@@ -81,7 +81,7 @@ const Table = <T extends { id: string | number }>({
                                             {col.label}
                                             {col.sortable && (
                                                 sortBy === col.key ? (
-                                                    sortOrder === 'asc' ? <ArrowUp className="w-3 h-3 text-primary-main" /> : <ArrowDown className="w-3 h-3 text-primary-main" />
+                                                    sortOrder === 'asc' ? <ArrowUp className="w-3 h-3 text-primary" /> : <ArrowDown className="w-3 h-3 text-primary" />
                                                 ) : <ArrowUpDown className="w-3 h-3 opacity-30" />
                                             )}
                                         </div>
@@ -89,12 +89,12 @@ const Table = <T extends { id: string | number }>({
                                 ))}
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-zinc-50 dark:divide-zinc-800">
+                        <tbody className="divide-y divide-border/20">
                             {loading ? (
                                 <tr>
                                     <td colSpan={columns.length} className="px-8 py-20 text-center">
-                                        <div className="flex flex-col items-center justify-center gap-4 text-zinc-400">
-                                            <Loader2 className="w-8 h-8 text-primary-main animate-spin" />
+                                        <div className="flex flex-col items-center justify-center gap-4 text-muted-foreground">
+                                            <Loader2 className="w-8 h-8 text-primary animate-spin" />
                                             <p className="font-medium text-xs">Loading records...</p>
                                         </div>
                                     </td>
@@ -102,16 +102,16 @@ const Table = <T extends { id: string | number }>({
                             ) : data.length === 0 ? (
                                 <tr>
                                     <td colSpan={columns.length} className="px-8 py-20 text-center">
-                                        <p className="text-sm text-zinc-500 italic">{emptyMessage}</p>
+                                        <p className="text-sm text-muted-foreground italic">{emptyMessage}</p>
                                     </td>
                                 </tr>
                             ) : (
                                 data.map((item) => (
-                                    <tr key={item.id} className="group hover:bg-zinc-50/50 dark:hover:bg-zinc-950/50 transition-colors">
+                                    <tr key={item.id} className="group hover:bg-muted/30 transition-colors">
                                         {columns.map((col) => (
                                             <td key={col.key} className={cn("px-8 py-6", col.className)}>
                                                 {col.render ? col.render(item) : (
-                                                    <span className="text-sm font-bold text-zinc-600 dark:text-zinc-400 italic">
+                                                    <span className="text-sm font-bold text-foreground/80 italic">
                                                         {String((item as Record<string, unknown>)[col.key] ?? '')}
                                                     </span>
                                                 )}
@@ -131,22 +131,22 @@ const Table = <T extends { id: string | number }>({
                     <div className="flex items-center gap-10">
                         {onPageSizeChange && pageSize && (
                             <div className="flex items-center gap-4">
-                                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Rows per page</span>
+                                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Rows per page</span>
                                 <div className="relative group">
                                     <select
                                         value={pageSize}
                                         onChange={(e) => onPageSizeChange(Number(e.target.value))}
-                                        className="appearance-none bg-surface-paper dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-radius-medium px-4 py-2 pr-10 text-[10px] font-bold text-zinc-600 dark:text-zinc-300 uppercase tracking-widest focus:outline-none focus:ring-4 focus:ring-primary-main/5 cursor-pointer shadow-sm"
+                                        className="appearance-none bg-card border border-border rounded-lg px-4 py-2 pr-10 text-[10px] font-bold text-foreground uppercase tracking-widest focus:outline-none focus:ring-4 focus:ring-primary/5 cursor-pointer shadow-sm"
                                     >
                                         {pageSizeOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                     </select>
-                                    <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400 pointer-events-none" />
+                                    <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
                                 </div>
                             </div>
                         )}
                         {totalCount !== undefined && (
-                            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
-                                Total Records: <span className="text-primary-main ml-1">{totalCount}</span>
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                                Total Records: <span className="text-primary ml-1">{totalCount}</span>
                             </p>
                         )}
                     </div>
@@ -156,7 +156,7 @@ const Table = <T extends { id: string | number }>({
                             <button
                                 disabled={page === 1}
                                 onClick={() => onPageChange(page - 1)}
-                                className="p-3 rounded-radius-medium border border-zinc-100 dark:border-zinc-800 bg-surface-paper dark:bg-zinc-900 text-zinc-500 hover:text-primary-main disabled:opacity-30 transition-all active:scale-95 shadow-sm"
+                                className="p-3 rounded-lg border border-border bg-card text-muted-foreground hover:text-primary disabled:opacity-30 transition-all active:scale-95 shadow-sm"
                             >
                                 <ChevronLeft className="w-5 h-5" />
                             </button>
@@ -181,10 +181,10 @@ const Table = <T extends { id: string | number }>({
                                             key={p}
                                             onClick={() => onPageChange(p)}
                                             className={cn(
-                                                "w-10 h-10 rounded-radius-medium text-[10px] font-bold uppercase transition-all shadow-sm",
+                                                "w-10 h-10 rounded-lg text-[10px] font-bold uppercase transition-all shadow-sm",
                                                 page === p
-                                                    ? "bg-primary-main shadow-xl shadow-primary-main/20 ring-4 ring-primary-main/5 active:scale-95"
-                                                    : "bg-surface-paper dark:bg-zinc-900 text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 border border-zinc-100 dark:border-zinc-800"
+                                                    ? "bg-primary text-primary-foreground shadow-xl shadow-primary/20 ring-4 ring-primary/5 active:scale-95"
+                                                    : "bg-card text-muted-foreground hover:bg-muted border border-border"
                                             )}
                                         >
                                             {p.toString().padStart(2, '0')}
@@ -195,7 +195,7 @@ const Table = <T extends { id: string | number }>({
                             <button
                                 disabled={page === totalPages}
                                 onClick={() => onPageChange(page + 1)}
-                                className="p-3 rounded-radius-medium border border-zinc-100 dark:border-zinc-800 bg-surface-paper dark:bg-zinc-900 text-zinc-500 hover:text-primary-main disabled:opacity-30 transition-all active:scale-95 shadow-sm"
+                                className="p-3 rounded-lg border border-border bg-card text-muted-foreground hover:text-primary disabled:opacity-30 transition-all active:scale-95 shadow-sm"
                             >
                                 <ChevronRight className="w-5 h-5" />
                             </button>
@@ -204,6 +204,7 @@ const Table = <T extends { id: string | number }>({
                 </div>
             )}
         </div>
+
     );
 };
 

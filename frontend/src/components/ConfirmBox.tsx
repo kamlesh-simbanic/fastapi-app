@@ -32,27 +32,27 @@ export const ConfirmBox: React.FC<ConfirmBoxProps> = ({
     const variants = {
         danger: {
             icon: Trash2,
-            iconClass: 'bg-red-500/10 text-red-500',
-            buttonClass: 'bg-red-500 hover:bg-red-600 shadow-red-500/20',
-            borderClass: 'border-red-500/30'
+            iconClass: 'bg-destructive/10 text-destructive',
+            buttonClass: 'bg-destructive hover:bg-destructive/90 shadow-destructive/20',
+            borderClass: 'border-destructive/30'
         },
         warning: {
             icon: AlertTriangle,
-            iconClass: 'bg-amber-500/10 text-amber-500',
-            buttonClass: 'bg-amber-500 hover:bg-amber-600 shadow-amber-500/20',
-            borderClass: 'border-amber-500/30'
+            iconClass: 'bg-warning/10 text-warning',
+            buttonClass: 'bg-warning hover:bg-warning/90 shadow-warning/20',
+            borderClass: 'border-warning/30'
         },
         info: {
             icon: Info,
-            iconClass: 'bg-indigo-500/10 text-indigo-500',
-            buttonClass: 'bg-indigo-500 hover:bg-indigo-600 shadow-indigo-500/20',
-            borderClass: 'border-indigo-500/30'
+            iconClass: 'bg-primary/10 text-primary',
+            buttonClass: 'bg-primary hover:bg-primary/90 shadow-primary/20',
+            borderClass: 'border-primary/30'
         },
         success: {
             icon: CheckCircle,
-            iconClass: 'bg-emerald-500/10 text-emerald-500',
-            buttonClass: 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20',
-            borderClass: 'border-emerald-500/30'
+            iconClass: 'bg-success/10 text-success',
+            buttonClass: 'bg-success hover:bg-success/90 shadow-success/20',
+            borderClass: 'border-success/30'
         }
     };
 
@@ -62,20 +62,20 @@ export const ConfirmBox: React.FC<ConfirmBoxProps> = ({
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             {/* Backdrop */}
             <div
-                className="absolute inset-0 bg-zinc-950/40 backdrop-blur-md animate-in fade-in duration-300"
+                className="absolute inset-0 bg-background/60 backdrop-blur-md animate-in fade-in duration-300"
                 onClick={onCancel}
             />
 
             {/* Modal Container */}
             <div className={cn(
-                "relative bg-white dark:bg-zinc-900 w-full max-w-sm rounded-[2.5rem] border overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300",
+                "relative bg-card w-full max-w-sm rounded-[2.5rem] border overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300",
                 borderClass,
-                "dark:border-zinc-800"
+                "border-border"
             )}>
                 {/* Close Button */}
                 <button
                     onClick={onCancel}
-                    className="absolute top-6 right-6 p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-zinc-400"
+                    className="absolute top-6 right-6 p-2 rounded-full hover:bg-muted transition-colors text-muted-foreground"
                 >
                     <X className="w-5 h-5" />
                 </button>
@@ -87,8 +87,8 @@ export const ConfirmBox: React.FC<ConfirmBoxProps> = ({
                             <Icon className="w-8 h-8" />
                         </div>
                         <div className="space-y-1">
-                            <h2 className="text-xl font-black text-zinc-900 dark:text-white uppercase tracking-tight">{title}</h2>
-                            <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 max-w-[240px] leading-relaxed italic">{description}</p>
+                            <h2 className="text-xl font-black text-foreground uppercase tracking-tight">{title}</h2>
+                            <p className="text-sm font-medium text-muted-foreground max-w-[240px] leading-relaxed italic">{description}</p>
                         </div>
                     </div>
 
@@ -98,13 +98,13 @@ export const ConfirmBox: React.FC<ConfirmBoxProps> = ({
                             onClick={onConfirm}
                             disabled={loading}
                             className={cn(
-                                "w-full py-4 rounded-2xl text-white text-xs font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg flex items-center justify-center gap-2",
+                                "w-full py-4 rounded-2xl text-primary-foreground text-xs font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg flex items-center justify-center gap-2",
                                 buttonClass,
                                 loading && "opacity-50 cursor-not-allowed active:scale-100"
                             )}
                         >
                             {loading ? (
-                                <Loader2 className="w-4 h-4 animate-spin text-white" />
+                                <Loader2 className="w-4 h-4 animate-spin text-primary-foreground" />
                             ) : (
                                 confirmText
                             )}
@@ -112,7 +112,7 @@ export const ConfirmBox: React.FC<ConfirmBoxProps> = ({
                         <button
                             onClick={onCancel}
                             disabled={loading}
-                            className="w-full py-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950 text-zinc-500 dark:text-zinc-400 text-xs font-black uppercase tracking-widest hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all active:scale-95 border border-zinc-100 dark:border-zinc-800"
+                            className="w-full py-4 rounded-2xl bg-secondary text-secondary-foreground text-xs font-black uppercase tracking-widest hover:bg-muted transition-all active:scale-95 border border-border"
                         >
                             {cancelText}
                         </button>
@@ -120,5 +120,6 @@ export const ConfirmBox: React.FC<ConfirmBoxProps> = ({
                 </div>
             </div>
         </div>
+
     );
 };

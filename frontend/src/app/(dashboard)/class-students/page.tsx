@@ -144,13 +144,13 @@ export default function ClassStudentsPage() {
             {/* Header */}
             <section className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="space-y-1">
-                    <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-2xl bg-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                    <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-2xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
                             <Users className="w-6 h-6 text-white" />
                         </div>
                         Class Student Assignment
                     </h1>
-                    <p className="text-zinc-500 dark:text-zinc-400 text-sm font-medium">Manage student groups for each class and academic year.</p>
+                    <p className="text-muted-foreground text-sm font-medium">Manage student groups for each class and academic year.</p>
                 </div>
 
                 <button
@@ -159,7 +159,7 @@ export default function ClassStudentsPage() {
                         setFormData({ academic_year: academicYear, class_id: '', students_raw: '' });
                         setIsAddOpen(true);
                     }}
-                    className="px-4 py-2 bg-indigo-500 text-white rounded-xl text-sm font-bold hover:bg-indigo-600 shadow-lg shadow-indigo-500/20 active:scale-95 transition-all flex items-center gap-2"
+                    className="px-4 py-2 bg-primary text-white rounded-xl text-sm font-bold hover:bg-primary/90 shadow-lg shadow-primary/20 active:scale-95 transition-all flex items-center gap-2"
                 >
                     <Plus className="w-4 h-4" />
                     New Assignment
@@ -167,42 +167,42 @@ export default function ClassStudentsPage() {
             </section>
 
             {/* Filters */}
-            <section className="flex flex-col sm:flex-row items-center gap-4 bg-white dark:bg-zinc-900 p-4 rounded-[2rem] border border-zinc-200 dark:border-zinc-800 shadow-sm">
+            <section className="flex flex-col sm:flex-row items-center gap-4 bg-card p-4 rounded-[2rem] border border-border shadow-sm">
                 <div className="flex items-center gap-3 flex-1 w-full">
-                    <Filter className="w-5 h-5 text-indigo-500 ml-2" />
+                    <Filter className="w-5 h-5 text-primary ml-2" />
                     <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="relative">
                             <select
                                 value={academicYear}
                                 onChange={(e) => setAcademicYear(e.target.value)}
-                                className="w-full appearance-none bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 pl-4 pr-10 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all cursor-pointer"
+                                className="w-full appearance-none bg-zinc-50 dark:bg-zinc-800/50 border border-border rounded-xl py-2.5 pl-4 pr-10 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer"
                             >
                                 <option value="2024-25">Academic Year: 2024-25</option>
                                 <option value="2025-26">Academic Year: 2025-26</option>
                                 <option value="2026-27">Academic Year: 2026-27</option>
                             </select>
-                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
+                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                         </div>
 
                         <div className="relative">
                             <select
                                 value={classFilter}
                                 onChange={(e) => setClassFilter(e.target.value)}
-                                className="w-full appearance-none bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 pl-4 pr-10 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all cursor-pointer"
+                                className="w-full appearance-none bg-zinc-50 dark:bg-zinc-800/50 border border-border rounded-xl py-2.5 pl-4 pr-10 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer"
                             >
                                 <option value="">All Classes</option>
                                 {classes.map(c => (
                                     <option key={c.id} value={c.id}>{c.standard} - {c.division}</option>
                                 ))}
                             </select>
-                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
+                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                         </div>
                     </div>
                 </div>
             </section>
 
             {error && (
-                <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center gap-3 text-red-500 animate-in slide-in-from-top-2">
+                <div className="p-4 rounded-2xl bg-destructive/10 border border-destructive/20 flex items-center gap-3 text-destructive animate-in slide-in-from-top-2">
                     <AlertCircle className="w-5 h-5 flex-shrink-0" />
                     <p className="text-sm font-bold">{error}</p>
                 </div>
@@ -211,15 +211,15 @@ export default function ClassStudentsPage() {
             {/* Main Content */}
             <div className="min-h-[400px]">
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center py-32 gap-4 text-zinc-500">
-                        <Loader2 className="w-12 h-12 text-indigo-500 animate-spin" />
+                    <div className="flex flex-col items-center justify-center py-32 gap-4 text-muted-foreground">
+                        <Loader2 className="w-12 h-12 text-primary animate-spin" />
                         <p className="font-bold text-sm tracking-widest uppercase opacity-70">Loading assignments...</p>
                     </div>
                 ) : filteredMappings.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-20 gap-4 bg-zinc-50 dark:bg-zinc-900/30 rounded-[3rem] border border-dashed border-zinc-200 dark:border-zinc-800 text-center">
+                    <div className="flex flex-col items-center justify-center py-20 gap-4 bg-muted/50 rounded-[3rem] border border-dashed border-border text-center">
                         <Users className="w-12 h-12 text-zinc-300" />
-                        <h3 className="text-lg font-bold text-zinc-900 dark:text-white">No assignments found</h3>
-                        <p className="text-zinc-500 text-sm max-w-xs">No students have been assigned to classes for this year yet.</p>
+                        <h3 className="text-lg font-bold text-foreground">No assignments found</h3>
+                        <p className="text-muted-foreground text-sm max-w-xs">No students have been assigned to classes for this year yet.</p>
                     </div>
                 ) : (
                     <Table
@@ -242,58 +242,58 @@ export default function ClassStudentsPage() {
             {/* Add/Edit Dialog */}
             {isAddOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-white dark:bg-zinc-950 w-full max-w-lg rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
-                        <div className="p-8 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
-                            <h2 className="text-xl font-black text-zinc-900 dark:text-white flex items-center gap-3">
-                                <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-500">
+                    <div className="bg-card w-full max-w-lg rounded-[2.5rem] border border-border shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+                        <div className="p-8 border-b border-zinc-100 dark:border-border flex items-center justify-between">
+                            <h2 className="text-xl font-black text-foreground flex items-center gap-3">
+                                <div className="p-2 rounded-xl bg-primary/10 text-primary">
                                     <Users className="w-5 h-5" />
                                 </div>
                                 {editingMapping ? 'Edit Assignment' : 'New Assignment'}
                             </h2>
-                            <button onClick={() => setIsAddOpen(false)} className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-xl transition-colors"><X className="w-5 h-5" /></button>
+                            <button onClick={() => setIsAddOpen(false)} className="p-2 hover:bg-secondary dark:hover:bg-zinc-900 rounded-xl transition-colors"><X className="w-5 h-5" /></button>
                         </div>
 
                         <form onSubmit={handleSubmit} className="p-8 space-y-6">
                             <div className="space-y-4">
                                 <div>
-                                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2 block">Academic Year</label>
+                                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2 block">Academic Year</label>
                                     <input
                                         required
                                         type="text"
                                         placeholder="e.g. 2025-26"
                                         value={formData.academic_year}
                                         onChange={(e) => setFormData({ ...formData, academic_year: e.target.value })}
-                                        className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-3 px-4 text-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-bold"
+                                        className="w-full bg-muted/50 border border-border rounded-2xl py-3 px-4 text-sm focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all font-bold"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2 block">Class</label>
+                                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2 block">Class</label>
                                     <div className="relative group">
                                         <select
                                             required
                                             value={formData.class_id}
                                             onChange={(e) => setFormData({ ...formData, class_id: e.target.value })}
-                                            className="w-full appearance-none bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-3 px-4 pr-10 text-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-bold text-zinc-700 dark:text-zinc-300 cursor-pointer"
+                                            className="w-full appearance-none bg-muted/50 border border-border rounded-2xl py-3 px-4 pr-10 text-sm focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all font-bold text-foreground cursor-pointer"
                                         >
                                             <option value="">Select a class</option>
                                             {classes.map((c) => (
                                                 <option key={c.id} value={c.id}>{c.standard} - {c.division}</option>
                                             ))}
                                         </select>
-                                        <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
+                                        <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2 block">Student IDs (Comma separated)</label>
+                                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2 block">Student IDs (Comma separated)</label>
                                     <textarea
                                         required
                                         rows={4}
                                         placeholder="e.g. 101, 102, 103"
                                         value={formData.students_raw}
                                         onChange={(e) => setFormData({ ...formData, students_raw: e.target.value })}
-                                        className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-3 px-4 text-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-bold resize-none"
+                                        className="w-full bg-muted/50 border border-border rounded-2xl py-3 px-4 text-sm focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all font-bold resize-none"
                                     />
                                 </div>
                             </div>
@@ -302,14 +302,14 @@ export default function ClassStudentsPage() {
                                 <button
                                     type="button"
                                     onClick={() => setIsAddOpen(false)}
-                                    className="flex-1 py-3.5 rounded-2xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-black uppercase tracking-widest hover:bg-zinc-200 transition-all"
+                                    className="flex-1 py-3.5 rounded-2xl bg-secondary text-muted-foreground dark:text-muted-foreground text-xs font-black uppercase tracking-widest hover:bg-secondary/80 transition-all"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={submitting}
-                                    className="flex-1 py-3.5 rounded-2xl bg-indigo-500 text-white text-xs font-black uppercase tracking-widest hover:bg-indigo-600 shadow-lg shadow-indigo-500/20 active:scale-95 transition-all flex items-center justify-center gap-2"
+                                    className="flex-1 py-3.5 rounded-2xl bg-primary text-white text-xs font-black uppercase tracking-widest hover:bg-primary/90 shadow-lg shadow-primary/20 active:scale-95 transition-all flex items-center justify-center gap-2"
                                 >
                                     {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : (editingMapping ? 'Update Assignment' : 'Create Assignment')}
                                 </button>

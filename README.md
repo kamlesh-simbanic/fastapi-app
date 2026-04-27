@@ -36,6 +36,34 @@ A comprehensive, modular school management application built with a FastAPI back
 - **Git Hooks**: [Husky](https://typicode.github.io/husky/) & [lint-staged](https://github.com/lint-staged/lint-staged)
 - **CI/CD**: GitHub Actions (Linting, Testing, QA Deployment)
 
+## 🎨 Design & Theming
+
+The application features a modern, premium design system built with **Tailwind v4** and structured around semantic CSS variables.
+
+### Key Principles
+- **Semantic Tokenization**: Instead of hardcoded color values, the UI strictly uses semantic tokens (e.g., `primary`, `secondary`, `card`, `muted`, `background`, `foreground`).
+- **Mode-Aware Surfaces**: All surfaces and text colors automatically adapt to Light and Dark modes using `next-themes`.
+- **Vibrant Aesthetic**: Utilizes a curated HSL-based palette with smooth gradients and glassmorphism (backdrop-blur) for a professional look.
+
+### Theme Configuration
+The theme is defined in `frontend/src/app/globals.css` within the Tailwind `@theme` block.
+
+| Token | Usage | Light Value | Dark Value |
+| :--- | :--- | :--- | :--- |
+| `primary` | Main actions, highlights | Indigo (vibrant) | Indigo (vibrant) |
+| `secondary` | Secondary surfaces, buttons | Zinc-100 | Zinc-800 |
+| `accent` | Decorative accents, branding | Purple | Purple |
+| `background` | Page background | White | Black (#0a0a0a) |
+| `card` | Container surfaces | White (bordered) | Zinc-900/50 |
+| `muted` | De-emphasized info | Zinc-50 | Zinc-900/30 |
+| `border` | Dividers and outlines | Zinc-200 | Zinc-800 |
+
+### Component Development
+When building new components, always prefer semantic classes:
+- **Backgrounds**: `bg-background`, `bg-card`, `bg-secondary`
+- **Text**: `text-foreground`, `text-muted-foreground`, `text-primary`
+- **Borders**: `border-border`
+
 ## 📁 Project Structure
 
 ```text

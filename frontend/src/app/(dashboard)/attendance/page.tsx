@@ -182,40 +182,40 @@ export default function AttendancePage() {
             {/* Header */}
             <section className="flex flex-col md:flex-row md:items-center justify-between gap-6 font-space">
                 <div className="space-y-1">
-                    <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-2xl bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                            <ClipboardCheck className="w-6 h-6 text-white" />
+                    <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-2xl bg-success flex items-center justify-center shadow-lg shadow-success/20">
+                            <ClipboardCheck className="w-6 h-6 text-success-foreground" />
                         </div>
                         Mark Attendance
                     </h1>
-                    <p className="text-zinc-500 dark:text-zinc-400 text-sm font-medium">Record daily student attendance by class.</p>
+                    <p className="text-muted-foreground text-sm font-medium">Record daily student attendance by class.</p>
                 </div>
 
                 <Link
                     href="/attendance/report"
-                    className="px-6 py-3 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-zinc-200 transition-all flex items-center gap-2 group"
+                    className="px-6 py-3 bg-secondary text-secondary-foreground rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-muted transition-all flex items-center gap-2 group"
                 >
-                    <FileText className="w-4 h-4 text-indigo-500 group-hover:scale-110 transition-transform" />
+                    <FileText className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
                     Monthly Report
                 </Link>
             </section>
 
             {error && (
-                <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center gap-3 text-red-500 animate-in slide-in-from-top-2">
+                <div className="p-4 rounded-2xl bg-destructive/10 border border-destructive/20 flex items-center gap-3 text-destructive animate-in slide-in-from-top-2">
                     <AlertCircle className="w-5 h-5 flex-shrink-0" />
                     <p className="text-sm font-bold">{error}</p>
                 </div>
             )}
 
             {success && (
-                <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-3 text-emerald-600 animate-in slide-in-from-top-2">
+                <div className="p-4 rounded-2xl bg-success/10 border border-success/20 flex items-center gap-3 text-success animate-in slide-in-from-top-2">
                     <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
                     <p className="text-sm font-bold">{success}</p>
                 </div>
             )}
 
             {/* Selection Controls */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white dark:bg-zinc-900 p-8 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all duration-300">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-card p-8 rounded-[2.5rem] border border-border shadow-sm transition-all duration-300">
                 <div className="space-y-2">
                     <CalendarPicker
                         label="Date"
@@ -234,7 +234,7 @@ export default function AttendancePage() {
                 <div className="space-y-2">
                     <label
                         htmlFor="class-select"
-                        className="text-[10px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2"
+                        className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2"
                     >
                         <Users className="w-3 h-3" /> Select Class
                     </label>
@@ -244,7 +244,7 @@ export default function AttendancePage() {
                             value={selectedClass}
                             onChange={(e) => setSelectedClass(e.target.value)}
                             disabled={classesLoading}
-                            className="w-full appearance-none bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-3 px-4 pr-10 text-sm focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-bold text-zinc-700 dark:text-zinc-300 cursor-pointer disabled:opacity-50"
+                            className="w-full appearance-none bg-muted/50 border border-border rounded-2xl py-3 px-4 pr-10 text-sm focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all font-bold text-foreground cursor-pointer disabled:opacity-50"
                         >
                             <option value="">Choose a class...</option>
                             {classes.map((cls) => (
@@ -253,7 +253,7 @@ export default function AttendancePage() {
                                 </option>
                             ))}
                         </select>
-                        <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
+                        <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                     </div>
                 </div>
             </div>
@@ -261,43 +261,43 @@ export default function AttendancePage() {
             {/* Student List */}
             <div className="min-h-[400px]">
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center py-32 gap-4 text-zinc-500 animate-in fade-in duration-500">
-                        <Loader2 className="w-12 h-12 text-emerald-500 animate-spin" />
+                    <div className="flex flex-col items-center justify-center py-32 gap-4 text-muted-foreground animate-in fade-in duration-500">
+                        <Loader2 className="w-12 h-12 text-primary animate-spin" />
                         <p className="font-bold text-sm tracking-widest uppercase opacity-70">Loading student roster...</p>
                     </div>
                 ) : students.length === 0 ? (
                     selectedClass ? (
-                        <div className="flex flex-col items-center justify-center py-20 gap-4 bg-zinc-50 dark:bg-zinc-900/30 rounded-3xl border border-dashed border-zinc-200 dark:border-zinc-800 text-center">
-                            <Users className="w-12 h-12 text-zinc-300" />
-                            <h3 className="text-lg font-bold text-zinc-900 dark:text-white">No students found</h3>
-                            <p className="text-zinc-500 text-sm max-w-xs">There are no students mapped to this class yet.</p>
+                        <div className="flex flex-col items-center justify-center py-20 gap-4 bg-muted/30 rounded-3xl border border-dashed border-border text-center">
+                            <Users className="w-12 h-12 text-muted-foreground/30" />
+                            <h3 className="text-lg font-bold text-foreground">No students found</h3>
+                            <p className="text-muted-foreground text-sm max-w-xs">There are no students mapped to this class yet.</p>
                         </div>
                     ) : (
-                        <div className="flex flex-col items-center justify-center py-32 gap-6 bg-zinc-50 dark:bg-zinc-900/30 rounded-[3rem] border border-dashed border-zinc-200 dark:border-zinc-800 text-center animate-in fade-in duration-700">
-                            <div className="w-20 h-20 rounded-full bg-emerald-500/5 flex items-center justify-center">
-                                <Users className="w-10 h-10 text-emerald-500/40" />
+                        <div className="flex flex-col items-center justify-center py-32 gap-6 bg-muted/30 rounded-[3rem] border border-dashed border-border text-center animate-in fade-in duration-700">
+                            <div className="w-20 h-20 rounded-full bg-primary/5 flex items-center justify-center">
+                                <Users className="w-10 h-10 text-primary/40" />
                             </div>
                             <div>
-                                <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2">Ready to start?</h3>
-                                <p className="text-zinc-500 text-sm max-w-sm mx-auto">Select a class from the dropdown above to load the student list and mark attendance.</p>
+                                <h3 className="text-xl font-bold text-foreground mb-2">Ready to start?</h3>
+                                <p className="text-muted-foreground text-sm max-w-sm mx-auto">Select a class from the dropdown above to load the student list and mark attendance.</p>
                             </div>
                         </div>
                     )
                 ) : (
                     <div className="space-y-6">
                         <div className="flex items-center justify-between px-4">
-                            <h2 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">Student Roster ({students.length})</h2>
+                            <h2 className="text-lg font-bold text-foreground tracking-tight">Student Roster ({students.length})</h2>
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => toggleAll(true)}
-                                    className="text-[10px] font-black text-emerald-600 uppercase tracking-widest hover:underline"
+                                    className="text-[10px] font-black text-success uppercase tracking-widest hover:underline"
                                 >
                                     Mark All Present
                                 </button>
-                                <span className="text-zinc-300">•</span>
+                                <span className="text-muted-foreground/30">•</span>
                                 <button
                                     onClick={() => toggleAll(false)}
-                                    className="text-[10px] font-black text-red-500 uppercase tracking-widest hover:underline"
+                                    className="text-[10px] font-black text-destructive uppercase tracking-widest hover:underline"
                                 >
                                     Mark All Absent
                                 </button>
@@ -318,10 +318,10 @@ export default function AttendancePage() {
                             <button
                                 onClick={handleSubmit}
                                 disabled={submitting || checkIsInvalidDate(date).invalid}
-                                className="px-8 py-4 bg-emerald-500 text-white rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-emerald-600 shadow-xl shadow-emerald-500/20 active:scale-95 transition-all flex items-center gap-3 disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed"
+                                className="px-8 py-4 bg-primary text-primary-foreground rounded-2xl text-sm font-black uppercase tracking-widest hover:opacity-90 shadow-xl shadow-primary/20 active:scale-95 transition-all flex items-center gap-3 disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed"
                             >
                                 {submitting ? (
-                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                    <Loader2 className="w-5 h-5 animate-spin text-primary-foreground" />
                                 ) : (
                                     <>
                                         <Save className="w-5 h-5" />
@@ -333,6 +333,6 @@ export default function AttendancePage() {
                     </div>
                 )}
             </div>
-        </div>
+        </div >
     );
 }

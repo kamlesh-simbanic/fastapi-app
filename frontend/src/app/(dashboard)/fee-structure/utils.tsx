@@ -16,21 +16,21 @@ export const getFeeStructureColumns = ({
             key: 'class',
             label: 'Class',
             sortable: true,
-            className: 'font-black text-zinc-900 dark:text-white capitalize',
+            className: 'font-black text-foreground capitalize',
             render: (fee) => fee.school_class ? `${fee.school_class.standard} - ${fee.school_class.division}` : 'Unknown Class'
         },
         {
             key: 'year',
             label: 'Academic Year',
             sortable: true,
-            className: 'font-bold text-zinc-600 dark:text-zinc-400',
+            className: 'font-bold text-muted-foreground dark:text-muted-foreground',
             render: (fee) => fee.year
         },
         {
             key: 'fee_amount',
             label: 'Fee Amount',
             sortable: true,
-            className: 'font-black text-zinc-600 dark:text-zinc-400',
+            className: 'font-black text-muted-foreground dark:text-muted-foreground',
             render: (fee) => `$${fee.fee_amount.toLocaleString()}`
         },
         {
@@ -39,10 +39,10 @@ export const getFeeStructureColumns = ({
             className: 'text-right',
             render: (fee) => (
                 <div className="flex items-center justify-end gap-2">
-                    <button onClick={() => onEdit(fee)} className="p-2 text-zinc-400 hover:text-indigo-500 hover:bg-white dark:hover:bg-zinc-800 rounded-xl transition-all shadow-sm">
+                    <button onClick={() => onEdit(fee)} className="p-2 text-muted-foreground hover:text-primary hover:bg-white dark:hover:bg-zinc-800 rounded-xl transition-all shadow-sm">
                         <Edit2 className="w-4 h-4" />
                     </button>
-                    <button onClick={() => onDelete(fee.id)} className="p-2 text-zinc-400 hover:text-red-500 hover:bg-white dark:hover:bg-zinc-800 rounded-xl transition-all shadow-sm">
+                    <button onClick={() => onDelete(fee.id)} className="p-2 text-muted-foreground hover:text-destructive hover:bg-white dark:hover:bg-zinc-800 rounded-xl transition-all shadow-sm">
                         <Trash2 className="w-4 h-4" />
                     </button>
                 </div>

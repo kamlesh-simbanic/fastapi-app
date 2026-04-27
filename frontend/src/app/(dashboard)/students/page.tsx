@@ -99,17 +99,17 @@ export default function StudentsPage() {
             {/* Toolbar */}
             <section className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="space-y-1">
-                    <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-2xl bg-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                            <GraduationCap className="w-6 h-6 text-white" />
+                    <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-2xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+                            <GraduationCap className="w-6 h-6 text-primary-foreground" />
                         </div>
                         Student Directory
                     </h1>
-                    <p className="text-zinc-500 dark:text-zinc-400 text-sm font-medium">Manage student academic records and admissions.</p>
+                    <p className="text-muted-foreground text-sm font-medium">Manage student academic records and admissions.</p>
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <Link href="/students/add" className="px-4 py-2 bg-indigo-500 text-white rounded-xl text-sm font-bold hover:bg-indigo-600 shadow-lg shadow-indigo-500/20 active:scale-95 transition-all flex items-center gap-2">
+                    <Link href="/students/add" className="px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-bold hover:opacity-90 shadow-lg shadow-primary/20 active:scale-95 transition-all flex items-center gap-2">
                         <Users className="w-4 h-4" />
                         Add Student
                     </Link>
@@ -119,15 +119,15 @@ export default function StudentsPage() {
             {/* Filters */}
             <section className="flex flex-col sm:flex-row items-center gap-4">
                 <div className="relative group flex-1">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                     <input
                         type="text"
                         placeholder="Search by name, GR number, or surname..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-3.5 pl-12 pr-12 text-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-sm"
+                        className="w-full bg-card border border-border rounded-2xl py-3.5 pl-12 pr-12 text-sm focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-sm"
                     />
-                    {search && <button onClick={() => setSearch('')} className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 hover:bg-zinc-100 rounded-xl text-zinc-400"><X className="w-4 h-4" /></button>}
+                    {search && <button onClick={() => setSearch('')} className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 hover:bg-muted rounded-xl text-muted-foreground"><X className="w-4 h-4" /></button>}
                 </div>
 
                 <div className="flex items-center gap-3 w-full sm:w-auto">
@@ -135,17 +135,17 @@ export default function StudentsPage() {
                         <select
                             value={sortBy}
                             onChange={(e) => setSortBy(e.target.value)}
-                            className="w-full sm:w-auto appearance-none bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl px-5 py-3.5 pr-12 text-sm font-bold text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer shadow-sm"
+                            className="w-full sm:w-auto appearance-none bg-card border border-border rounded-2xl px-5 py-3.5 pr-12 text-sm font-bold text-foreground focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all cursor-pointer shadow-sm"
                         >
                             {SORT_OPTIONS.map(opt => (
                                 <option key={opt.value} value={opt.value}>Sort by: {opt.label}</option>
                             ))}
                         </select>
-                        <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 pointer-events-none" />
+                        <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                     </div>
                     <button
                         onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
-                        className="p-3.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors shadow-sm active:scale-95 text-indigo-500"
+                        className="p-3.5 bg-card border border-border rounded-2xl hover:bg-muted transition-colors shadow-sm active:scale-95 text-primary"
                     >
                         {sortOrder === 'asc' ? <ArrowUp className="w-5 h-5" /> : <ArrowDown className="w-5 h-5" />}
                     </button>
@@ -155,23 +155,24 @@ export default function StudentsPage() {
             {/* Main Content */}
             <div className="min-h-[400px]">
                 {error && (
-                    <div className="mb-8 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center gap-3 text-red-500 animate-in slide-in-from-top-2">
+                    <div className="mb-8 p-4 rounded-2xl bg-destructive/10 border border-destructive/20 flex items-center gap-3 text-destructive animate-in slide-in-from-top-2">
                         <X className="w-5 h-5 flex-shrink-0 cursor-pointer" onClick={() => setError(null)} />
                         <p className="text-sm font-bold uppercase tracking-tight">{error}</p>
                     </div>
                 )}
 
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center py-32 gap-4 text-zinc-500 animate-in fade-in duration-500">
-                        <Loader2 className="w-12 h-12 text-indigo-500 animate-spin" />
+                    <div className="flex flex-col items-center justify-center py-32 gap-4 text-muted-foreground animate-in fade-in duration-500">
+                        <Loader2 className="w-12 h-12 text-primary animate-spin" />
                         <p className="font-bold text-sm tracking-widest uppercase opacity-70">Synchronizing Students...</p>
                     </div>
                 ) : students.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-20 gap-4 bg-zinc-50 dark:bg-zinc-900/30 rounded-3xl border border-dashed border-zinc-200 dark:border-zinc-800 text-center">
-                        <Users className="w-12 h-12 text-zinc-300" />
-                        <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Empty Directory</h3>
-                        <button onClick={() => { setSearch(''); }} className="text-indigo-500 text-sm font-bold hover:underline">Clear search filter</button>
+                    <div className="flex flex-col items-center justify-center py-20 gap-4 bg-muted/30 rounded-3xl border border-dashed border-border text-center">
+                        <Users className="w-12 h-12 text-muted-foreground/30" />
+                        <h3 className="text-lg font-bold text-foreground">Empty Directory</h3>
+                        <button onClick={() => { setSearch(''); }} className="text-primary text-sm font-bold hover:underline">Clear search filter</button>
                     </div>
+
                 ) : (
                     <Table
                         columns={STUDENT_COLUMNS}
