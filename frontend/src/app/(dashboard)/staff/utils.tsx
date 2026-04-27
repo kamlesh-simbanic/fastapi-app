@@ -11,7 +11,7 @@ export const STAFF_COLUMNS: Column<Staff>[] = [
         key: 'name',
         label: 'Name',
         sortable: true,
-        className: 'font-bold text-zinc-900 dark:text-white text-sm'
+        className: 'font-bold text-foreground text-sm'
     },
     {
         key: 'department',
@@ -26,14 +26,14 @@ export const STAFF_COLUMNS: Column<Staff>[] = [
         key: 'qualification',
         label: 'Degree',
         sortable: true,
-        className: 'text-xs font-medium text-zinc-500'
+        className: 'text-xs font-medium text-muted-foreground'
     },
     {
         key: 'contact',
         label: 'Contact Info',
         render: (member) => (
-            <div className="text-[11px] text-zinc-400">
-                <div className="text-zinc-600 dark:text-zinc-300 font-medium">{member.email}</div>
+            <div className="text-[11px] text-muted-foreground">
+                <div className="text-muted-foreground dark:text-zinc-300 font-medium">{member.email}</div>
                 <div>{member.mobile}</div>
             </div>
         )
@@ -42,14 +42,14 @@ export const STAFF_COLUMNS: Column<Staff>[] = [
         key: 'city',
         label: 'City',
         sortable: true,
-        className: 'text-xs text-zinc-500'
+        className: 'text-xs text-muted-foreground'
     },
     {
         key: 'created_at',
         label: 'Joined',
         sortable: true,
         render: (member) => (
-            <span className="text-xs text-zinc-500">
+            <span className="text-xs text-muted-foreground">
                 {new Date(member.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
             </span>
         )
@@ -60,7 +60,7 @@ export const STAFF_COLUMNS: Column<Staff>[] = [
         className: 'text-right',
         render: (member) => (
             <div className="flex items-center justify-end gap-1">
-                <Link href={`/staff/edit?id=${member.id}`} className="p-2 text-zinc-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-xl transition-all shadow-sm group">
+                <Link href={`/staff/edit?id=${member.id}`} className="p-2 text-muted-foreground hover:text-primary hover:bg-primary dark:hover:bg-primary/10 rounded-xl transition-all shadow-sm group">
                     <Pencil className="w-4 h-4 transition-transform group-hover:scale-110" />
                 </Link>
             </div>

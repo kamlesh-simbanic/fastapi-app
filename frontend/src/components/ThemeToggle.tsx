@@ -15,7 +15,7 @@ export function ThemeToggle() {
 
     if (!mounted) {
         return (
-            <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 animate-pulse" />
+            <div className="w-10 h-10 rounded-xl bg-muted border border-border animate-pulse" />
         );
     }
 
@@ -24,7 +24,7 @@ export function ThemeToggle() {
     return (
         <button
             onClick={() => setTheme(isDark ? 'light' : 'dark')}
-            className="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-500/50 transition-all active:scale-95 shadow-lg shadow-black/5 dark:shadow-black/20"
+            className="p-2.5 rounded-xl bg-card border border-border text-muted-foreground hover:text-primary hover:border-primary/50 transition-all active:scale-95 shadow-lg shadow-black/5 dark:shadow-black/20"
             aria-label="Toggle theme"
         >
             {isDark ? (
@@ -35,3 +35,4 @@ export function ThemeToggle() {
         </button>
     );
 }
+

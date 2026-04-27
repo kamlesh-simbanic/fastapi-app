@@ -32,8 +32,8 @@ export default function AuthenticatedLayout({
         return (
             <div className="min-h-screen bg-background flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
-                    <Layers className="w-12 h-12 text-indigo-500 animate-pulse" />
-                    <p className="text-zinc-500 text-sm font-medium animate-pulse">Authenticating...</p>
+                    <Layers className="w-12 h-12 text-primary animate-pulse" />
+                    <p className="text-muted-foreground text-sm font-medium animate-pulse">Authenticating...</p>
                 </div>
             </div>
         );

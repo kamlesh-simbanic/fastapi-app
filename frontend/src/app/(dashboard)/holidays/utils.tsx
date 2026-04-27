@@ -13,7 +13,7 @@ export const getHolidayColumns = ({
         {
             key: 'name',
             label: 'Holiday Name',
-            className: 'text-sm font-bold text-zinc-900 dark:text-white uppercase tracking-tight',
+            className: 'text-sm font-bold text-foreground uppercase tracking-tight',
             render: (h) => (
                 <div className="flex items-center gap-3">
                     <div className="p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg text-amber-600 dark:text-amber-400">
@@ -28,7 +28,7 @@ export const getHolidayColumns = ({
             label: 'Date',
             sortable: true,
             render: (h) => (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 text-[10px] font-black uppercase text-zinc-500 tracking-wider">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary text-[10px] font-black uppercase text-muted-foreground tracking-wider">
                     <Clock className="w-3 h-3 text-amber-500" />
                     {new Date(h.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                 </span>
@@ -51,7 +51,7 @@ export const getHolidayColumns = ({
             render: (h) => (
                 <button
                     onClick={() => onDelete(h.id)}
-                    className="p-2 text-zinc-300 hover:text-red-500 transition-colors"
+                    className="p-2 text-zinc-300 hover:text-destructive transition-colors"
                 >
                     <Trash2 className="w-5 h-5" />
                 </button>
